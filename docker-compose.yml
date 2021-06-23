@@ -1,0 +1,114 @@
+version: '3.7'
+
+volumes:
+  static_volume:
+  media_volume:
+  local_postgres_data:
+
+services:
+  postgresdb:
+#    image: postgres:12.0-alpine
+    build:
+      context: ./compose/postgres/
+      dockerfile: Dockerfile
+    container_name: postgresdb
+    volumes:
+      - ./compose/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - local_postgres_data:/var/lib/postgresql/data:Z
+      #      - local_postgres_data_backups:/backups:z
+#    env_file:
+#      - .envs/.production/postgres.env
+    environment:
+      - POSTGRES_PASSWORD=cheburan-0
+    ports:
+      - "5432:5432"
+    restart: always
+
+  django: &django
+    build:
+      context: .
+      dockerfile: compose/django/Dockerfile
+    container_name: django
+    depends_on:
+      - postgresdb
+    volumes:
+      - .:/app:rw # map data and files from parent directory in host to microservice directory in docker container
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    env_file:
+      - .envs/.production/django.env
+      - .envs/.production/postgres.env
+    ports:
+      - "8000:8000"
+    expose:
+      - "8000"
+    command: make gunicorn-run
+    restart: always
+
+  nginx:
+    build:
+      context: ./compose/nginx/
+      dockerfile: Dockerfile
+    depends_on:
+      - django
+#      - redis
+    ports:
+      - "80:80"
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    restart: "on-failure"
+
+#  redis:
+#    image: "redis:alpine"
+#
+#  celery:
+#    restart: always
+#    build:
+#      context: .
+#    command: make worker
+#    depends_on:
+#      - web
+#      - redis
+#    ports:
+#      - "587:587"
+
+  redis:
+    image: redis:5.0
+    container_name: redis
+#
+  celeryworker:
+    <<: *django
+    container_name: celeryworker
+    volumes:
+      - .:/app:rw
+    depends_on:
+      - redis
+      - postgresdb
+#      - mailhog
+    ports: []
+    command: make celeryworker
+#
+  celerybeat:
+    <<: *django
+    container_name: celerybeat
+    volumes:
+      - .:/app:rw
+    depends_on:
+      - redis
+      - postgresdb
+#      - mailhog
+    ports: []
+    command: make celerybeat
+
+  flower:
+    <<: *django
+    container_name: flower
+    volumes:
+      - .:/app:rw
+    depends_on:
+      - redis
+      - postgresdb
+    ports:
+      - "5555:5555"
+    command: make flower

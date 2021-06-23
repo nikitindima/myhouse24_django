@@ -1,0 +1,4 @@
+CREATE USER roman WITH PASSWORD 'cheburan-0';
+
+CREATE DATABASE postgres_db;
+GRANT ALL PRIVILEGES ON DATABASE postgres_db TO roman;

@@ -1,0 +1,227 @@
+{% extends "site/elements/base.html" %}
+{% load static %}
+{% block content %}
+<div class="slider slick-initialized slick-slider slick-dotted"><i
+        class="fas fa-chevron-circle-left fa-3x slick-prev slick-arrow" style></i>
+  <div class="slick-list draggable">
+    <div class="slick-track" style="opacity: 1; width: 5600px; transform: translate3d(-800px, 0px, 0px);">
+      <div class="slick-slide slick-cloned" data-slick-index="-1" aria-hidden="true" tabindex="-1"
+           style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_6' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide slick-current slick-active" data-slick-index="0" aria-hidden="false" tabindex="0"
+           role="tabpanel" id="slick-slide00" aria-describedby="slick-slide-control00" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_3' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide" data-slick-index="1" aria-hidden="true" tabindex="-1" role="tabpanel" id="slick-slide01"
+           aria-describedby="slick-slide-control01" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_8' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide" data-slick-index="2" aria-hidden="true" tabindex="-1" role="tabpanel" id="slick-slide02"
+           aria-describedby="slick-slide-control02" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_6' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide slick-cloned" data-slick-index="3" aria-hidden="true" tabindex="-1" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_3' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide slick-cloned" data-slick-index="4" aria-hidden="true" tabindex="-1" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_8' %}" class="img-responsive" alt>
+      </div>
+      <div class="slick-slide slick-cloned" data-slick-index="5" aria-hidden="true" tabindex="-1" style="width: 800px;">
+        <div class="slideTitle hidden-xs"></div>
+        <img src="{% static 'site/images/jpg/glide_6' %}" class="img-responsive" alt>
+      </div>
+    </div>
+  </div>
+
+
+  <i class="fas fa-chevron-circle-right fa-3x slick-next slick-arrow" style></i>
+  <ul class="slick-dots" style role="tablist">
+    <li class="slick-active" role="presentation">
+      <button type="button" role="tab" id="slick-slide-control00" aria-controls="slick-slide00" aria-label="1 of 3"
+              tabindex="0" aria-selected="true">1
+      </button>
+    </li>
+    <li role="presentation">
+      <button type="button" role="tab" id="slick-slide-control01" aria-controls="slick-slide01" aria-label="2 of 3"
+              tabindex="-1">2
+      </button>
+    </li>
+    <li role="presentation">
+      <button type="button" role="tab" id="slick-slide-control02" aria-controls="slick-slide02" aria-label="3 of 3"
+              tabindex="-1">3
+      </button>
+    </li>
+  </ul>
+</div>
+
+<div class="info">
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-7 col-md-8">
+        <div class="page-header">
+          <h1></h1>
+        </div>
+        <div class="box">
+          <b></b>
+          <h3>О ЖИЛОМ КОМПЛЕКСЕ<br></h3>
+          <p>
+
+
+            Жилой комплекс «NORD» расположен на берегу Черного моря в живописном районе Одессы. Оригинальная архитектура
+            комплекса делает его уникальным объектом не только для Одессы, но и для всей Украины – дом прекрасно
+            вписывается в архитектуру берега и открывает свои жильцам и гостям прекрасный вид на бескрайнее море. Ярким
+            преимуществом жилого комплекса является его месторасположения – удобная транспортная развязка, социальная
+            инфраструктура, парк и прекрасный морской воздух создают все условия для комфортного проживания.
+
+
+            <br></p>
+          <p><b></b></p>
+          <div class="row">
+            <div class="col-xs-4">
+              <a href="/about" class="btn btn-primary">Подробнее</a>
+            </div>
+            <div class="col-xs-8">
+              <a href="https://itunes.apple.com/us/app/%D0%BC%D0%BE%D0%B9%D0%B4%D0%BE%D0%BC24/id1308075440?l=ru&amp;ls=1&amp;mt=8">
+                <img src="{% static 'site/images/png/appstore.png' %}" class="img-responsive imgStore" alt>
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=com.avadamedia.program.myhouse24&amp;hl=uk">
+                <img src="{% static 'site/images/png/googleplay.png' %}" class="img-responsive imgStore" alt>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-5 col-md-4">
+        <div class="page-header">
+          <h3>Контакты</h3>
+        </div>
+        <div class="box">
+          <p><i class="fas fa-user-circle"></i> AVADA-MEDIA</p>
+          <p><i class="fas fa-compass"></i> ул. Космонавтов, 32</p>
+          <p><i class="fas fa-map-marker"></i> Малиновский р-н, г. Одесса</p>
+          <p><i class="fas fa-phone"></i> <a href="tel:+380971799663">+38 (097) 179-96-63</a></p>
+          <p><i class="fas fa-envelope"></i> <a href="mailto:info@avada-media.com.ua">info@avada-media.com.ua</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="advantages">
+  <div class="container">
+    <div class="row row-eq-height">
+      <div class="col-xs-12">
+        <div class="page-header">
+          <h3>Рядом с нами</h3>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide_5' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Магазины, Банки, Школы</h3>
+            <p></p>
+            <p>
+
+              Район расположения жилого комплекса имеет всю необходимую для проживания социальную инфраструктуру – в
+              непосредственной близости находятся лечебно-профилактические учреждения, аптеки, магазины, отделения
+              банков, частные и коммерческие детские сады, школы
+
+              <br></p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide_1' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Рестораны и Кафе</h3>
+            <p></p>
+            <p>
+
+              В непосредственной близости от жилого комплекса&nbsp; расположены рыбный ресторан&nbsp; и итальянская
+              пиццерия. Кроме того, всего в десяти минутах ходьбы от комплекса находятся рестораны испанской,
+              итальянской, американской, украинской и русской кухни, пиццерии, кафе и лаунж-бары на любой вкус.
+
+              <br></p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide_2' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Пляж</h3>
+            <p></p>
+            <p>
+
+              Жилой комплекс расположен на берегу Черного моря в районе Аркадия. В десяти минутах ходьбы от него
+              находится знаменитые пляжи Аркадия и Чайка, а чуть дальше – пляжи курортный, 13-ая станция Большого
+              Фонтана, Пляжник и другие знаменитые пляжи Одессы
+
+              <br></p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide_7' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Спортивный Комплекс</h3>
+            <p></p>
+            <p>
+
+              Всего в 5 минутах ходьбы от жилого комплекса&nbsp; находится Спортивный комплекс Международного
+              гуманитарного университета - это современный оборудованный комплекс с залами для проведения волейбольных
+              соревнований, соревнований по танцам и борьбе и других спортивных мероприятий
+
+              <br></p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Клубная Жизнь</h3>
+            <p></p>
+            <div>
+
+              Район расположения жилого комплекса&nbsp; Аркадия является культовым местом ночного отдыха и развлечения –
+              буквально в 5-10 минутах ходьбы от комплекса находятся такие места сосредоточения клубной жизни страны<br>
+            </div>
+            <p></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 advantage-item">
+        <div class="thumbnail">
+          <img src="{% static 'site/images/jpg/glide_4' %}" class="img-responsive" alt>
+          <div class="caption">
+            <h3>Удобная транспортная развязка</h3>
+            <p></p>
+            <p>
+
+              ЖК&nbsp; расположена на берегу Черного моря в районе Аркадии и имеет удобную транспортную развязку,
+              позволяющую даже в час Пик быстро и без проблем доехать в течение десяти минут до центра города или
+              выехать на автострады Одесской обл
+
+              <br></p>
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

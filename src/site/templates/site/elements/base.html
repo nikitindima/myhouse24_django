@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html><html lang="ru-RU"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+
+    <meta name="csrf-param" content="_csrf">
+    <meta name="csrf-token" content="nVBEW7FvW2dMP34XEmGeZWgEISD9EGhvm38roF9EOUmuCTU40FsOUXRyKE9ULvQvJ1R3UKlDPxnSLmTsFilyGQ==">
+    <title>Сайт Управляющей Компании ЖКХ - "МОЙ ДОМ 24"</title>
+
+    <meta name="description" content="Универсальная система для управляющей компании ЖКХ многоквартирного дома &quot;МОЙ ДОМ 24&quot; - сайт управляющей компании + база управления квартирами + мобильное приложение - гибкая индивидуальная настройка для любой организации. Удобная комьютерная программа для ОСМД
+">
+<meta name="keywords" content="программа для ОСМД, управление домом, управление многоквартирным домом, система учета квартир, программа для жильцов дома,  сайт управляющей компании, мой дом 21, crm для жильцов">
+<meta name="keywords" content="программа для ОСМД, управление домом, управление многоквартирным домом, система учета квартир, программа для жильцов дома,  сайт управляющей компании, мой дом 21, crm для жильцов">
+<link href="{% static 'site/css/fontawesome-all.min.css' %}" rel="stylesheet">
+<link href="{% static 'site/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'site/css/slick.css' %}" rel="stylesheet">
+<link href="{% static 'site/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'site/js/simplelightbox/simplelightbox.min.css' %}" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-64276279-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-64276279-2');
+</script>
+</head>
+<body>
+{% include 'site/elements/navbar.html' %}
+{% block content %}{% endblock %}
+{% include 'site/elements/footer.html' %}
+
+<script src="{% static 'site/assets/d50915a0/jquery.js' %}"></script>
+<script src="{% static 'site/assets/dd3f499f/yii.js' %}"></script>
+<script src="{% static 'site/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'site/js/slick.min.js' %}"></script>
+<script src="{% static 'site/js/main.js' %}"></script>
+<script src="{% static 'site/js/simplelightbox/simple-lightbox.min.js' %}"></script>
+
+</body>
+</html>
+
