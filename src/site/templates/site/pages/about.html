@@ -1,0 +1,128 @@
+{% extends "site/elements/base.html" %}
+{% load static %}
+{% block nav_item_about %}active{% endblock %}
+
+{% block title %}CRM-система для управляющей компании ЖКХ - &quot;МОЙ ДОМ 24&quot;{% endblock %}
+
+{% block content %}
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="breadcrumb">
+                        <li><a href="{% url 'site:home' %}">Главная</a></li>
+                        <li class="active">О нас</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box clearfix">
+                        <div class="page-header">
+                            <h1>О управляющей компании</h1>
+                        </div>
+                        <img src="{% static 'site/images/png/tower.png' %}"
+                             class="img-responsive imgFloatRight" alt="">
+                        <p>
+
+                        </p>
+                        <p>Компания-застройщик не только создала этот объект для своих покупателей, но и после окончания
+                            строительства взяла на себя все услуги по обеспечению удобного проживания своих жильцов. Для
+                            этого была
+                            организована управляющая компания «Морская симфония», которая осуществляет комплексное
+                            обслуживание
+                            коммунальной сферы жизнедеятельности своих клиентов.<br></p>
+                        <p><b><i>Миссией управляющей компании является такая схема взаимодействия с жильцами дома, при
+                            которой
+                            услуги компании не отвлекают их от проживания и отдыха и создают максимально комфортную
+                            экосистему в доме.
+                            Незаметный сервис и максимально эффективная работа являются визитной карточкой компании.</i></b>
+                        </p>
+                        <p><br>В функции управляющей компании входят как содержание и управление хозяйством комплекса,
+                            так и
+                            охраняемой придомовой территории – уборка, техническое обслуживание лифтового хозяйства,
+                            системы электро и
+                            водоснабжения дома, котельной и пожарной систем, диспетчеризация, охрана, содержание
+                            придомовой территории
+                            и многое другое. В штате компании собраны только профессионалы своего дела, которые помогут
+                            жильцам в
+                            самых трудных и критических ситуациях решить их жилищно-коммунальные проблемы семь дней в
+                            неделю
+                            круглосуточно – электрики и сантехники, инженеры, монтеры и другие специалисты имеют
+                            многолетний опыт и
+                            высокий уровень квалификации. </p>
+                        <p>Все это делает жилой комплекс&nbsp; уникальным, комфортным и безопасным местом для проживания
+                            и отдыха
+                            всей семьи круглый год. Доверьте заботу о вашем доме и вашей квартире управляющей компании&nbsp;
+                            и вы
+                            сможете круглый год наслаждаться проживанием на берегу моря и прекрасной природой
+                            Одессы.</p>
+
+                        <br>
+                        <p></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery g1">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-6 col-md-3 item" data-src="/upload/WebsiteAboutImage/86/image.jpg">
+                    <a href="http://myhouse24.avada-media.ua/upload/WebsiteAboutImage/86/image.jpg" class="big">
+                        <img src="{% static 'site/images/png/room1.png' %}"
+                             alt="" class="img-responsive img-thumbnail">
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6 col-md-3 item" data-src="/upload/WebsiteAboutImage/88/image.jpg">
+                    <a href="http://myhouse24.avada-media.ua/upload/WebsiteAboutImage/88/image.jpg" class="big">
+                        <img src="{% static 'site/images/png/room2.png' %}"
+                             alt="" class="img-responsive img-thumbnail">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box clearfix">
+                        <div class="page-header">
+                            <h3>Дополнительные услуги</h3>
+                        </div>
+                        <p>
+
+                        </p>
+                        <p>Главной обязанностью управляющей компании является поддержка комфортных условий для жильцов,
+                            оперативное
+                            реагирование на их просьбы и пожелания</p>
+                        <p><b>К дополнительным услугам управляющей компании также относятся: 24-часовая охрана
+                            придомовой территории
+                            и паркинга, уборка территории и вывоз мусора, обслуживание пирса и пляжа. Также при желании
+                            жильцы дома
+                            могут заказать любые строительно-ремонтные работы от штатной бригады компании</b></p>
+
+                        <br>
+                        <p></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>jQuery(function ($) {
+
+        var lightbox = $('.g1 .item a').simpleLightbox({
+            captionsData: 'alt',
+        });
+
+    });</script>
+{% endblock %}

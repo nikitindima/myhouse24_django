@@ -1,8 +1,8 @@
 #!make
-#include .envs/.local/django.env
-#include .envs/.local/postgres.env
-#export $(shell sed 's/=.*//' .envs/.local/django.env)
-#export $(shell sed 's/=.*//' .envs/.local/postgres.env)
+include .envs/.local/django.env
+include .envs/.local/postgres.env
+export $(shell sed 's/=.*//' .envs/.local/django.env)
+export $(shell sed 's/=.*//' .envs/.local/postgres.env)
 
 MANAGE = python manage.py
 SOURCE = src
@@ -35,9 +35,9 @@ prune:
 	docker system prune -a --volumes --force
 
 startapp:
-	mkdir $(SOURCE)/apps/$(NAME)
+	mkdir $(SOURCE)/$(NAME)
 	sleep 3
-	django-admin startapp $(NAME) ./$(SOURCE)/apps/$(NAME)
+	django-admin startapp $(NAME) ./$(SOURCE)/$(NAME)
 
 run:
 	$(MANAGE) runserver 127.0.0.1:8001
@@ -65,7 +65,7 @@ gen-s:
 	$(MANAGE) gen_seances
 
 kill-port:
-	sudo fuser -k 8000/tcp
+	sudo fuser -k 8001/tcp
 
 diagram:
 	$(MANAGE) graph_models -a -g -o my_project_visualized.png

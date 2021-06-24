@@ -1,0 +1,121 @@
+{% extends "site/elements/base.html" %}
+{% load static %}
+{% block nav_item_services %}active{% endblock %}
+
+{% block title %}CRM-система для управляющей компании ЖКХ - &quot;МОЙ ДОМ 24&quot;{% endblock %}
+
+{% block content %}
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ol class="breadcrumb">
+                        <li><a href="{% url 'site:home' %}">Главная</a></li>
+                        <li class="active">Услуги</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="services">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="page-header">
+                        <h1>Наши услуги</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-7">
+                    <img src="{% static 'site/images/jpg/service1.jpeg' %}"
+                         class="img-responsive img-thumbnail" alt="">
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    <div class="page-header">
+                        <h3> Уборка комплекса (парадных) и территории, вывоз мусора</h3>
+                    </div>
+                    <p>
+
+                        Управляющая компания осуществляет весь комплекс работ по уборке комплекса, придомовой территории
+                        и набережной . В зимнее время года территория жилого комплекса своевременно очищается от снега и
+                        льда, пешеходные пандусы, дорожки и проезжая часть обрабатываются анти скользящими составами.
+                        Специалисты управляющей компании осуществляют регулярный уход за зелеными насаждениям.
+
+                        <br></p></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-7">
+                    <img src="{% static 'site/images/jpg/service2.jpg' %}"
+                         class="img-responsive img-thumbnail" alt="">
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    <div class="page-header">
+                        <h3>Обслуживание паркинга</h3>
+                    </div>
+                    <p>
+
+                        Жилой комплекс&nbsp; имеет собственный четырехуровневый надземный паркинг, обслуживание которого
+                        осуществляет управляющая компания.<br>Обслуживание паркинга включает в себя следующие работы и
+                        услуги: Уборка территории, &nbsp;Поддержание функционирования инженерных сетей паркинга, &nbsp;Обслуживание
+                        системы выезда-въезда в паркинг, Обеспечение функционирования пропускного режима для въезда на
+                        территорию паркинга, &nbsp;Охрана и обеспечение безопасности жильцов и автомобильного
+                        транспорта.
+
+                        <br></p></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-7">
+                    <img src="{% static 'site/images/jpg/service3.jpeg' %}"
+                         class="img-responsive img-thumbnail" alt="">
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    <div class="page-header">
+                        <h3>Обслуживание лифтов</h3>
+                    </div>
+                    <p>
+
+                        Лифтовое хозяйство жилого комплекса представлена современными высокоскоростными пассажирскими и
+                        грузопассажирскими лифтовыми системами от мирового производителя.<br>Обслуживание лифтового
+                        хозяйства включает в себя: &nbsp;Уборку в кабинах лифтов и обеспечение сохранности лифтов,
+                        выполняемые штатными сотрудниками компании, &nbsp;Техническое обслуживание лифтов, выполняемое
+                        силами подрядных организаций.
+
+                        <br></p></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-7">
+                    <img src="{% static 'site/images/jpg/service4.jpeg' %}"
+                         class="img-responsive img-thumbnail" alt="">
+                </div>
+                <div class="col-xs-12 col-md-5">
+                    <div class="page-header">
+                        <h3>Охрана жилого комплекса</h3>
+                    </div>
+                    <p>
+
+                        Охрана жилого комплекса осуществляется штатными специалистами управляющей компании. Охрана
+                        жилого комплекса охватывает апартаменты жильцов, придомовую территорию и надземный паркинг с
+                        автотранспортом. Охрана жилого комплекса осуществляется с использованием современной системы
+                        контроля доступа и видеонаблюдения за территорией. Попасть на территорию комплекса жильцы могут
+                        только при наличие электронного ключа, а гости – через систему заявок от жильцов дома на
+                        посещение.
+
+                        <br></p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="paginations">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <nav aria-label="Page navigation">
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
