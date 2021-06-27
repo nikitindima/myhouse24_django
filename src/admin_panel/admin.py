@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import SeoData, Article, SiteHomePage
+
+admin.site.register(SeoData)
+admin.site.register(Article)
+admin.site.register(SiteHomePage)

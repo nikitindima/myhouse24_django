@@ -1,20 +1,38 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps import GenericSitemap
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+from robots.models import Rule, Url
+
+from .sitemaps import StaticViewSitemap, robots_txt
+
+sitemaps = {
+    'static': StaticViewSitemap,
+}
+
+rule = Rule()
+# url = Url(pattern='admin_panel/')
+# url.save()
+# rule.disallowed.add(url)
+
 
 urlpatterns = [
-    path("allauth/", TemplateView.as_view(template_name="admin_panel/pages/home.html"), name="home"),
-    path("allauth/about/", TemplateView.as_view(template_name="admin_panel/pages/about.html"), name="about"),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots.txt', robots_txt, name='robots_txt'),
+
+    path("allauth/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path("allauth/about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
     # Django Admin, use {% url 'admin_panel:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("allauth/users/", include("src.users.urls", namespace="users")),
     path("allauth/accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
-    path("admin/", include("src.admin_panel.urls", namespace="admin_panel")),
+    path("admin_panel/", include("src.admin_panel.urls", namespace="admin_panel")),
     path("", include("src.site.urls", namespace="site")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

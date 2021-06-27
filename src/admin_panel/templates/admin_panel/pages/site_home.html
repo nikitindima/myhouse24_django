@@ -1,0 +1,233 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block nav_item_site_control %}active menu-open{% endblock %}
+{% block nav_item_site_home %}active{% endblock %}
+
+{% block head %}
+    <!-- include summernote css/js-->
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Редактирование страницы{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 345px;">
+        <section class="content-header">
+            <h1>
+                Редактирование страницы </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="/admin/"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Редактирование страницы</li>
+            </ul>
+        </section>
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Редактирование страницы "Главная"</h3>
+                            <div class="box-tools">
+                                <a href="{% url 'admin_panel:update_sitemap' %}"
+                                   class="btn btn-default btn-sm updateSeoFiles">
+                                    <span class="hidden-xs">Обновить robots и sitemap</span><i
+                                        class="fa fa-refresh visible-xs" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <form method="POST" id="" enctype="multipart/form-data" novalidate>
+                            <div class="box-body">
+                                <form id="w0" action="/admin/website/home" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <h3 class="page-header">Слайдер</h3>
+                                    <div class="row site-main-slider">
+                                        <div class="col-md-4">
+                                            <h4>Слайд 1</h4>
+                                            {% if obj.slider1 %}
+                                                <img src="{{ obj.slider1.url }}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% else %}
+                                                <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% endif %}
+                                            <div class="form-group margin-bottom-30 field-websitehomeslide-0-imagefile">
+                                                <label class="control-label" for="id_form1-slider1">Рекомендуемый
+                                                    размер: (1920x800)</label>
+                                                {{ form1.slider1 }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <h4>Слайд 2</h4>
+                                            {% if obj.slider2 %}
+                                                <img src="{{ obj.slider2.url }}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% else %}
+                                                <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% endif %}
+                                            <div class="form-group margin-bottom-30 field-websitehomeslide-0-imagefile">
+                                                <label class="control-label" for="id_form1-slider2">Рекомендуемый
+                                                    размер: (1920x800)</label>
+                                                {{ form1.slider2 }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <h4>Слайд 3</h4>
+                                            {% if obj.slider3 %}
+                                                <img src="{{ obj.slider3.url }}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% else %}
+                                                <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                     alt="image not found" class="img-responsive margin-bottom-15">
+                                            {% endif %}
+                                            <div class="form-group margin-bottom-30 field-websitehomeslide-0-imagefile">
+                                                <label class="control-label" for="id_form1-slider3">Рекомендуемый
+                                                    размер: (1920x800)</label>
+                                                {{ form1.slider3 }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h3 class="page-header">Краткая информация</h3>
+
+                                            <div class="form-group">
+                                                <label class="control-label"
+                                                       for="{{ form1.title.auto_id }}">{{ form1.title.label }}</label>
+                                                {{ form1.title }}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label"
+                                                       for="{{ form1.description.auto_id }}">{{ form1.description.label }}</label>
+                                                {{ form1.description }}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <div class="custom-control">
+                                                    {{ form1.show_links }}
+                                                    <label class="control-label"
+                                                           for="{{ form1.show_links.auto_id }}">{{ form1.show_links.label }}</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row near-img">
+                                        <div class="col-xs-12">
+                                            <h3 class="page-header">Рядом с нами</h3>
+                                        </div>
+                                        {{ formset.management_form }}
+                                        {% for form in formset.forms %}
+                                            <div class="col-md-4">
+                                                <h4>Блок {{ forloop.counter }}</h4>
+                                                {% for hidden in form.hidden_fields %}
+                                                    {{ hidden }}
+                                                {% endfor %}
+                                                {% if form.instance.image %}
+                                                    <img src="{{ form.instance.image.url }}"
+                                                         alt="error" class="img-responsive margin-bottom-15">
+                                                {% else %}
+                                                    <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                         alt="error" class="img-responsive margin-top-0">
+                                                {% endif %}
+
+                                                <div class="form-group">
+                                                    <label class="control-label" for="{{ form.image.auto_id }}">Рекомендуемый
+                                                        размер: (1000x600)</label>
+                                                    {{ form.image }}
+                                                </div>
+
+                                                {#                                                <div class="form-group">#}
+                                                {#                                                    <label class="control-label" for="{{ form.image.auto_id }}">Рекомендуемый#}
+                                                {#                                                        размер: (1000x600)</label>#}
+                                                {#                                                    <input type="checkbox" name="{{ form.image.auto_id }}-clear_id"#}
+                                                {#                                                           id="formset-0-image-clear_id">#}
+                                                {#                                                    <label for="{{ form.image.auto_id }}-clear_id">Очистить</label><br>#}
+                                                {#                                                    Изменить:#}
+                                                {#                                                    <input type="file" name="{{ form.image.auto_id }}" accept="image/*"#}
+                                                {#                                                           id="{{ form.image.auto_id }}">#}
+                                                {#                                                </div>#}
+
+
+                                                <div class="form-group">
+                                                    <label class="control-label"
+                                                           for="{{ form.title.auto_id }}">{{ form.title.label }}</label>
+                                                    {{ form.title }}
+                                                </div>
+
+                                                <div class="form-group margin-bottom-30">
+                                                    <label class="control-label"
+                                                           for="{{ form.description.auto_id }}">{{ form.description.label }}</label>
+                                                    {{ form.description }}
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h3 class="page-header">Настройки SEO</h3>
+
+                                            <div class="form-group">
+                                                <label class="control-label"
+                                                       for="{{ seo_data_form.title.auto_id }}">{{ seo_data_form.title.label }}</label>
+                                                {{ seo_data_form.title }}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label"
+                                                       for="{{ seo_data_form.description.auto_id }}">{{ seo_data_form.description.label }}</label>
+                                                {{ seo_data_form.description }}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label"
+                                                       for="{{ seo_data_form.keywords.auto_id }}">{{ seo_data_form.keywords.label }}</label>
+                                                {{ seo_data_form.keywords }}
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-12 text-center">
+                                            <div class="form-group">
+                                                <a href="/admin/website/home" class="btn btn-default">Отменить</a>
+                                                <button type="submit" class="btn btn-success">Сохранить</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            const notes = document.querySelectorAll('.summernote')
+            $(notes).summernote({
+                height: 150,
+                disableResizeEditor: true
+            });
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}
+
+{% endblock %}

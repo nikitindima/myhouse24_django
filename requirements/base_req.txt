@@ -32,3 +32,6 @@ gunicorn==20.1.0  # https://github.com/benoitc/gunicorn
 # Email
 # ------------------------------------------------------------------------------
 django-anymail[mailgun]==8.2  # https://github.com/anymail/django-anymail
+
+# Robots
+django-robots  # https://django-robots.readthedocs.io/en/latest/#installation

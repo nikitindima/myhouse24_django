@@ -1,6 +1,7 @@
 """Base settings to build other settings files upon."""
 import os
 from pathlib import Path
+from django.contrib.messages import constants as messages
 
 import environ
 
@@ -71,6 +72,7 @@ DJANGO_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.sites",
+    "django.contrib.sitemaps",  # new
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # "django.contrib.humanize", # Handy template tags
@@ -83,6 +85,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "django_celery_beat",
+    'robots'
 ]
 LOCAL_APPS = [
     "src.admin_panel",
@@ -91,6 +94,18 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# endregion
+
+# region MESSAGES
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+MESSAGE_TAGS = {
+        messages.DEBUG: 'message',
+        messages.INFO: 'message',
+        messages.SUCCESS: 'success',
+        messages.WARNING: 'warning',
+        messages.ERROR: 'error',
+ }
 # endregion
 
 # region AUTHENTICATION
@@ -323,7 +338,6 @@ if USE_TZ:
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
 # CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_BROKER_URL = 'redis://localhost:6379'
-
 
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL

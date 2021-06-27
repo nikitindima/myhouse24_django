@@ -10,22 +10,26 @@
     <meta name="csrf-token"
           content="I9zRnQtvEUdUpkdxChPyYocqnhttfpjG2smcP2Q-p2xOlYfzWF1iMCOUMQlPer0bxkvTKSkh84KqpuhNN23-QQ==">
     <title>{% block title %}{% endblock %}</title>
-    <link href="{% static 'admin_panel/bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'admin_panel/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
-    <link href="{% static 'admin_panel/bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-    <link href="{% static 'admin_panel/bower_components/Ionicons/css/ionicons.min.css' %}" rel="stylesheet">
-    <link href="{% static 'admin_panel/bower_components/jvectormap/jquery-jvectormap.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}"
+          rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/Ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/css/AdminLTE.min.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/plugins/iCheck/flat/blue.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/css/all-skins.min.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/alertifyjs/css/alertify.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/alertifyjs/css/themes/default.min.css' %}" rel="stylesheet">
+    {% block head %}{% endblock %}
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"
           rel="stylesheet">
 </head>
 <body class="hold-transition skin-black-light sidebar-mini fixed">
-<div class="wrapper">
 
+<div class="wrapper">
     <!--main-header-->
     <header class="main-header">
 
@@ -109,10 +113,12 @@
                             <!-- Menu Footer-->
                             <li class="user-footer">
                                 <div class="pull-left">
-                                    <a class="btn btn-default btn-flat" href="/admin_panel/user-admin/update-my">Профиль</a>
+                                    <a class="btn btn-default btn-flat"
+                                       href="/admin_panel/user-admin/update-my">Профиль</a>
                                 </div>
                                 <div class="pull-right">
-                                    <a class="btn btn-default btn-flat" href="/admin_panel/site/logout" data-method="post">Выход</a>
+                                    <a class="btn btn-default btn-flat" href="/admin_panel/site/logout"
+                                       data-method="post">Выход</a>
                                 </div>
                             </li>
                         </ul>
@@ -129,39 +135,52 @@
         <section class="sidebar">
 
             <ul class="sidebar-menu" data-widget="tree">
-                <li class="active"><a href="/admin_panel"><i class="fa fa-line-chart"></i> <span>Статистика</span></a></li>
-                <li><a href="/admin_panel/account-transaction/index"><i class="fa fa-dollar"></i> <span>Касса</span></a></li>
+                <li class="active"><a href="/admin_panel"><i class="fa fa-line-chart"></i> <span>Статистика</span></a>
+                </li>
+                <li><a href="/admin_panel/account-transaction/index"><i class="fa fa-dollar"></i> <span>Касса</span></a>
+                </li>
                 <li><a href="/admin_panel/invoice/index"><i class="fa fa-files-o"></i> <span>Квитанции на оплату</span></a>
                 </li>
-                <li><a href="/admin_panel/account/index"><i class="fa fa-credit-card"></i> <span>Лицевые счета</span></a></li>
+                <li><a href="/admin_panel/account/index"><i class="fa fa-credit-card"></i>
+                    <span>Лицевые счета</span></a></li>
                 <li><a href="/admin_panel/flat/index"><i class="fa fa-key"></i> <span>Квартиры</span></a></li>
-                <li><a href="/admin_panel/user/index"><i class="fa fa-users"></i> <span>Владельцы квартир</span></a></li>
+                <li><a href="/admin_panel/user/index"><i class="fa fa-users"></i> <span>Владельцы квартир</span></a>
+                </li>
                 <li><a href="/admin_panel/house/index"><i class="fa fa-building"></i> <span>Дома</span></a></li>
-                <li><a href="/admin_panel/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a></li>
+                <li><a href="/admin_panel/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
+                </li>
                 <li><a href="/admin_panel/master-request/index"><i class="fa fa-wrench"></i>
                     <span>Заявки вызова мастера</span></a></li>
                 <li><a href="/admin_panel/counter-data/counters"><i class="fa fa-dashboard"></i>
                     <span>Показания счетчиков</span></a></li>
-                <li class="treeview"><a href="#!"><i class="fa fa-desktop"></i> <span>Управление сайтом</span> <span
+                <li class="{% block nav_item_site_control %}{% endblock %}treeview"><a href="#!"><i
+                        class="fa fa-desktop"></i> <span>Управление сайтом</span> <span
                         class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                     <ul class='treeview-menu'>
-                        <li><a href="/admin_panel/website/home"><i class="fa fa-circle-o"></i>
+                        <li class="{% block nav_item_site_home %}{% endblock %}"><a
+                                href="{% url 'admin_panel:site_home' %}"><i class="fa fa-circle-o"></i>
                             <span>Главная страница</span></a></li>
-                        <li><a href="/admin_panel/website/about"><i class="fa fa-circle-o"></i> <span>О нас</span></a></li>
-                        <li><a href="/admin_panel/website/services"><i class="fa fa-circle-o"></i> <span>Услуги</span></a>
+                        <li class="{% block nav_item_site_about %}{% endblock %}"><a
+                                href="{% url 'admin_panel:site_about' %}"><i class="fa fa-circle-o"></i>
+                            <span>О нас</span></a></li>
+                        <li class="{% block nav_item_site_services %}{% endblock %}"><a
+                                href="{% url 'admin_panel:site_services' %}"><i class="fa fa-circle-o"></i>
+                            <span>Услуги</span></a>
                         </li>
-                        <li><a href="/admin_panel/website/tariffs"><i class="fa fa-circle-o"></i> <span>Тарифы</span></a></li>
-                        <li><a href="/admin_panel/website/contact"><i class="fa fa-circle-o"></i> <span>Контакты</span></a>
+                        <li class="{% block nav_item_site_contacts %}{% endblock %}"><a
+                                href="{% url 'admin_panel:site_contacts' %}"><i class="fa fa-circle-o"></i> <span>Контакты</span></a>
                         </li>
                     </ul>
                 </li>
                 <li class="treeview"><a href="#!"><i class="fa fa-cogs"></i> <span>Настройки системы</span> <span
                         class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                     <ul class='treeview-menu'>
-                        <li><a href="/admin_panel/service/index"><i class="fa fa-briefcase"></i> <span>Услуги</span></a></li>
+                        <li><a href="/admin_panel/service/index"><i class="fa fa-briefcase"></i> <span>Услуги</span></a>
+                        </li>
                         <li><a href="/admin_panel/tariff/index"><i class="fa fa-money"></i> <span>Тарифы</span></a></li>
                         <li><a href="/admin_panel/user-admin/role"><i class="fa fa-user"></i> <span>Роли</span></a></li>
-                        <li><a href="/admin_panel/user-admin/index"><i class="fa fa-user-plus"></i> <span>Пользователи</span></a>
+                        <li><a href="/admin_panel/user-admin/index"><i class="fa fa-user-plus"></i>
+                            <span>Пользователи</span></a>
                         </li>
                         <li><a href="/admin_panel/pay-company/index"><i class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
                         </li>
@@ -179,19 +198,20 @@
 
     <script src="{% static 'admin_panel/js/jquery.js' %}"></script>
     <script src="{% static 'admin_panel/js/yii.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/fastclick/lib/fastclick.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/fastclick/fastclick.js' %}"></script>
     <script src="{% static 'admin_panel/js/adminlte.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/iCheck/icheck.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.ru-RU.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/jquery-sparkline/jquery.sparkline.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
-    <script src="{% static 'admin_panel/bower_components/chart.js/Chart.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
     <script src="{% static 'admin_panel/js/main.js' %}"></script>
+    <script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
 
     {% block scripts %}{% endblock %}
 
