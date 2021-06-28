@@ -1,13 +1,21 @@
 {% for message in messages %}
-{#<div class="container-fluid p-0">#}
-{#  <div class="alert {{ message.tags }} alert-dismissible" role="alert" >#}
-{#    <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
-{#      <span aria-hidden="true">&times;</span>#}
-{#    </button>#}
-{#    {{ message }}#}
-{#  </div>#}
-{#</div>#}
     <script>
-       alertify.{{ message.tags }}('{{ message }}');
+        alertify.{{ message.tags }}('{{ message }}');
     </script>
+{% endfor %}
+
+{% for error in form1.non_field_errors %}
+    <script>
+        alertify.error('{{ error|escape }}');
+    </script>
+{% endfor %}
+
+{% for field in form1 %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <script>
+                alertify.error('{{ error|escape }}');
+            </script>
+        {% endfor %}
+    {% endif %}
 {% endfor %}

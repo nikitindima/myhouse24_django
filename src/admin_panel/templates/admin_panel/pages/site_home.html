@@ -146,18 +146,6 @@
                                                     {{ form.image }}
                                                 </div>
 
-                                                {#                                                <div class="form-group">#}
-                                                {#                                                    <label class="control-label" for="{{ form.image.auto_id }}">Рекомендуемый#}
-                                                {#                                                        размер: (1000x600)</label>#}
-                                                {#                                                    <input type="checkbox" name="{{ form.image.auto_id }}-clear_id"#}
-                                                {#                                                           id="formset-0-image-clear_id">#}
-                                                {#                                                    <label for="{{ form.image.auto_id }}-clear_id">Очистить</label><br>#}
-                                                {#                                                    Изменить:#}
-                                                {#                                                    <input type="file" name="{{ form.image.auto_id }}" accept="image/*"#}
-                                                {#                                                           id="{{ form.image.auto_id }}">#}
-                                                {#                                                </div>#}
-
-
                                                 <div class="form-group">
                                                     <label class="control-label"
                                                            for="{{ form.title.auto_id }}">{{ form.title.label }}</label>
@@ -219,15 +207,6 @@
 
 {% block scripts %}
     <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
-    <script>
-        $(document).ready(function () {
-            const notes = document.querySelectorAll('.summernote')
-            $(notes).summernote({
-                height: 150,
-                disableResizeEditor: true
-            });
-        });
-    </script>
+    <script src="{% static 'site/js/make_summernote.js' %}"></script>
     {% include 'admin_panel/elements/messages.html' %}
-
 {% endblock %}

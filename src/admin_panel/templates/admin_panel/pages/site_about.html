@@ -1,11 +1,293 @@
 {% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
 {% load static %}
 {% block nav_item_site_control %}active menu-open{% endblock %}
 {% block nav_item_site_about %}active{% endblock %}
 
 {% block title %}Редактирование страницы{% endblock %}
 
-{% block content %}
-
+{% block head %}
+    <!-- include summernote css/js-->
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/css/base.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 849px;">
+        <section class="content-header">
+            <h1>Редактирование страницы</h1>
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Редактирование страницы</li>
+            </ul>
+        </section>
+
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Редактирование страницы "О нас"</h3>
+                        </div>
+                        <div class="box-body">
+                            <form method="POST" id="" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
+                                <h3 class="page-header">Информация</h3>
+                                <div class="row">
+                                    <div class="col-md-8">
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.title.auto_id }}">{{ form1.title.label }}</label>
+                                            {{ form1.title }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.description.auto_id }}">{{ form1.description.label }}</label>
+                                            {{ form1.description }}
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h4>Фото директора</h4>
+                                        {% if obj.portrait %}
+                                            <img src="{{ obj.portrait.url }}" alt=""
+                                                 style="width: 250px; height: 310px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt=""
+                                                 style="width: 250px; height: 310px; object-fit: cover;">
+                                        {% endif %}
+
+                                        <div class="form-group">
+                                            <label class="control-label" for="{{ form1.portrait.auto_id }}">Рекомендуемый
+                                                размер: (250x310)</label>
+                                            {{ form1.portrait }}
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row site-about-gallery">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Фотогалерея</h3>
+                                    </div>
+                                    <div class="col-xs-12">
+                                        {% for image in obj.gallery.all %}
+                                            <div class="col-xs-4 col-sm-2 text-center">
+                                                {% if image.image %}
+                                                    <img src="{{ image.image.url }}"
+                                                         alt="" class="margin-bottom-15 img-thumbnail"
+                                                         style="width: 250px; height: 150px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                         alt="" class="margin-bottom-15 img-thumbnail"
+                                                         style="width: 250px; height: 150px; object-fit: cover;">
+                                                {% endif %}
+
+                                                <div class="form-group margin-bottom-15">
+                                                    <a href="{% url 'admin_panel:delete_gallery_image' image.pk %}"
+                                                       data-confirm="Удалить?"
+                                                       title="Удалить"><i class="fa fa-trash text-red"
+                                                                          aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label class="control-label" for="{{ formset_gallery.auto_id }}">Рекомендуемый
+                                                размер: (1200x1200)</label>
+                                            {{ form1.gallery_upload }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <h3 class="page-header">Дополнительная информация</h3>
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.title2.auto_id }}">{{ form1.title2.label }}</label>
+                                            {{ form1.title2 }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.description2.auto_id }}">{{ form1.description2.label }}</label>
+                                            {{ form1.description2 }}
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row site-about-gallery">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Дополнительная фотогалерея</h3>
+                                    </div>
+                                    <div class="col-xs-12">
+
+                                        {% for image in obj.gallery2.all %}
+
+                                            <div class="col-xs-4 col-sm-2 text-center">
+                                                {% if image.image %}
+                                                    <img src="{{ image.image.url }}"
+                                                         alt="" class="margin-bottom-15 img-thumbnail"
+                                                         style="width: 250px; height: 150px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                         alt="" class="margin-bottom-15 img-thumbnail"
+                                                         style="width: 250px; height: 150px; object-fit: cover;">
+                                                {% endif %}
+
+                                                <div class="form-group margin-bottom-15">
+                                                    <a href="{% url 'admin_panel:delete_gallery_image' image.id %}"
+                                                       data-confirm="Удалить?"
+                                                       title="Удалить"><i class="fa fa-trash text-red"
+                                                                          aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label class="control-label" for="{{ formset_gallery2.auto_id }}">Рекомендуемый
+                                                    размер: (1200x1200)</label>
+                                                {{ form1.gallery2_upload }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <h3 class="page-header">Документы</h3>
+                                <div class="col-xs-12 col-md-6">
+                                    <div id="form_set" class="row">
+                                        {{ formset.management_form }}
+
+                                        <div class="form_set">
+                                            {% for form in formset.forms %}
+                                                {% for hidden in form.hidden_fields %}
+                                                    {{ hidden }}
+                                                {% endfor %}
+
+                                                <div class="form-group">
+                                                    <a href="/admin/website/delete-document/11"
+                                                       class="pull-right text-red" data-confirm="Удалить?"><i
+                                                            class="fa fa-trash"></i></a>
+                                                </div>
+                                                <img class="fa fa-3x pull-left"
+                                                     style="width: 32px; height: 42px; object-fit: cover;"
+                                                     src="{{ form.instance.file.url }}"
+                                                     alt="">
+
+                                                <label for="{{ form.file.auto_id }}">PDF, JPG (макс. размер 20
+                                                    Mb)</label>
+                                                <input type="file" id="{{ form.file.auto_id }}"
+                                                       name="{{ form.file.html_name }}">
+
+                                                <div class="form-group">
+                                                    <label for="{{ form.name.auto_id }}">Название документа</label>
+                                                    {{ form.name }}
+                                                </div>
+
+                                            {% endfor %}
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div id="empty_form" style="display:none">
+                                    <div class="form-group">
+                                        <a href="/admin/website/delete-document/11"
+                                           class="pull-right text-red"
+                                           data-confirm="Удалить?"><i
+                                                class="fa fa-trash"></i></a>
+
+                                        <img class="fa fa-3x pull-left"
+                                             style="width: 32px; height: 42px; object-fit: cover;"
+                                             src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                             alt="">
+
+                                        <label for="{{ formset.empty_form.file.auto_id }}">PDF, JPG (макс.
+                                            размер 20 Mb)</label>
+                                        <input type="file"
+                                               id="{{ formset.empty_form.file.auto_id }}"
+                                               name="{{ formset.empty_form.file.html_name }}">
+
+                                        <div class="form-group">
+                                            <label for="{{ formset.empty_form.name.auto_id }}">Название
+                                                документа</label>
+                                            {{ formset.empty_form.name }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <input type="button" value="Добавить документ"
+                                               class="fileUpload btn btn-success" id="add_more">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Настройки SEO</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.title.auto_id }}">{{ seo_data_form.title.label }}</label>
+                                            {{ seo_data_form.title }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.description.auto_id }}">{{ seo_data_form.description.label }}</label>
+                                            {{ seo_data_form.description }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.keywords.auto_id }}">{{ seo_data_form.keywords.label }}</label>
+                                            {{ seo_data_form.keywords }}
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <div class="form-group">
+                                            <a href="/admin/website/about" class="btn btn-default">Отменить</a>
+                                            <button type="submit" class="btn btn-success">Сохранить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    <script src="{% static 'site/js/make_summernote.js' %}"></script>
+    {% include 'admin_panel/elements/messages.html' %}
+{#    <script>#}
+{#        let form_count = {{ formset.total_form_count }};#}
+{#        $('#add_more').click(function () {#}
+{#            form_count++#}
+            {#const form_idx = $('#id_formset_document-TOTAL_FORMS').val();#}
+{#            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_count));#}
+{#            $('#id_formset_document-TOTAL_FORMS').val(form_count);#}
+            {#form_idx.eq('parseInt(form_idx) + 1');#}
+{#        });#}
+{#    </script>#}
+    <script src="{% static 'site/js/make_summernote.js' %}"></script>
+{% endblock %}
