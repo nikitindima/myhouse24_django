@@ -19,3 +19,15 @@
         {% endfor %}
     {% endif %}
 {% endfor %}
+
+{% for form in formset %}
+    {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <script>
+                    alertify.error('{{ field.name }} - {{ error|escape }}');
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}

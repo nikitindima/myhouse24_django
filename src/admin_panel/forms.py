@@ -1,4 +1,5 @@
 import os
+import unicodedata
 
 from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
@@ -13,18 +14,53 @@ class GalleryImageForm(ModelForm):
 
 
 class DocumentForm(ModelForm):
+    name = forms.CharField(required=True, widget=TextInput(attrs={"placeholder": "Введите название документа",
+                                                                  "class": "form-control"}))
+
     class Meta:
         model = Document
         fields = ['name', 'file']
         widgets = {
-            "name": TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Введите название документа",
-                }
-            ),
             "file": FileInput(),
         }
+
+    def clean(self):
+        super().clean()
+        print('cleaned data', self.cleaned_data)
+
+    def clean_name(self):
+        print('clean_name')
+        file_name = self.cleaned_data['name']
+        print(file_name)
+        if file_name:
+            print('name is ok')
+            file_name = unicodedata.normalize('NFKD', file_name)
+            return file_name
+        else:
+            print('name is None')
+            raise forms.ValidationError("Введите корректное имя файла.")
+
+    def clean_file(self):
+        print('clean_file')
+        uploaded_file = self.cleaned_data['file']
+        print(uploaded_file)
+        if uploaded_file is None:
+            print('file is None')
+            raise forms.ValidationError("Загрузите файл.")
+        try:
+            print(88)
+            # check if the file is a valid image
+            img = forms.ImageField()
+            img.to_python(uploaded_file)
+        except forms.ValidationError:
+            print(44)
+            # file is not a valid image; so check if it's a pdf
+            name, ext = os.path.splitext(uploaded_file.name)
+            if ext not in ['.pdf', '.PDF']:
+                print(55)
+                raise forms.ValidationError("Вы можете загружать только изображения и pdf.")
+            print(66)
+        return uploaded_file
 
 
 class SiteHomeForm(ModelForm):

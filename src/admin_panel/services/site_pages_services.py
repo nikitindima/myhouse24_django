@@ -1,4 +1,5 @@
 from django.forms import modelformset_factory
+from django.http import QueryDict
 
 from src.admin_panel.forms import ArticleForm, SiteHomeForm, SeoDataForm, GalleryImageForm, DocumentForm
 from src.admin_panel.models import SiteHomePage, SeoData, Article, GalleryImage, Document
@@ -79,11 +80,10 @@ def create_forms(request, obj, form):
 
 def save_new_objects_to_many_to_many_field(field, new_objects_name, request):
     new_objects = request.FILES.getlist(f'{new_objects_name}')
+    objects = []
 
-    if new_objects:
-        objects = []
-
-        if field.model == GalleryImage:
+    if field.model == GalleryImage:
+        if new_objects:
             for new_obj in new_objects:
                 obj = GalleryImage(image=new_obj)
                 obj.save()
@@ -91,14 +91,20 @@ def save_new_objects_to_many_to_many_field(field, new_objects_name, request):
 
             field.add(*objects)
 
-        elif field.model == Document:
-            for new_obj in new_objects:
-                obj = Document(file=new_obj, name=new_obj.name)
-                obj.save()
-                objects.append(obj)
+    elif field.model == Document:
+        print(request.FILES)
+        for file in request.FILES:
+            pass
+            # file = request.FILES.getlist(file)
+            # name = request.POST.get(file.replace('file', 'name')) or 'Файл'
+            # print(file, request.POST.get(file))
+            # obj = Document(file=file, name=name)
+            # obj.save()
+            # objects.append(obj)
+            # print(obj)
 
-            field.add(*objects)
+        field.add(*objects)
 
-        else:
-            raise Exception(
-                'Function save_new_objects_to_many_to_many_field can\'t handle this ManyToManyField model type.')
+    else:
+        raise Exception(
+            'Function save_new_objects_to_many_to_many_field can\'t handle this ManyToManyField model type.')

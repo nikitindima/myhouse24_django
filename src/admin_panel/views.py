@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.sitemaps import ping_google
+from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -51,32 +52,20 @@ def site_about_view(request):
     formset = create_formset(request, obj, Document)
 
     if request.method == "POST":
-        forms_valid_status = validate_forms(form1, seo_data_form, formset)
+        forms_valid_status = validate_forms(form1, seo_data_form, document_formset=formset)
 
         if forms_valid_status:
-            formset_factory = modelformset_factory(
-                Document, form=DocumentForm, fields=["name", "file"], extra=0
-            )
-            formset = formset_factory(
-                request.POST,
-                request.FILES,
-                prefix="formset_document",
-                queryset=obj.docs.all(),
-            )
-            formset.is_valid()
-            formset.save()
-            # save_forms(form1, seo_data_form, formset)
+            save_forms(form1, seo_data_form, formset)
             save_new_objects_to_many_to_many_field(obj.gallery, "form1-gallery_upload", request)
             save_new_objects_to_many_to_many_field(obj.gallery2, "form1-gallery2_upload", request)
-            # save_new_objects_to_many_to_many_field(obj.docs, "formset_document-new-file", request)
-            # save_new_objects_to_many_to_many_field(obj.docs, "form1-documents", request)
-            # for obj in formset.cleaned_data:
-            # print('post', request.POST)
-
-            print(request.FILES)
-            print('------')
-            for form in formset:
-                print(form.as_table())
+            for form in formset.extra_forms:
+                name = form.cleaned_data.get("name")
+                file = form.cleaned_data.get("file")
+                print('obj', name, file)
+                new_document = Document(name=name, file=file)
+                new_document.full_clean()
+                new_document.save()
+                obj.docs.add(new_document)
 
             messages.success(request, "Данные успешно обновлены.")
 
@@ -110,5 +99,6 @@ def update_sitemap_view(request):
 class GalleryImageDeleteView(DeleteView):
     model = GalleryImage
     success_url = reverse_lazy("admin_panel:site_about")
+
 
 # endregion

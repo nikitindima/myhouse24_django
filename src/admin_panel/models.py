@@ -58,8 +58,8 @@ class GalleryImage(models.Model):
 class Document(models.Model):
     upload_path = os.path.join(MEDIA_ROOT, "docs")
 
-    name = models.CharField(max_length=100)
-    file = models.FileField(upload_to=UploadToPathAndRename(upload_path))
+    name = models.CharField(max_length=100, blank=False, null=False)
+    file = models.FileField(upload_to=UploadToPathAndRename(upload_path), blank=False, null=False)
 
 
 class SiteAboutPage(models.Model):
