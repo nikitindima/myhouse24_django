@@ -52,20 +52,20 @@ def site_about_view(request):
     formset = create_formset(request, obj, Document)
 
     if request.method == "POST":
-        forms_valid_status = validate_forms(form1, seo_data_form, document_formset=formset)
+        forms_valid_status = validate_forms(form1, seo_data_form, formset=formset)
 
         if forms_valid_status:
             save_forms(form1, seo_data_form, formset)
             save_new_objects_to_many_to_many_field(obj.gallery, "form1-gallery_upload", request)
             save_new_objects_to_many_to_many_field(obj.gallery2, "form1-gallery2_upload", request)
             for form in formset.extra_forms:
-                name = form.cleaned_data.get("name")
-                file = form.cleaned_data.get("file")
-                print('obj', name, file)
-                new_document = Document(name=name, file=file)
-                new_document.full_clean()
-                new_document.save()
-                obj.docs.add(new_document)
+                if form.cleaned_data != {}:
+                    name = form.cleaned_data.get("name")
+                    file = form.cleaned_data.get("file")
+                    new_document = Document(name=name, file=file)
+                    new_document.full_clean()
+                    new_document.save()
+                    obj.docs.add(new_document)
 
             messages.success(request, "Данные успешно обновлены.")
 
@@ -89,6 +89,8 @@ def site_services_view(request):
 def site_contacts_view(request):
     return render(request, "admin_panel/pages/site_contacts.html")
 
+# region SERVICES
+
 
 def update_sitemap_view(request):
     ping_google(sitemap_url="/sitemap.xml")
@@ -101,4 +103,10 @@ class GalleryImageDeleteView(DeleteView):
     success_url = reverse_lazy("admin_panel:site_about")
 
 
-# endregion
+class DocumentDeleteView(DeleteView):
+    model = Document
+    success_url = reverse_lazy("admin_panel:site_about")
+
+# endregion SERVICES
+
+# endregion SITE_CONTROL

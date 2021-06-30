@@ -173,16 +173,28 @@
                                                         {{ hidden }}
                                                     {% endfor %}
 
-                                                    <div class="form-group">
-                                                        <a href="/admin/website/delete-document/11"
+                                                    {% if form.instance.id %}
+                                                        <a href="{% url 'admin_panel:delete_document' form.instance.id %}"
                                                            class="pull-right text-red" data-confirm="Удалить?"><i
                                                                 class="fa fa-trash"></i></a>
-                                                    </div>
+                                                    {% else %}
+                                                        <a href="#!" onClick="checkId(this)"
+                                                           class="pull-right text-red form-row-remove-btn"><i
+                                                                class="fa fa-trash"></i></a>
+                                                    {% endif %}
+
                                                     {% if form.instance.file %}
+                                                        {% if form.instance.file.name|default:""|slice:"-4:" == ".pdf" %}
+                                                        <img class="fa fa-3x pull-left"
+                                                             style="width: 32px; height: 42px; object-fit: cover;"
+                                                             src="https://upload.wikimedia.org/wikipedia/commons/4/42/Pdf-2127829.png"
+                                                             alt="">
+                                                        {% else %}
                                                         <img class="fa fa-3x pull-left"
                                                              style="width: 32px; height: 42px; object-fit: cover;"
                                                              src="{{ form.instance.file.url }}"
                                                              alt="">
+                                                        {% endif %}
                                                     {% else %}
                                                         <img class="fa fa-3x pull-left"
                                                              style="width: 32px; height: 42px; object-fit: cover;"
@@ -191,7 +203,7 @@
                                                     {% endif %}
 
 
-                                                    <label for="{{ form.file.auto_id }}">PDF, JPG (макс. размер 20
+                                                    <label for="{{ form.file.auto_id }}">PDF, IMAGE (макс. размер 20
                                                         Mb)</label>
                                                     <input type="file" id="{{ form.file.auto_id }}"
                                                            name="{{ form.file.html_name }}">
@@ -208,28 +220,26 @@
                                 </div>
 
                                 <div id="empty_form" style="display:none">
-                                    <div class="form-group">
-                                        {#                                        {{ formset.empty_form|crispy }}#}
-                                        <a href="/admin/website/delete-document/11"
-                                           class="pull-right text-red"
-                                           data-confirm="Удалить?"><i
+                                    <div class="new_form">
+                                        <a href="#!" onClick="checkId(this)"
+                                           class="pull-right text-red form-row-remove-btn"><i
                                                 class="fa fa-trash"></i></a>
 
                                         <img class="fa fa-3x pull-left"
                                              style="width: 32px; height: 42px; object-fit: cover;"
                                              src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
                                              alt="">
-                                    </div>
-                                    <label for="{{ formset.empty_form.file.auto_id }}">PDF, JPG (макс.
-                                        размер 20 Mb)</label>
-                                    <input type="file"
-                                           id="{{ formset.empty_form.file.auto_id }}"
-                                           name="{{ formset.empty_form.file.html_name }}">
+                                        <label for="{{ formset.empty_form.file.auto_id }}">PDF, JPG (макс.
+                                            размер 20 Mb)</label>
+                                        <input type="file"
+                                               id="{{ formset.empty_form.file.auto_id }}"
+                                               name="{{ formset.empty_form.file.html_name }}">
 
-                                    <div class="form-group">
-                                        <label for="{{ formset.empty_form.name.auto_id }}">Название
-                                            документа</label>
-                                        {{ formset.empty_form.name }}
+                                        <div class="form-group">
+                                            <label for="{{ formset.empty_form.name.auto_id }}">Название
+                                                документа</label>
+                                            {{ formset.empty_form.name }}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -298,5 +308,13 @@
             {#form_idx.eq('parseInt(form_idx) + 1');#}
         });
     </script>
+    <script>
+        function checkId(elem) {
+            let form_set = elem.parentNode;
+            form_set.remove()
+        }
+    </script>
+
+
     <script src="{% static 'site/js/make_summernote.js' %}"></script>
 {% endblock %}

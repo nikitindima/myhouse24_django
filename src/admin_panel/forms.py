@@ -3,8 +3,20 @@ import unicodedata
 
 from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
+from django.template.defaultfilters import filesizeformat
+from django.utils.translation import ugettext_lazy as _
 
 from .models import SiteHomePage, Article, SeoData, SiteAboutPage, GalleryImage, Document
+
+# 2.5MB - 2621440
+# 5MB - 5242880
+# 10MB - 10485760
+# 20MB - 20971520
+# 50MB - 5242880
+# 100MB 104857600
+# 250MB - 214958080
+# 500MB - 429916160
+MAX_UPLOAD_SIZE = 20971520
 
 
 class GalleryImageForm(ModelForm):
@@ -41,25 +53,26 @@ class DocumentForm(ModelForm):
             raise forms.ValidationError("Введите корректное имя файла.")
 
     def clean_file(self):
-        print('clean_file')
         uploaded_file = self.cleaned_data['file']
-        print(uploaded_file)
+
+        if uploaded_file.size > MAX_UPLOAD_SIZE:
+            # check if the file has a valid size
+            raise forms.ValidationError(_('Пожалуйста, загрузите файл с размером меньше %s. Текущий размер %s') % (
+                filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(uploaded_file.size)))
+
         if uploaded_file is None:
-            print('file is None')
             raise forms.ValidationError("Загрузите файл.")
         try:
-            print(88)
             # check if the file is a valid image
             img = forms.ImageField()
             img.to_python(uploaded_file)
         except forms.ValidationError:
-            print(44)
             # file is not a valid image; so check if it's a pdf
             name, ext = os.path.splitext(uploaded_file.name)
             if ext not in ['.pdf', '.PDF']:
                 print(55)
                 raise forms.ValidationError("Вы можете загружать только изображения и pdf.")
-            print(66)
+
         return uploaded_file
 
 
