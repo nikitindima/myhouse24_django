@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
 
-from src.admin_panel.models import SiteHomePage, SiteAboutPage
+from src.admin_panel.models import SiteHomePage, SiteAboutPage, SiteServicesPage
 from src.admin_panel.services.site_pages_services import (
     get_or_create_page_object,
 )
@@ -27,8 +27,12 @@ class AboutView(DetailView):
         return obj
 
 
-def services_view(request):
-    return render(request, "site/pages/services.html")
+class ServicesView(DetailView):
+    template_name = "site/pages/services.html"
+
+    def get_object(self, queryset=None):
+        obj = get_or_create_page_object(SiteServicesPage)
+        return obj
 
 
 def contacts_view(request):

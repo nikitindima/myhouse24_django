@@ -40,9 +40,9 @@
                             </div>
                         </div>
 
-                        <form method="POST" id="" enctype="multipart/form-data" novalidate>
+
                             <div class="box-body">
-                                <form id="w0" action="/admin/website/home" method="post" enctype="multipart/form-data">
+                                <form id="w0" method="post" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <h3 class="page-header">Слайдер</h3>
                                     <div class="row site-main-slider">
@@ -155,7 +155,7 @@
                                                 <div class="form-group margin-bottom-30">
                                                     <label class="control-label"
                                                            for="{{ form.description.auto_id }}">{{ form.description.label }}</label>
-                                                    {{ form.description }}
+                                                    {{ form.description|safe }}
                                                 </div>
 
                                             </div>
@@ -195,7 +195,7 @@
                                     </div>
                                 </form>
                             </div>
-                        </form>
+
 
                     </div>
                 </div>

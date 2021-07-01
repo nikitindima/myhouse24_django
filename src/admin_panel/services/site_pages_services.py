@@ -1,8 +1,20 @@
 from django.forms import modelformset_factory
 from django.http import QueryDict
 
-from src.admin_panel.forms import ArticleForm, SiteHomeForm, SeoDataForm, GalleryImageForm, DocumentForm
-from src.admin_panel.models import SiteHomePage, SeoData, Article, GalleryImage, Document
+from src.admin_panel.forms import (
+    ArticleForm,
+    SiteHomeForm,
+    SeoDataForm,
+    GalleryImageForm,
+    DocumentForm,
+)
+from src.admin_panel.models import (
+    SiteHomePage,
+    SeoData,
+    Article,
+    GalleryImage,
+    Document, SiteServicesPage,
+)
 
 
 def get_or_create_page_object(obj_model):
@@ -23,16 +35,16 @@ def get_or_create_page_object(obj_model):
     return obj
 
 
-def create_formset(request, obj, formset_type):
+def create_formset(request, obj_m2m_field, formset_type):
     if formset_type is Article:
         formset_factory = modelformset_factory(
-            Article, form=ArticleForm, fields=["title", "description", "image"], extra=1
+            Article, form=ArticleForm, fields=["title", "description", "image"], extra=0, can_delete=True
         )
         formset = formset_factory(
             request.POST or None,
             request.FILES or None,
             prefix="formset_article",
-            queryset=obj.around_us.all(),
+            queryset=obj_m2m_field.all(),
         )
         return formset
 
@@ -44,7 +56,7 @@ def create_formset(request, obj, formset_type):
             request.POST or None,
             request.FILES or None,
             prefix="formset_document",
-            queryset=obj.docs.all(),
+            queryset=obj_m2m_field.all(),
         )
         return formset
 
@@ -65,21 +77,26 @@ def create_gallery_formset(obj_field, request):
     return formset
 
 
-def create_forms(request, obj, form):
-    form1 = form(
-        request.POST or None, request.FILES or None, prefix="form1", instance=obj
-    )
+def create_forms(request, obj, form=None, only_seo=False):
     seo_data_form = SeoDataForm(
         request.POST or None,
         request.FILES or None,
         prefix="seo_form",
         instance=obj.seo_data,
     )
-    return form1, seo_data_form
+    if only_seo:
+        return seo_data_form
+    elif form:
+        form1 = form(
+            request.POST or None, request.FILES or None, prefix="form1", instance=obj
+        )
+        return form1, seo_data_form
+    else:
+        raise Exception('Func "create_forms" got wrong attributes')
 
 
 def save_new_objects_to_many_to_many_field(field, new_objects_name, request):
-    new_objects = request.FILES.getlist(f'{new_objects_name}')
+    new_objects = request.FILES.getlist(f"{new_objects_name}")
     objects = []
 
     if field.model == GalleryImage:
@@ -107,4 +124,5 @@ def save_new_objects_to_many_to_many_field(field, new_objects_name, request):
 
     else:
         raise Exception(
-            'Function save_new_objects_to_many_to_many_field can\'t handle this ManyToManyField model type.')
+            "Function save_new_objects_to_many_to_many_field can't handle this ManyToManyField model type."
+        )

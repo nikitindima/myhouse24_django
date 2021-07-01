@@ -5,8 +5,16 @@ from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
+from django_summernote.widgets import SummernoteWidget
 
-from .models import SiteHomePage, Article, SeoData, SiteAboutPage, GalleryImage, Document
+from .models import (
+    SiteHomePage,
+    Article,
+    SeoData,
+    SiteAboutPage,
+    GalleryImage,
+    Document,
+)
 
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -16,49 +24,48 @@ from .models import SiteHomePage, Article, SeoData, SiteAboutPage, GalleryImage,
 # 100MB 104857600
 # 250MB - 214958080
 # 500MB - 429916160
+from .services.forms_services import check_filesize
+
 MAX_UPLOAD_SIZE = 20971520
 
 
 class GalleryImageForm(ModelForm):
     class Meta:
         model = GalleryImage
-        fields = ['image']
+        fields = ["image"]
 
 
 class DocumentForm(ModelForm):
-    name = forms.CharField(required=True, widget=TextInput(attrs={"placeholder": "Введите название документа",
-                                                                  "class": "form-control"}))
+    name = forms.CharField(
+        required=True,
+        widget=TextInput(
+            attrs={"placeholder": "Введите название документа", "class": "form-control"}
+        ),
+    )
 
     class Meta:
         model = Document
-        fields = ['name', 'file']
+        fields = ["name", "file"]
         widgets = {
             "file": FileInput(),
         }
 
-    def clean(self):
-        super().clean()
-        print('cleaned data', self.cleaned_data)
-
     def clean_name(self):
-        print('clean_name')
-        file_name = self.cleaned_data['name']
+        print("clean_name")
+        file_name = self.cleaned_data["name"]
         print(file_name)
         if file_name:
-            print('name is ok')
-            file_name = unicodedata.normalize('NFKD', file_name)
+            print("name is ok")
+            file_name = unicodedata.normalize("NFKD", file_name)
             return file_name
         else:
-            print('name is None')
+            print("name is None")
             raise forms.ValidationError("Введите корректное имя файла.")
 
     def clean_file(self):
-        uploaded_file = self.cleaned_data['file']
+        uploaded_file = self.cleaned_data["file"]
 
-        if uploaded_file.size > MAX_UPLOAD_SIZE:
-            # check if the file has a valid size
-            raise forms.ValidationError(_('Пожалуйста, загрузите файл с размером меньше %s. Текущий размер %s') % (
-                filesizeformat(MAX_UPLOAD_SIZE), filesizeformat(uploaded_file.size)))
+        check_filesize(uploaded_file, MAX_UPLOAD_SIZE)
 
         if uploaded_file is None:
             raise forms.ValidationError("Загрузите файл.")
@@ -69,9 +76,11 @@ class DocumentForm(ModelForm):
         except forms.ValidationError:
             # file is not a valid image; so check if it's a pdf
             name, ext = os.path.splitext(uploaded_file.name)
-            if ext not in ['.pdf', '.PDF']:
+            if ext not in [".pdf", ".PDF"]:
                 print(55)
-                raise forms.ValidationError("Вы можете загружать только изображения и pdf.")
+                raise forms.ValidationError(
+                    "Вы можете загружать только изображения и pdf."
+                )
 
         return uploaded_file
 
@@ -87,10 +96,10 @@ class SiteHomeForm(ModelForm):
                     "placeholder": "Введите заголовок",
                 }
             ),
-            "description": Textarea(
+            "description": SummernoteWidget(
                 attrs={
-                    "class": "form-control summernote",
-                    "placeholder": "Введите краткий текст",
+                    'summernote': {'disableResizeEditor': 'true', 'height': '200', 'width': '100%',
+                                   'placeholder': 'введите описание'}
                 }
             ),
             "show_links": CheckboxInput(
@@ -110,10 +119,16 @@ class SiteHomeForm(ModelForm):
 
 
 class SiteAboutForm(ModelForm):
-    gallery_upload = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    gallery2_upload = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    documents = forms.FileField(required=False, widget=forms.ClearableFileInput(
-        attrs={'multiple': True, 'class': 'upload'}))
+    gallery_upload = forms.ImageField(
+        required=False, widget=forms.ClearableFileInput(attrs={"multiple": True})
+    )
+    gallery2_upload = forms.ImageField(
+        required=False, widget=forms.ClearableFileInput(attrs={"multiple": True})
+    )
+    documents = forms.FileField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={"multiple": True, "class": "upload"}),
+    )
 
     class Meta:
         model = SiteAboutPage
@@ -150,11 +165,11 @@ class SiteAboutForm(ModelForm):
             "description": "Краткий текст",
             "title2": "Заголовок",
             "description2": "Краткий текст",
-            "portrait": "Фото директора"
+            "portrait": "Фото директора",
         }
 
     def clean_documents(self):
-        uploaded_file = self.cleaned_data['documents']
+        uploaded_file = self.cleaned_data["documents"]
         try:
             # check if the file is a valid image
             img = forms.ImageField()
@@ -162,8 +177,10 @@ class SiteAboutForm(ModelForm):
         except forms.ValidationError:
             # file is not a valid image; so check if it's a pdf
             name, ext = os.path.splitext(uploaded_file.name)
-            if ext not in ['.pdf', '.PDF']:
-                raise forms.ValidationError("Вы можете загружать только изображения и pdf.")
+            if ext not in [".pdf", ".PDF"]:
+                raise forms.ValidationError(
+                    "Вы можете загружать только изображения и pdf."
+                )
         return uploaded_file
 
 
@@ -181,13 +198,14 @@ class ArticleForm(ModelForm):
             "description": Textarea(
                 attrs={
                     "class": "form-control summernote",
-                    "placeholder": "Введите описание",
                 }
             ),
-            # 'image': TextInput(attrs={
-            #     'class': 'form-control',
-            #     'placeholder': 'Введите СЕО ключевые слова',
-            # }),
+            # "description": SummernoteWidget(
+            #     attrs={
+            #         'summernote': {'disableResizeEditor': 'true', 'height': '200', 'width': '100%',
+            #                        'placeholder': 'введите описание'}
+            #     }
+            # ),
         }
 
         labels = {
@@ -195,6 +213,41 @@ class ArticleForm(ModelForm):
             "description": "Описание",
             "image": "Файл",
         }
+
+    def clean_title(self):
+        article_title = self.cleaned_data["title"]
+        if article_title:
+            article_title = unicodedata.normalize("NFKD", article_title)
+            return article_title
+        else:
+            raise forms.ValidationError("Введите заголовок статьи.")
+
+    def clean_description(self):
+        article_description = self.cleaned_data["description"]
+        if article_description:
+            article_description = unicodedata.normalize("NFKD", article_description)
+            return article_description
+        else:
+            raise forms.ValidationError("Введите описание.")
+
+    def clean_file(self):
+        uploaded_file = self.cleaned_data["image"]
+
+        if uploaded_file is None:
+            raise forms.ValidationError("Загрузите файл.")
+
+        check_filesize(uploaded_file, MAX_UPLOAD_SIZE)
+
+        try:
+            # check if the file is a valid image
+            img = forms.ImageField()
+            img.to_python(uploaded_file)
+        except forms.ValidationError:
+            raise forms.ValidationError(
+                "Вы можете загружать только изображения."
+            )
+
+        return uploaded_file
 
 
 class SeoDataForm(ModelForm):

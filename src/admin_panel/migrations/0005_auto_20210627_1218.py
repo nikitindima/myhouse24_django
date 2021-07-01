@@ -7,43 +7,49 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0004_document_galleryimage_siteaboutpage'),
+        ("admin_panel", "0004_document_galleryimage_siteaboutpage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteaboutpage',
-            name='portrait',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/portraits')),
+            model_name="siteaboutpage",
+            name="portrait",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/portraits"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='siteaboutpage',
-            name='description',
+            model_name="siteaboutpage",
+            name="description",
             field=models.CharField(blank=True, max_length=3000, null=True),
         ),
         migrations.AlterField(
-            model_name='siteaboutpage',
-            name='description2',
+            model_name="siteaboutpage",
+            name="description2",
             field=models.CharField(blank=True, max_length=3000, null=True),
         ),
         migrations.AlterField(
-            model_name='siteaboutpage',
-            name='title',
+            model_name="siteaboutpage",
+            name="title",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='siteaboutpage',
-            name='title2',
+            model_name="siteaboutpage",
+            name="title2",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AlterField(
-            model_name='sitehomepage',
-            name='description',
+            model_name="sitehomepage",
+            name="description",
             field=models.CharField(blank=True, max_length=3000, null=True),
         ),
         migrations.AlterField(
-            model_name='sitehomepage',
-            name='title',
+            model_name="sitehomepage",
+            name="title",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

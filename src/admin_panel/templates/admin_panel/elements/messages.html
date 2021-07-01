@@ -1,14 +1,14 @@
 {#<-----Messages----->#}
 {% for message in messages %}
     <script>
-        alertify.{{ message.tags }}('{{ message }}');
+        alertify.{{ message.tags }}('{{ message }}', 10);
     </script>
 {% endfor %}
 
 {#<-----form1.errors----->#}
 {% for error in form1.non_field_errors %}
     <script>
-        alertify.error('{{ error|escape }}');
+        alertify.error('{{ error|escape }}', 10);
     </script>
 {% endfor %}
 
@@ -16,7 +16,7 @@
     {% if field.errors %}
         {% for error in field.errors %}
             <script>
-                alertify.error('{{ error|escape }}');
+                alertify.error('{{ error|escape }}', 10);
             </script>
         {% endfor %}
     {% endif %}
@@ -25,7 +25,7 @@
 {#<-----formset.errors----->#}
 {% for error in formset.non_field_errors %}
     <script>
-        alertify.error('{{ error|escape }}');
+        msg = alertify.error('{{ error }}', 10);
     </script>
 {% endfor %}
 
@@ -34,7 +34,7 @@
         {% if field.errors %}
             {% for error in field.errors %}
                 <script>
-                    alertify.error('{{ field.name }} - {{ error|escape }}');
+                    alertify.error('{{ field.name }} - {{ error|escape }}', 10);
                 </script>
             {% endfor %}
         {% endif %}
@@ -44,7 +44,7 @@
 {#<-----seo_data_form.errors----->#}
 {% for error in seo_data_form.non_field_errors %}
     <script>
-        alertify.error('{{ error|escape }}');
+        alertify.error('{{ error|escape }}', 10);
     </script>
 {% endfor %}
 
@@ -52,7 +52,7 @@
     {% if field.errors %}
         {% for error in field.errors %}
             <script>
-                alertify.error('{{ error|escape }}');
+                alertify.error('{{ error|escape }}', 10);
             </script>
         {% endfor %}
     {% endif %}

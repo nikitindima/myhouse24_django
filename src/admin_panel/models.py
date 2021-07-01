@@ -11,20 +11,35 @@ from .services.media_services import UploadToPathAndRename
 # region SITE_CONTROL
 
 # region staff
+
+
 class Article(models.Model):
     upload_path = os.path.join(MEDIA_ROOT, "images", "site", "home_page", "articles")
 
-    title = models.CharField(max_length=100, null=True, blank=True)
-    description = models.CharField(max_length=3000, null=True, blank=True)
-    image = models.ImageField(
-        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
-    )
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=3000)
+    image = models.ImageField(upload_to=UploadToPathAndRename(upload_path))
 
 
 class SeoData(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=3000, null=True, blank=True)
     keywords = models.CharField(max_length=2000, null=True, blank=True)
+
+
+class GalleryImage(models.Model):
+    upload_path = os.path.join(MEDIA_ROOT, "images", "gallery-images")
+
+    image = models.ImageField(upload_to=UploadToPathAndRename(upload_path))
+
+
+class Document(models.Model):
+    upload_path = os.path.join(MEDIA_ROOT, "docs")
+
+    name = models.CharField(max_length=100, blank=False, null=False)
+    file = models.FileField(
+        upload_to=UploadToPathAndRename(upload_path), blank=False, null=False
+    )
 
 
 # endregion staff
@@ -49,19 +64,6 @@ class SiteHomePage(models.Model):
     around_us = models.ManyToManyField(Article)
 
 
-class GalleryImage(models.Model):
-    upload_path = os.path.join(MEDIA_ROOT, "images", "gallery-images")
-
-    image = models.ImageField(upload_to=UploadToPathAndRename(upload_path))
-
-
-class Document(models.Model):
-    upload_path = os.path.join(MEDIA_ROOT, "docs")
-
-    name = models.CharField(max_length=100, blank=False, null=False)
-    file = models.FileField(upload_to=UploadToPathAndRename(upload_path), blank=False, null=False)
-
-
 class SiteAboutPage(models.Model):
     upload_path = os.path.join(MEDIA_ROOT, "images", "portraits")
 
@@ -69,7 +71,9 @@ class SiteAboutPage(models.Model):
     description = models.CharField(max_length=3000, null=True, blank=True)
     title2 = models.CharField(max_length=100, null=True, blank=True)
     description2 = models.CharField(max_length=3000, null=True, blank=True)
-    portrait = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    portrait = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
 
     gallery = ManyToManyField(GalleryImage, related_name="gallery")
     gallery2 = ManyToManyField(GalleryImage, related_name="gallery2")
@@ -77,6 +81,12 @@ class SiteAboutPage(models.Model):
     docs = ManyToManyField(Document)
 
     seo_data = models.ForeignKey(SeoData, on_delete=models.CASCADE)
+
+
+class SiteServicesPage(models.Model):
+    services = models.ManyToManyField(Article)
+    seo_data = models.ForeignKey(SeoData, on_delete=models.CASCADE)
+
 
 # endregion pages
 

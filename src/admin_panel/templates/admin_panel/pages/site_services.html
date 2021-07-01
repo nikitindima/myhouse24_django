@@ -1,11 +1,279 @@
 {% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
 {% load static %}
 {% block nav_item_site_control %}active menu-open{% endblock %}
 {% block nav_item_site_services %}active{% endblock %}
 
 {% block title %}Редактирование страницы{% endblock %}
 
-{% block content %}
-
+{% block head %}
+    <!-- include summernote css/js-->
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/css/base.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block content %}
+    <div class="content-wrapper" style="min-height: 849px;">
+        <section class="content-header">
+            <h1>
+                Редактирование страницы </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Редактирование страницы</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Редактирование страницы "Услуги"</h3>
+                        </div>
+                        <div class="box-body">
+
+                            <form method="POST" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
+                                {#                                <--services formset->#}
+                                <div class="row near-img">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Услуги</h3>
+                                    </div>
+
+                                    <div id="form_set">
+                                        {{ formset.management_form }}
+                                        <div class="delete-list"></div>
+                                        {#                                        <input type="hidden" name="formset_article-7-DELETE" value="on"#}
+                                        {#                                               id="id_formset_article-7-DELETE">#}
+                                        {#                                        <div class="delete-sample">#}
+                                        {#                                        </div>#}
+
+                                        {% for form in formset.forms %}
+                                            <div class="col-md-4 form_set">
+                                                {% for hidden in form.hidden_fields %}
+                                                    {{ hidden }}
+                                                {% endfor %}
+                                                <h4> Услуга {{ forloop.counter }}
+                                                    {% if form.instance.id %}
+                                                        {#                                                        <div class="form-group pull-right margin-bottom-15">#}
+                                                        {#                                                            <a href="{% url 'admin_panel:delete_article' form.instance.id %}"#}
+                                                        {#                                                               data-confirm="Удалить?"#}
+                                                        {#                                                               title="Удалить"><i class="fa fa-trash text-red"#}
+                                                        {#                                                                                  aria-hidden="true"></i></a>#}
+                                                        {#                                                        </div>#}
+                                                        <a href="{% url 'admin_panel:delete_article' form.instance.id %}"
+                                                           class="pull-right text-red"
+                                                           onClick="delete_object(event)">
+                                                            <i class="fa fa-trash"></i></a>
+                                                    {% else %}
+                                                        <a href="#!" onClick="delete_parent(this, 2)"
+                                                           class="pull-right text-red form-row-remove-btn">
+                                                            <i class="fa fa-trash"></i></a>
+                                                    {% endif %}
+                                                </h4>
+
+                                                {% if form.instance.image %}
+                                                    <img class="img-responsive margin-bottom-15"
+                                                         style="width: 627px; height: 200px; object-fit: cover;"
+                                                         src="{{ form.instance.image.url }}"
+                                                         alt="">
+
+                                                {% else %}
+                                                    <img class="img-responsive margin-bottom-15"
+                                                         style="width: 627px; height: 200px; object-fit: cover;"
+                                                         src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                         alt="">
+                                                {% endif %}
+
+                                                <div class="form-group">
+                                                    <label for="{{ form.image.auto_id }}">Рекомендуемый размер:
+                                                        (720x300)</label>
+                                                    <input type="file" id="{{ form.image.auto_id }}"
+                                                           name="{{ form.image.html_name }}" class="form-control">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="{{ form.title.auto_id }}">Название услуги</label>
+                                                    {{ form.title }}
+                                                </div>
+
+                                                <div class="form-group margin-bottom-30">
+                                                    <div class="form-group">
+                                                        <label class="control-label"
+                                                               for="{{ form.description.auto_id }}">Описание
+                                                            услуги</label>
+                                                        {{ form.description|safe }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div id="empty_form" style="display:none">
+                                        <div class="col-md-4 new_form"
+                                             id="{{ formset.empty_form.title.auto_id|get_int }}">
+
+                                            <h4> Услуга <span class="new-form-title">77</span>
+                                                <a href="#!" onClick="delete_parent(this, 2)"
+                                                   class="pull-right text-red form-row-remove-btn">
+                                                    <i class="fa fa-trash"></i></a>
+                                            </h4>
+
+                                            <img class="img-responsive margin-bottom-15"
+                                                 style="width: 627px; height: 200px; object-fit: cover;"
+                                                 src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
+                                                 alt="">
+
+                                            <div class="form-group">
+                                                <label for="{{ formset.empty_form.image.auto_id }}">Рекомендуемый
+                                                    размер:
+                                                    (720x300)</label>
+                                                <input type="file" id="{{ formset.empty_form.image.auto_id }}"
+                                                       name="{{ formset.empty_form.image.html_name }}"
+                                                       class="form-control">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="{{ formset.empty_form.title.auto_id }}">Название
+                                                    услуги</label>
+                                                {{ formset.empty_form.title }}
+                                            </div>
+
+                                            <div class="form-group margin-bottom-30">
+                                                <div class="form-group">
+                                                    <label class="control-label"
+                                                           for="{{ formset.empty_form.description.auto_id }}">Описание
+                                                        услуги</label>
+                                                    {{ formset.empty_form.description }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                {#<--END services formset->#}
+
+                                {#<--seo_form-->#}
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Настройки SEO</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.title.auto_id }}">{{ seo_data_form.title.label }}</label>
+                                            {{ seo_data_form.title }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.description.auto_id }}">{{ seo_data_form.description.label }}</label>
+                                            {{ seo_data_form.description }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.keywords.auto_id }}">{{ seo_data_form.keywords.label }}</label>
+                                            {{ seo_data_form.keywords }}
+                                        </div>
+
+                                    </div>
+                                </div>
+                                {#<--END seo_form-->#}
+
+                                {#<--form footer-->#}
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <div class="form-group">
+                                            <a href="{% url 'admin_panel:site_services' %}" class="btn btn-default">Отменить</a>
+                                            <button type="button" role="button" id="add_more"
+                                                    class="btn btn-success bg-green-active">
+                                                Добавить услугу
+                                            </button>
+                                            <button id="submit" type="submit" class="btn btn-success">Сохранить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {#<--END form footer-->#}
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    {#    <script src="{% static 'site/js/make_summernote.js' %}"></script>#}
+    {% include 'admin_panel/elements/messages.html' %}
+
+    <script>
+        let form_count = $('#id_formset_article-TOTAL_FORMS').val()
+        let form_initial = $('#id_formset_article-INITIAL_FORMS').val()
+        $('#add_more').click(function () {
+            form_count++
+            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, (form_count - 1)));
+            $('#id_formset_article-TOTAL_FORMS').val(form_count);
+            make_summernote(form_count - 1)
+            change_service_numbers_for_new_forms()
+        })
+
+        $(document).ready(function () {
+            for (let i = 0; i < form_count; i++) {
+                make_summernote(i)
+                change_service_numbers_for_new_forms()
+            }
+        });
+
+        function make_summernote(i) {
+            const new_textarea = document.getElementById('id_formset_article-' + (i) + '-description')
+            $(new_textarea).summernote({
+                height: 150,
+                disableResizeEditor: true
+            })
+        }
+
+        function delete_parent(elem, level) {
+            let form_set = elem.parentElement;
+            if (level === 2) {
+                form_set = form_set.parentElement;
+            }
+            form_set.remove()
+            change_service_numbers_for_new_forms()
+            {#$('#id_formset_article-TOTAL_FORMS').val(form_count - 1)#}
+        }
+
+        function change_service_numbers_for_new_forms() {
+            let all_new_forms = document.querySelectorAll('.new-form-title'), i;
+            for (i = 0; i < all_new_forms.length; ++i) {
+                all_new_forms[i].innerHTML = '' + (parseInt(form_initial) + i + 1)
+            }
+        }
+
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            }else {
+                event.preventDefault();
+            }
+            {#if (window.confirm("Вы действительно хотите удалить объект?")) {#}
+            {#    $.ajax({#}
+            {#        type: 'GET',#}
+            {#        url: '/admin_panel/website/delete-article/' + id + '/',#}
+            {#        enctype: '',#}
+                    {#success: function (data) {#}
+                    {#error: function (response) {#}
+                    {#    alertify.error('Ошибка сервера. Попробуйте перезагрузить страницу и попробовать еще раз.');},#}
+            {#        cache: false,#}
+            {#        contentType: false,#}
+            {#        processData: false,#}
+            {#    });#}
+            {#    window.location = window.location#}
+        }
+    </script>
+{% endblock %}

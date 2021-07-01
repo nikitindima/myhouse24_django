@@ -7,18 +7,24 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0005_auto_20210627_1218'),
+        ("admin_panel", "0005_auto_20210627_1218"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='file',
-            field=models.FileField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('docs')),
+            model_name="document",
+            name="file",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "docs"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='name',
+            model_name="document",
+            name="name",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

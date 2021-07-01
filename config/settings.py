@@ -85,12 +85,14 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "django_celery_beat",
-    'robots'
+    "robots",
+    "django_summernote",
 ]
 LOCAL_APPS = [
     "src.admin_panel",
     "src.users",
     "src.site",
+    "src.admin_panel.templatetags"
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -571,3 +573,6 @@ elif not DEBUG:
         },
     }
     # endregion
+
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'

@@ -40,7 +40,7 @@ startapp:
 	django-admin startapp $(NAME) ./$(SOURCE)/$(NAME)
 
 run:
-	$(MANAGE) runserver 127.0.0.1:8001
+	$(MANAGE) runserver 127.0.0.1:8080
 
 # ##########################################################################
 # deploy commands

@@ -12,4 +12,5 @@ urlpatterns = [
     path("website/update-sitemap/", views.update_sitemap_view, name="update_sitemap"),
     path("website/delete-gallery-image/<int:pk>/", views.GalleryImageDeleteView.as_view(), name="delete_gallery_image"),
     path("website/delete-document/<int:pk>/", views.DocumentDeleteView.as_view(), name="delete_document"),
+    path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article"),
 ]
