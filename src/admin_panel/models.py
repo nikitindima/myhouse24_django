@@ -1,12 +1,15 @@
 import os
 
 from django.conf.global_settings import MEDIA_ROOT
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import ManyToManyField, URLField
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 
 from .services.media_services import UploadToPathAndRename
+
+User = get_user_model()
 
 
 # region SITE_CONTROL
@@ -106,3 +109,39 @@ class SiteContactsPage(models.Model):
 # endregion pages
 
 # endregion SITE_CONTROL
+
+# region PROPERTY
+class House(models.Model):
+    name = models.CharField(max_length=100)
+    address = models.CharField(max_length=300)
+    house_staff = models.ManyToManyField(User)
+    gallery = models.ManyToManyField(GalleryImage)
+
+
+class Section(models.Model):
+    name = models.CharField(max_length=100)
+    section = models.ForeignKey(House, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class Floor(models.Model):
+    name = models.CharField(max_length=100)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True)
+
+
+class Account(models.Model):
+    number = models.CharField(max_length=40)
+    is_active = models.BooleanField()
+
+
+class Flat(models.Model):
+    number = models.PositiveIntegerField()
+    area = models.DecimalField(max_digits=10, decimal_places=2)
+
+    floor = models.ForeignKey(Floor, on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True)
+    house = models.ForeignKey(House, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
+    # tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True, blank=True)
+
+# endregion PROPERTY
