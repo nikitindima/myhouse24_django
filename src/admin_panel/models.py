@@ -2,8 +2,9 @@ import os
 
 from django.conf.global_settings import MEDIA_ROOT
 from django.db import models
-from django.db.models import ManyToManyField
+from django.db.models import ManyToManyField, URLField
 from django.urls import reverse
+from phonenumber_field.modelfields import PhoneNumberField
 
 from .services.media_services import UploadToPathAndRename
 
@@ -85,6 +86,20 @@ class SiteAboutPage(models.Model):
 
 class SiteServicesPage(models.Model):
     services = models.ManyToManyField(Article)
+    seo_data = models.ForeignKey(SeoData, on_delete=models.CASCADE)
+
+
+class SiteContactsPage(models.Model):
+    title = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=3000, null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    phone = PhoneNumberField(null=True, blank=True)
+    map = models.CharField(max_length=4000, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    location = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=100, null=True, blank=True)
+
     seo_data = models.ForeignKey(SeoData, on_delete=models.CASCADE)
 
 

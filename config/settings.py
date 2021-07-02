@@ -87,6 +87,7 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "robots",
     "django_summernote",
+    "phonenumber_field"
 ]
 LOCAL_APPS = [
     "src.admin_panel",

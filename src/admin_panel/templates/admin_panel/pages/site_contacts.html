@@ -5,7 +5,145 @@
 
 {% block title %}Редактирование страницы{% endblock %}
 
-{% block content %}
-
+{% block head %}
+    <!-- include summernote css/js-->
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block content %}
+    <div class="content-wrapper" style="min-height: 869px;">
+        <section class="content-header">
+            <h1>
+                Редактирование страницы </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="/admin/"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Редактирование страницы</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Редактирование страницы "Контакты"</h3>
+                        </div>
+                        <div class="box-body">
+                            <form method="POST" novalidate>
+                                {% csrf_token %}
+
+                                <div class="row">
+                                    <div class="col-xs-12 col-md-8">
+                                        <h3 class="page-header">Контактная информация</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.title.auto_id }}">Заголовок</label>
+                                            {{ form1.title }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.description.auto_id }}">Краткий текст</label>
+                                            {{ form1.description }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.website.auto_id }}">Ссылка на коммерческий сайт</label>
+                                            {{ form1.website }}
+                                        </div>
+
+                                    </div>
+                                    <div class="col-xs-12 col-md-4">
+                                        <h3 class="page-header">Контакты</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.name.auto_id }}">ФИО</label>
+                                            {{ form1.name }}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.location.auto_id }}">Локация</label>
+                                            {{ form1.location }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.address.auto_id }}">Адрес</label>
+                                            {{ form1.address }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.phone.auto_id }}">Телефон</label>
+                                            {{ form1.phone }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.email.auto_id }}">E-mail</label>
+                                            {{ form1.email }}
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h3 class="page-header">Карта</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ form1.map.auto_id }}">Код карты</label>
+                                            {{ form1.map }}
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="page-header">Настройки SEO</h3>
+
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.title.auto_id }}">Заголовок</label>
+                                            {{ seo_data_form.title }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.description.auto_id }}">Описание</label>
+                                            {{ seo_data_form.description }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label"
+                                                   for="{{ seo_data_form.keywords.auto_id }}">Ключевые слова</label>
+                                            {{ seo_data_form.keywords }}
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <div class="form-group">
+                                            <a href="{% url 'admin_panel:site_contacts' %}" class="btn btn-default">Отменить</a>
+                                            <button type="submit" class="btn btn-success">Сохранить</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    <script src="{% static 'site/js/make_summernote.js' %}"></script>
+    {% include 'admin_panel/elements/messages.html' %}
+{% endblock %}

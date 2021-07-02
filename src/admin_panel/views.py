@@ -6,8 +6,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 
-from .forms import SiteHomeForm, SiteAboutForm, DocumentForm
-from .models import SiteHomePage, SiteAboutPage, GalleryImage, Document, Article, SiteServicesPage
+from .forms import SiteHomeForm, SiteAboutForm, DocumentForm, SiteContactsForm
+from .models import SiteHomePage, SiteAboutPage, GalleryImage, Document, Article, SiteServicesPage, SiteContactsPage
 from .services.forms_services import validate_forms, save_forms
 from .services.site_pages_services import (
     get_or_create_page_object,
@@ -94,11 +94,10 @@ def site_services_view(request):
 
     if request.method == "POST":
         forms_valid_status = validate_forms(seo_data_form, formset=formset)
-        for form in formset:
-            print('---------')
-            print(form.cleaned_data)
+
         if forms_valid_status:
             save_forms(seo_data_form, formset)
+
             for form in formset.extra_forms:
                 if form.cleaned_data != {}:
                     title = form.cleaned_data.get("title")
@@ -124,7 +123,27 @@ def site_services_view(request):
 
 
 def site_contacts_view(request):
-    return render(request, "admin_panel/pages/site_contacts.html")
+    obj = get_or_create_page_object(SiteContactsPage)
+    form1, seo_data_form = create_forms(request, obj, SiteContactsForm)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1, seo_data_form)
+
+        if forms_valid_status:
+            save_forms(form1, seo_data_form)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:site_contacts")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "obj": obj,
+        "form1": form1,
+        "seo_data_form": seo_data_form,
+    }
+    return render(request, "admin_panel/pages/site_contacts.html", context=context)
 
 
 # region SERVICES

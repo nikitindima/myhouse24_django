@@ -3,6 +3,7 @@ import unicodedata
 
 from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
+from django.forms.widgets import URLInput, EmailInput
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 from django_summernote.widgets import SummernoteWidget
@@ -13,7 +14,7 @@ from .models import (
     SeoData,
     SiteAboutPage,
     GalleryImage,
-    Document,
+    Document, SiteContactsPage,
 )
 
 # 2.5MB - 2621440
@@ -183,6 +184,69 @@ class SiteAboutForm(ModelForm):
                 )
         return uploaded_file
 
+
+class SiteContactsForm(ModelForm):
+    class Meta:
+        model = SiteContactsPage
+        exclude = ['seo_data', ]
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите заголовок",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control summernote",
+                    "placeholder": "Введите краткий текст",
+                }
+            ),
+            "website": URLInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите ссылку на сайт",
+                }
+            ),
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите имя контатного лица",
+                }
+            ),
+            "phone": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите телефон контатного лица",
+                }
+            ),
+            "map": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите код гугл карты",
+                    "rows": "6",
+                }
+            ),
+            "email": EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите адрес электронной почты",
+                }
+            ),
+            "location": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите локацию (улица, дом)",
+                }
+            ),
+            "address": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите адрес (район, город)",
+                }
+            ),
+        }
+        
 
 class ArticleForm(ModelForm):
     class Meta:
