@@ -2,6 +2,7 @@ import os
 
 from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ManyToManyField, URLField
 from django.urls import reverse
@@ -112,15 +113,22 @@ class SiteContactsPage(models.Model):
 
 # region PROPERTY
 class House(models.Model):
-    name = models.CharField(max_length=100)
-    address = models.CharField(max_length=300)
+    upload_path = os.path.join(MEDIA_ROOT, "images", "houses")
+
+    name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=300, null=True, blank=True)
     house_staff = models.ManyToManyField(User)
-    gallery = models.ManyToManyField(GalleryImage)
+    image1 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    image2 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    image3 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    image4 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    image5 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
 
 
 class Section(models.Model):
-    name = models.CharField(max_length=100)
-    section = models.ForeignKey(House, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=100, blank=True)
+    floors = models.PositiveIntegerField(blank=True, default=10, validators=[MinValueValidator(1)])
+    house = models.ForeignKey(House, on_delete=models.CASCADE)
 
 
 class Floor(models.Model):

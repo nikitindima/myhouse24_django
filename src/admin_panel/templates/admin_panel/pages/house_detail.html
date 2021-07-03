@@ -1,0 +1,106 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_house_list %}active{% endblock %}
+
+{% block title %}Дом {{ object.name }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 869px;">
+        <section class="content-header">
+            <h1>Дом {{ object.name }}</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:house_list' %}">Дома</a></li>
+                <li class="active">Дом {{ object.name }}</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"></h3>
+                    <div class="box-tools">
+                        <a href="{% url 'admin_panel:house_update' object.pk %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать дом</span><i class="fa fa-pencil visible-xs"
+                                                                               aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-4">
+                            <table class="table table-bordered table-striped table-view">
+                                <tbody>
+                                <tr>
+                                    <td>Название</td>
+                                    <td>{{ object.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Адрес</td>
+                                    <td>{{ object.address }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Секций</td>
+                                    <td>{{ sections }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Этажей</td>
+                                    <td>{{ floors }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Пользователи</td>
+                                    <td>
+                                        <p class="no-margin">Не назначены</p>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-xs-12 col-lg-8">
+                            <div class="row">
+                                <div class="col-xs-12 col-md-6">
+                                    <img src="{% if object.image1 %}{{ object.image1.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                         class="img-responsive largeImg margin-bottom-30" alt=""
+                                         style="width:522px; height: 350px; object-fit: cover;">
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <img src="{% if object.image2 %}{{ object.image2.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                         class="img-responsive smallImg margin-bottom-30" alt=""
+                                         style="width:248px; height: 160px; object-fit: cover;">
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <img src="{% if object.image3 %}{{ object.image3.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                         class="img-responsive smallImg margin-bottom-30" alt=""
+                                         style="width:248px; height: 160px; object-fit: cover;">
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <img src="{% if object.image4 %}{{ object.image4.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                         class="img-responsive smallImg margin-bottom-30" alt=""
+                                         style="width:248px; height: 160px; object-fit: cover;">
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <img src="{% if object.image5 %}{{ object.image5.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                         class="img-responsive smallImg margin-bottom-30" alt=""
+                                         style="width:248px; height: 160px; object-fit: cover;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

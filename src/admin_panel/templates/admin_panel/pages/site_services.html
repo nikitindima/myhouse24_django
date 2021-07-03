@@ -57,12 +57,6 @@
                                                 {% endfor %}
                                                 <h4> Услуга {{ forloop.counter }}
                                                     {% if form.instance.id %}
-                                                        {#                                                        <div class="form-group pull-right margin-bottom-15">#}
-                                                        {#                                                            <a href="{% url 'admin_panel:delete_article' form.instance.id %}"#}
-                                                        {#                                                               data-confirm="Удалить?"#}
-                                                        {#                                                               title="Удалить"><i class="fa fa-trash text-red"#}
-                                                        {#                                                                                  aria-hidden="true"></i></a>#}
-                                                        {#                                                        </div>#}
                                                         <a href="{% url 'admin_panel:delete_article' form.instance.id %}"
                                                            class="pull-right text-red"
                                                            onClick="delete_object(event)">
@@ -261,19 +255,6 @@
             }else {
                 event.preventDefault();
             }
-            {#if (window.confirm("Вы действительно хотите удалить объект?")) {#}
-            {#    $.ajax({#}
-            {#        type: 'GET',#}
-            {#        url: '/admin_panel/website/delete-article/' + id + '/',#}
-            {#        enctype: '',#}
-                    {#success: function (data) {#}
-                    {#error: function (response) {#}
-                    {#    alertify.error('Ошибка сервера. Попробуйте перезагрузить страницу и попробовать еще раз.');},#}
-            {#        cache: false,#}
-            {#        contentType: false,#}
-            {#        processData: false,#}
-            {#    });#}
-            {#    window.location = window.location#}
         }
     </script>
 {% endblock %}

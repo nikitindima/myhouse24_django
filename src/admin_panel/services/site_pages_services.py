@@ -35,7 +35,7 @@ def get_or_create_page_object(obj_model):
     return obj
 
 
-def create_formset(request, obj_m2m_field, formset_type):
+def create_formset_and_save_to_m2m_field(request, obj_m2m_field, formset_type):
     if formset_type is Article:
         formset_factory = modelformset_factory(
             Article, form=ArticleForm, fields=["title", "description", "image"], extra=0, can_delete=True

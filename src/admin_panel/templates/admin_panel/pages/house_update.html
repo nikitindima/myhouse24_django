@@ -1,0 +1,398 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_house_list %}active{% endblock %}
+
+{% block title %}Дом {{ object.name }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 345px;">
+        <section class="content-header">
+            <h1>Дом {{ object.name }}</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:house_list' %}">Дома</a></li>
+                <li><a href="{% url 'admin_panel:house_detail' object.id %}">Дом {{ object.name }}</a></li>
+                <li class="active">Редактирование</li>
+            </ul>
+
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-body">
+
+                    {#                    <form id="myForm" method="post" action="">#}
+                    {#                        <table border="0" cellpadding="0" cellspacing="0">#}
+                    {#                            <tbody>#}
+                    {#                            {% for form in formset.forms %}#}
+                    {#                                <tr>#}
+                    {#                                    <td>{{ form.name }}</td>#}
+                    {#                                    <td>{{ form.floors }}</td>#}
+                    {#                                    {{ form.DELETE }}#}
+                    {#                                </tr>#}
+                    {#                            {% endfor %}#}
+                    {#                            </tbody>#}
+                    {#                        </table>#}
+                    {#                        {{ formset.management_form }}#}
+                    {#                    </form>#}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-4">
+                                <div class="form-group">
+
+                                    {{ form1.name.label_tag }}
+                                    {{ form1.name }}
+
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form1.address.label_tag }}
+                                    {{ form1.address }}
+
+                                </div>
+
+                                <div class="form-group">
+
+                                    {{ form1.image1.label_tag }}
+                                    {{ form1.image1 }}
+
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form1.image2.label_tag }}
+                                    {{ form1.image2 }}
+
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form1.image3.label_tag }}
+                                    {{ form1.image3 }}
+
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form1.image4.label_tag }}
+                                    {{ form1.image4 }}
+
+                                </div>
+                                <div class="form-group">
+
+                                    {{ form1.image5.label_tag }}
+                                    {{ form1.image5 }}
+
+                                </div>
+
+
+                            </div>
+
+                            <div class="col-xs-12 col-lg-8">
+                                <div class="row">
+                                    <div class="col-xs-12 col-md-6">
+                                        <img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                {% if object.image1 %}{{ object.image1.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                             class="img-responsive largeImg margin-bottom-30" alt=""
+                                             style="width:522px; height: 350px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-xs-6 col-md-3">
+                                        <img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                {% if object.image2 %}{{ object.image2.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                             class="img-responsive smallImg margin-bottom-30" alt=""
+                                             style="width:248px; height: 160px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-xs-6 col-md-3">
+                                        <img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                {% if object.image3 %}{{ object.image3.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                             class="img-responsive smallImg margin-bottom-30" alt=""
+                                             style="width:248px; height: 160px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-xs-6 col-md-3">
+                                        <img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                {% if object.image4 %}{{ object.image4.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                             class="img-responsive smallImg margin-bottom-30" alt=""
+                                             style="width:248px; height: 160px; object-fit: cover;">
+                                    </div>
+                                    <div class="col-xs-6 col-md-3">
+                                        <img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                {% if object.image5 %}{{ object.image5.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                             class="img-responsive smallImg margin-bottom-30" alt=""
+                                             style="width:248px; height: 160px; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-8">
+                                <div class="nav-tabs-custom">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#tab-sections" data-toggle="tab"
+                                                              aria-expanded="true">Секции</a></li>
+                                        <li><a href="#tab-houseuseradmins" data-toggle="tab" aria-expanded="false">Пользователи</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+
+                                        <div class="tab-pane active clearfix" id="tab-sections">
+                                            {{ formset.management_form }}
+                                            <div id="form-section-rows" class="form-group">
+                                                {% for form in formset %}
+                                                    {% for hidden in form.hidden_fields %}
+                                                        {{ hidden }}
+                                                    {% endfor %}
+
+                                                    <div class="row form-section"
+                                                         id="section-{{ form.name.auto_id|get_id }}">
+                                                        <div class="col-xs-12">
+                                                            <div class="form-group">
+                                                                <div class="input-group">
+                                                                    <div class="col-xs-8">
+                                                                        {{ form.name.label_tag }}
+                                                                        {{ form.name }}
+                                                                    </div>
+                                                                    <div class="col-xs-4">
+                                                                        {{ form.floors.label_tag }}
+                                                                        {{ form.floors }}
+                                                                    </div>
+                                                                    <span class="input-group-btn" style="">
+                                                                {% if form.instance.id %}
+                                                                    <button type="button" style="bottom: -11px;"
+                                                                            onclick="delete_object(event, {{ form.instance.id }})"
+                                                                            class="btn btn-danger form-row-remove-btn">
+                                                                        <i class="fa fa-trash"></i></button>
+                                                                {% else %}
+                                                                    <button type="button" style="bottom: -11px;"
+                                                                            onclick="delete_parent(this, 2)"
+                                                                            class="btn btn-danger form-row-remove-btn">
+                                                                        <i class="fa fa-trash"></i></button>
+                                                                {% endif %}
+                                                                </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div id="form-section-empty-form" style="display: none;">
+
+                                                <div class="row form-section"
+                                                     id="section-{{ formset.empty_form.name.auto_id|get_id }}">
+                                                    <div class="col-xs-12">
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <div class="col-xs-8 cols-sm-12">
+                                                                    {{ formset.empty_form.name.label_tag }}
+                                                                    {{ formset.empty_form.name }}
+                                                                </div>
+                                                                <div class="col-xs-4 cols-sm-12">
+                                                                    {{ formset.empty_form.floors.label_tag }}
+                                                                    {{ formset.empty_form.floors }}
+                                                                </div>
+                                                                <div class="input-group-btn">
+                                                                    <button type="button" style="bottom: -11px;"
+                                                                            onclick="delete_parent(this, 4)"
+                                                                            class="btn btn-danger form-row-remove-btn">
+                                                                        <i class="fa fa-trash"></i></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <button class="btn btn-success pull-right form-row-add-section-btn"
+                                                    type="button">Добавить
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-pane clearfix" id="tab-houseuseradmins">
+                                            <div id="form-houseuseradmin-rows">
+                                            </div>
+                                            <button class="btn btn-success pull-right form-row-add-houseuseradmin-btn"
+                                                    type="button">Добавить
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <div class="form-group">
+                                    <a href="{% url 'admin_panel:house_update' object.id %}" class="btn btn-default">Отменить</a>
+                                    <button type="submit" class="btn btn-success">Сохранить</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}>
+    <script src="{% static 'admin_panel/js/jquery.formset.js' %}"></script>
+    <script>
+        let section_empty_field = document.getElementById('id_formset_sections-__prefix__-floors')
+        section_empty_field.setAttribute('min', '1')
+        let sections_form_counters = $('#id_formset_sections-TOTAL_FORMS').val()
+        let sections_form_initial = $('#id_formset_sections-INITIAL_FORMS').val()
+
+        $('.form-row-add-section-btn').click(function () {
+            sections_form_counters++
+            $('#form-section-rows').append($('#form-section-empty-form').html().replace(/__prefix__/g, (sections_form_counters - 1)));
+            $('#id_formset_sections-TOTAL_FORMS').val(sections_form_counters);
+
+            let new_section_floors_field = document.getElementById('id_formset_sections-' + (sections_form_counters - 1) + '-floors')
+            new_section_floors_field.addEventListener("keypress", function (evt) {
+                if (evt.which < 48 || evt.which > 57) {
+                    evt.preventDefault();
+                }
+            });
+
+            let new_section_name_field = document.getElementById('id_formset_sections-' + (sections_form_counters - 1) + '-name')
+            new_section_name_field.value = 'Секция ' + sections_form_counters
+        })
+
+        function delete_parent(elem, level) {
+            let form_set = elem.parentElement;
+            for (let i = 0; i < level; i++) {
+                form_set = form_set.parentElement;
+            }
+            form_set.remove()
+        }
+
+        function delete_object(event, id) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+                send_ajax(id)
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function send_ajax(id) {
+            let form_data = new FormData()
+
+            form_data.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+            form_data.append('pk', id)
+
+            $.ajax({
+                type: 'post',
+                url: '/admin_panel/section/delete/',
+                enctype: 'multipart/form-data',
+                data: form_data,
+                success: function (data) {
+                    location.href = location.href;
+                },
+                error: function (response) {
+                    console.log(response)
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+            });
+        }
+    </script>
+{% endblock %}

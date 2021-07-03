@@ -1,6 +1,9 @@
 from django import forms
+from django.forms import modelformset_factory
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
+
+from src.admin_panel.models import Section
 
 
 def validate_multiple_forms_and_append(iterable_obj, append_to):
@@ -57,3 +60,53 @@ def check_filesize(uploaded_file, max_upload_size):
             _("Пожалуйста, загрузите файл с размером меньше %s. Текущий размер %s")
             % (filesizeformat(max_upload_size), filesizeformat(uploaded_file.size))
         )
+
+
+def validate_image(form, name, max_size=None):
+    uploaded_file = form.cleaned_data.get(name)
+    print(uploaded_file)
+    if uploaded_file is not None:
+
+        if max_size:
+            check_filesize(uploaded_file, max_size)
+        try:
+            # check if the file is a valid image
+            img = forms.ImageField()
+            img.to_python(uploaded_file)
+        except forms.ValidationError:
+            raise forms.ValidationError(
+                "Вы можете загружать только изображения"
+            )
+
+
+def create_formset(form, request, post=False, qs=None, can_delete=False):
+    formset_factory = modelformset_factory(
+        model=form.Meta.model, form=form, extra=0, can_delete=can_delete
+    )
+    formset = formset_factory(
+        request.POST or None,
+        prefix="formset_sections",
+    )
+
+    if post:
+        formset.data = request.POST or None
+    if qs is None:
+        formset.queryset = form.Meta.model.objects.none()
+    else:
+        formset.queryset = qs
+
+    return formset
+
+
+def save_extra_forms(formset, model, **kwargs):
+    for form in formset.extra_forms:
+        if form.cleaned_data.get("name"):
+            name = form.cleaned_data.get("name")
+
+            if model is Section:
+                new_object = Section(name=name, house=kwargs['house'])
+            else:
+                raise Exception('You passed wrong model type to "save_extra_forms" function')
+
+            new_object.full_clean()
+            new_object.save()

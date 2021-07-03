@@ -1,7 +1,7 @@
 {#<-----Messages----->#}
 {% for message in messages %}
     <script>
-        alertify.{{ message.tags }}('{{ message }}', 10);
+        alertify.{{ message.tags }}('{{ message|escape }}', 10);
     </script>
 {% endfor %}
 

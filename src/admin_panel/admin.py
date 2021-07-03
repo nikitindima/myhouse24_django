@@ -6,7 +6,7 @@ from .models import (
     SiteHomePage,
     SiteAboutPage,
     GalleryImage,
-    Document, SiteServicesPage,
+    Document, SiteServicesPage, House, Flat, Section,
 )
 
 admin.site.register(SeoData)
@@ -16,3 +16,6 @@ admin.site.register(SiteAboutPage)
 admin.site.register(SiteServicesPage)
 admin.site.register(Document)
 admin.site.register(GalleryImage)
+admin.site.register(House)
+admin.site.register(Flat)
+admin.site.register(Section)

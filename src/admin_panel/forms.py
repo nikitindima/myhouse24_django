@@ -1,12 +1,14 @@
 import os
 import unicodedata
+from collections import OrderedDict
 
 from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
-from django.forms.widgets import URLInput, EmailInput
+from django.forms.widgets import URLInput, EmailInput, NumberInput
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
-from django_summernote.widgets import SummernoteWidget
+from django_form_builder.forms import BaseDynamicForm
+from django_form_builder import dynamic_fields
 
 from .models import (
     SiteHomePage,
@@ -14,7 +16,7 @@ from .models import (
     SeoData,
     SiteAboutPage,
     GalleryImage,
-    Document, SiteContactsPage,
+    Document, SiteContactsPage, House, Section, Floor,
 )
 
 # 2.5MB - 2621440
@@ -25,16 +27,21 @@ from .models import (
 # 100MB 104857600
 # 250MB - 214958080
 # 500MB - 429916160
-from .services.forms_services import check_filesize
+from .services.forms_services import check_filesize, validate_image
 
 MAX_UPLOAD_SIZE = 20971520
 
 
+# region SHARED_STAFF
 class GalleryImageForm(ModelForm):
     class Meta:
         model = GalleryImage
         fields = ["image"]
 
+
+# endregion SHARED_STAFF
+
+# region SITE_CONTROL
 
 class DocumentForm(ModelForm):
     name = forms.CharField(
@@ -97,10 +104,10 @@ class SiteHomeForm(ModelForm):
                     "placeholder": "Введите заголовок",
                 }
             ),
-            "description": SummernoteWidget(
+            "description": Textarea(
                 attrs={
-                    'summernote': {'disableResizeEditor': 'true', 'height': '200', 'width': '100%',
-                                   'placeholder': 'введите описание'}
+                    "class": "form-control summernote",
+                    "placeholder": "Введите описание",
                 }
             ),
             "show_links": CheckboxInput(
@@ -246,7 +253,7 @@ class SiteContactsForm(ModelForm):
                 }
             ),
         }
-        
+
 
 class ArticleForm(ModelForm):
     class Meta:
@@ -345,3 +352,105 @@ class SeoDataForm(ModelForm):
             "description": "СЕО - Описание",
             "keywords": "СЕО - Ключевые слова",
         }
+
+
+# endregion SITE_CONTROL
+
+# region PROPERTY
+# region staff
+class SectionForm(ModelForm):
+    class Meta:
+        model = Section
+        fields = ["name", "floors"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название секции",
+                }
+            ),
+            "floors": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите количество этажей",
+                    "type": "number",
+                    "max": 500,
+                    "min": 5,
+                }
+            ),
+        }
+        labels = {
+            "name": "Название",
+            "floors": "Этажи",
+        }
+
+
+class FloorForm(forms.ModelForm):
+    class Meta:
+        model = Floor
+        fields = ["name"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название этажа",
+                }
+            ),
+        }
+        labels = {
+            "name": "Название"
+        }
+
+
+# endregion staff
+
+class HouseForm(ModelForm):
+    class Meta:
+        model = House
+        fields = ['name', 'address', 'image1', 'image2', 'image3', 'image4', 'image5']
+
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название дома",
+                }
+            ),
+            "address": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите адрес дома",
+                }
+            ),
+            "image1": FileInput(),
+            "image2": FileInput(),
+            "image3": FileInput(),
+            "image4": FileInput(),
+            "image5": FileInput(),
+        }
+        labels = {
+            "name": "Название",
+            "address": "Адрес",
+            "image1": "Изображение #1. Размер: (522x350)",
+            "image2": "Изображение #2. Размер: (248x160)",
+            "image3": "Изображение #3. Размер: (248x160)",
+            "image4": "Изображение #4. Размер: (248x160)",
+            "image5": "Изображение #5. Размер: (248x160)",
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for image in ["image1", "image2", "image3", "image4", "image5"]:
+            validate_image(self, image, max_size=MAX_UPLOAD_SIZE)
+        return cleaned_data
+
+
+class HouseUpdateForm(HouseForm):
+    class Meta(HouseForm.Meta):
+        model = House
+
+
+class HouseCreateForm(HouseForm):
+    class Meta(HouseForm.Meta):
+        model = House
+# endregion PROPERTY

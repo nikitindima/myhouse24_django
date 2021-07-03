@@ -6,9 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="icon" type="image/png" href="http://myhouse24.avada-media.ua/favicon.png">
-    <meta name="csrf-param" content="_csrf-backend">
-    <meta name="csrf-token"
-          content="I9zRnQtvEUdUpkdxChPyYocqnhttfpjG2smcP2Q-p2xOlYfzWF1iMCOUMQlPer0bxkvTKSkh84KqpuhNN23-QQ==">
     <title>{% block title %}{% endblock %}</title>
     <link href="{% static 'admin_panel/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'admin_panel/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}"
@@ -146,14 +143,14 @@
                 <li><a href="/admin_panel/flat/index"><i class="fa fa-key"></i> <span>Квартиры</span></a></li>
                 <li><a href="/admin_panel/user/index"><i class="fa fa-users"></i> <span>Владельцы квартир</span></a>
                 </li>
-                <li><a href="/admin_panel/house/index"><i class="fa fa-building"></i> <span>Дома</span></a></li>
+                <li class="{% block nav_item_house_list %}{% endblock %}"><a href="{% url 'admin_panel:house_list' %}"><i class="fa fa-building"></i> <span>Дома</span></a></li>
                 <li><a href="/admin_panel/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
                 </li>
                 <li><a href="/admin_panel/master-request/index"><i class="fa fa-wrench"></i>
                     <span>Заявки вызова мастера</span></a></li>
                 <li><a href="/admin_panel/counter-data/counters"><i class="fa fa-dashboard"></i>
                     <span>Показания счетчиков</span></a></li>
-                <li class="{% block nav_item_site_control %}{% endblock %}treeview"><a href="#!"><i
+                <li class="{% block nav_item_site_control %}{% endblock %} treeview"><a href="#!"><i
                         class="fa fa-desktop"></i> <span>Управление сайтом</span> <span
                         class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                     <ul class='treeview-menu'>
@@ -197,7 +194,6 @@
     {% include 'admin_panel/elements/footer.html' %}
 
     <script src="{% static 'admin_panel/js/jquery.js' %}"></script>
-    <script src="{% static 'admin_panel/js/yii.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/fastclick/fastclick.js' %}"></script>
@@ -210,7 +206,7 @@
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
-    <script src="{% static 'admin_panel/js/main.js' %}"></script>
+{#    <script src="{% static 'admin_panel/js/main.js' %}"></script>#}
     <script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
 
     {% block scripts %}{% endblock %}

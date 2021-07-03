@@ -14,6 +14,13 @@ def home_view(request):
 class HomeView(DetailView):
     template_name = "site/pages/home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        contacts = get_or_create_page_object(SiteContactsPage)
+
+        context.update({'contacts': contacts})
+        return context
+
     def get_object(self, queryset=None):
         obj = get_or_create_page_object(SiteHomePage)
         return obj

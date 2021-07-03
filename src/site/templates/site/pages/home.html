@@ -1,4 +1,5 @@
 {% extends "site/elements/base.html" %}
+{% load extra_tags %}
 {% load static %}
 {% block nav_item_home %}active{% endblock %}
 
@@ -55,12 +56,11 @@
                         <h3>Контакты</h3>
                     </div>
                     <div class="box">
-                        <p><i class="fas fa-user-circle"></i> AVADA-MEDIA</p>
-                        <p><i class="fas fa-compass"></i> ул. Космонавтов, 32</p>
-                        <p><i class="fas fa-map-marker"></i> Малиновский р-н, г. Одесса</p>
-                        <p><i class="fas fa-phone"></i> <a href="tel:+380971799663">+38 (097) 179-96-63</a></p>
-                        <p><i class="fas fa-envelope"></i> <a href="mailto:info@avada-media.com.ua">info@avada-media.com.ua</a>
-                        </p>
+                        <p><i class="fas fa-user-circle"></i> {{ contacts.name }}</p>
+                        <p><i class="fas fa-compass"></i> {{ contacts.location }}</p>
+                        <p><i class="fas fa-map-marker"></i> {{ contacts.address }}</p>
+                        <p><i class="fas fa-phone"></i> <a href="tel:{{ contacts.phone }}">{{ contacts.phone|cool_phone_number }}</a></p>
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:{{ contacts.email }}">{{ contacts.email }}</a></p>
                     </div>
                 </div>
             </div>
