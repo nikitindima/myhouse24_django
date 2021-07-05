@@ -38,3 +38,6 @@ django-robots  # https://django-robots.readthedocs.io/en/latest/#installation
 
 # Summernote
 django_summernote
+
+# Validation
+django-jsonview

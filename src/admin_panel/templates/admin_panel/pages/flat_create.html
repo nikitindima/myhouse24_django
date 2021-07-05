@@ -1,0 +1,195 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_house_list %}active{% endblock %}
+
+{% block title %}Новый дом{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>
+                Новая квартира </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:flat_list' %}">Квартиры</a></li>
+                <li class="active">Новая квартира</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-body">
+
+                    <form id="w0" method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6 col-sm-push-6">
+                                <div class="form-group field-flatform-account_uid ">
+                                    <label class="control-label" for="flatform-account_uid">Лицевой счет</label>
+                                    <input type="text" id="flatform-account_uid" class="form-control"
+                                           name="FlatForm[account_uid]"> <select id="account_uid"
+                                                                                 class="form-control select2-hidden-accessible"
+                                                                                 name="account_uid"
+                                                                                 onchange="if ($(this).val()) { $(&quot;#flatform-account_uid&quot;).val($(this).val()); $(&quot;#account_uid&quot;).val(&quot;&quot;).trigger(&quot;change&quot;); }"
+                                                                                 data-s2-options="s2options_7ebc6538"
+                                                                                 data-krajee-select2="select2_27ecbd8a"
+                                                                                 style="display:none" tabindex="-1"
+                                                                                 aria-hidden="true">
+                                    <option value="">или выберите из списка...</option>
+                                </select><span class="select2 select2-container select2-container--default" dir="ltr"
+                                               style="width: 100%;"><span class="selection"><span
+                                        class="select2-selection select2-selection--single" role="combobox"
+                                        aria-haspopup="true" aria-expanded="false" tabindex="0"
+                                        aria-labelledby="select2-account_uid-container"><span
+                                        class="select2-selection__rendered" id="select2-account_uid-container"><span
+                                        class="select2-selection__placeholder">или выберите из списка...</span></span><span
+                                        class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span
+                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
+                                    <div class="help-block"></div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-sm-pull-6">
+
+                                <div class="form-group required">
+                                    {{ form1.number|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.area|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group field-flatform-house_id required">
+                                    {{ form1.house|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group field-flatform-section_id">
+                                    {{ form1.section|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group field-flatform-floor_id">
+                                    {{ form1.floor|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group field-flatform-user_id">
+                                    {{ form1.owner|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group field-flatform-tariff_id has-success">
+                                    {{ form1.tariff|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="redirect" value="False" id="redirect">
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <div class="form-group">
+                                    <a href="{% url 'admin_panel:flat_create' %}"
+                                       class="btn btn-default margin-bottom-15">Отменить</a>
+                                    <input type="submit" class="btn btn-success margin-bottom-15" name="action_save"
+                                           value="Сохранить"> <input type="submit"
+                                                                     class="btn btn-success margin-bottom-15 bg-green-active"
+                                                                     onclick="redirect_after_save()"
+                                                                     value="Сохранить и добавить н  овую"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const select_house = $('select[name=form1-house]')
+            const select_section = $('select[name=form1-section]')
+            const select_floor = $('select[name=form1-floor]')
+            const select_owner = $('select[name=form1-owner]')
+            const select_tariff = $('select[name=form1-tariff]')
+
+            select_house.select2({
+                theme: 'bootstrap',
+            })
+            select_section.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/sections/' + select_house.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_floor.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/floors/' + select_section.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_owner.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/users/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_tariff.select2({
+                theme: 'bootstrap',
+            })
+
+            select_house.on("select2:select", function () {
+                select_section.select2("val", 0)
+                select_floor.select2("val", '0')
+            });
+            select_section.on("select2:select", function () {
+                select_floor.select2("val", '0')
+            });
+        })
+
+        function redirect_after_save() {
+            let redirect_status = $('#redirect')
+            redirect_status.val('True');
+        }
+    </script>
+
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

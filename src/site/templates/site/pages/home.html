@@ -13,13 +13,25 @@
 {% block content %}
     <div class="slider">
         <div>
+            {% if object.slider1 %}
             <img src="{{ object.slider1.url }}" alt="asf">
+            {% else %}
+            <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="asf">
+            {% endif %}
         </div>
         <div>
-            <img src="{{ object.slider2.url }}" alt="saf">
+            {% if object.slider2 %}
+            <img src="{{ object.slider2.url }}" alt="asf">
+            {% else %}
+            <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="asf">
+            {% endif %}
         </div>
         <div>
-            <img src="{{ object.slider3.url }}" alt="afs">
+            {% if object.slider3 %}
+            <img src="{{ object.slider3.url }}" alt="asf">
+            {% else %}
+            <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="asf">
+            {% endif %}
         </div>
     </div>
 

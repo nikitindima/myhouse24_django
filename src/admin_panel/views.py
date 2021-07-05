@@ -1,15 +1,20 @@
+from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.sitemaps import ping_google
 from django.db.models import Max
 from django.http import HttpResponseRedirect, HttpRequest, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.context_processors import csrf
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView, UpdateView, DetailView
+from django.core import serializers
+from jsonview.decorators import json_view
 
 from .forms import SiteHomeForm, SiteAboutForm, SiteContactsForm, HouseCreateForm, SectionForm, FloorForm, HouseForm, \
-    HouseUpdateForm
+    HouseUpdateForm, FlatCreateForm
 from .models import SiteHomePage, SiteAboutPage, GalleryImage, Document, Article, SiteServicesPage, SiteContactsPage, \
-    House, Section
+    House, Section, Flat
 from .services.forms_services import validate_forms, save_forms, create_formset, save_extra_forms
 from .services.site_pages_services import (
     get_or_create_page_object,
@@ -17,6 +22,8 @@ from .services.site_pages_services import (
     create_formset_and_save_to_m2m_field,
     save_new_objects_to_many_to_many_field,
 )
+
+User = get_user_model()
 
 
 def home_view(request):
@@ -300,6 +307,90 @@ def section_delete_view(request):
         section.delete()
     return JsonResponse({'success': 'true'})
 
+
 # endregion HOUSE
 
+# region FLAT
+
+class FlatListView(ListView):
+    template_name = "admin_panel/pages/flat_list.html"
+    queryset = Flat.objects.select_related('section', 'house', 'owner')
+
+
+def flat_create_view(request):
+    form1 = FlatCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            if request.POST.get('redirect') == 'True':
+                return redirect("admin_panel:flat_create")
+            else:
+                return redirect("admin_panel:flat_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/flat_create.html", context=context)
+
+
+class FlatDeleteView(DeleteView):
+    model = House
+    success_url = reverse_lazy("admin_panel:house_list")
+    success_message = "Квартира успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+# endregion FLAT
+
 # endregion PROPERTY
+
+# region API
+
+def api_sections(request, pk):
+    sections = Section.objects.filter(house=pk)
+    results = []
+    for section in sections:
+        data = section.serialize(pattern='select2')
+        results.append(data)
+    print(results)
+    return JsonResponse({'results': results})
+
+
+def api_floors(request, pk):
+    section = get_object_or_404(Section, pk=pk)
+    floors = section.floors
+    print(floors)
+    results = []
+    for floor in range(floors):
+        data = {'id': str(range(floors)[floor] + 1), 'text': f'Этаж {floor + 1}'}
+        results.append(data)
+    print(results)
+    return JsonResponse({'results': results})
+
+
+def api_users(request):
+    users = User.objects.filter(status="ACTIVE", is_staff=False)
+    results = []
+    for user in users:
+        data = user.serialize(pattern='select2')
+        results.append(data)
+    print(results)
+    return JsonResponse({'results': results})
+
+
+# endregion API
+

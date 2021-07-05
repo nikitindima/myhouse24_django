@@ -1,0 +1,187 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_flat_list %}active{% endblock %}
+
+{% block title %}Квартиры{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 345px;">
+        <section class="content-header">
+            <h1>
+                Дома </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
+                <li class="active">Квартиры</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="pull-right margin-bottom">
+                        <a class="btn btn-success" href="{% url 'admin_panel:flat_create' %}">Добавить квартиру</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"></h3>
+                            <div class="box-tools">
+                                <a href="{% url 'admin_panel:flat_list' %}" class="btn btn-default btn-sm">
+                                    <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
+                                                                              aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive" style="padding:10px">
+                            <table id="datatable" class="display" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>№ квартиры</th>
+                                    <th>Дом</th>
+                                    <th>Секция</th>
+                                    <th>Этаж</th>
+                                    <th>Владелец</th>
+                                    <th>Остаток</th>
+                                    <th></th>
+                                </tr>
+                                <tr style="">
+                                    <th class="dt-center">№ квартиры</th>
+                                    <th>Дом</th>
+                                    <th>Секция</th>
+                                    <th>Этаж</th>
+                                    <th>Владелец</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for flat in flat_list %}
+
+                                    <tr data-href="{% url 'admin_panel:home' %}"
+                                        style="cursor: pointer;">
+                                        <td data-filter="{{ flat.number }}">{{ flat.number }}</td>
+                                        <td data-filter="{{ flat.house.name }}">{{ flat.house.name }}</td>
+                                        <td data-filter="{{ flat.section.name }}">{{ flat.section.name }}</td>
+                                        <td data-filter="Этаж {{ flat.floor }}">Этаж {{ flat.floor }}</td>
+                                        <td data-filter="{{ flat.owner }}">{{ flat.owner }}</td>
+                                        <td>0</td>
+                                        <td>
+                                            <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
+                                                    {#                                                                                 href="{% url 'admin_panel:flat_update' flat.pk %}"#}
+                                                                                 title="Редактировать"
+                                                                                 data-toggle="tooltip">
+                                                <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
+                                                    {#                                                                                    href="{% url 'admin_panel:flat_delete' flat.pk %}"#}
+                                                                                    title="Удалить"
+                                                                                    onClick="delete_object(event)">
+                                                <i class="fa fa-trash"></i></a></div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="box-footer">
+                            <div>Количество квартир: <span class="text-bold">{{ flat_list.count }}</span></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
+            const table = $('#datatable').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                sDom: '<"top"i>rt<"bottom"lp><"clear">',
+                lengthChange: false,
+                bInfo: false,
+                pageLength: 10,
+                drawCallback: add_links_to_rows,
+                columns: [
+                    {"width": "8%", "className": "dt-center"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    {"width": "8%", "className": "dt-center"},
+                ],
+
+            });
+
+            $('#datatable thead tr:eq(1) th').slice(0, 5).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+
+                        table.column(i)
+                            .search(val ? '^' + $(this).val() + '$' : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    if ($.inArray(thisStatus, statusItems) === -1) statusItems.push(thisStatus);
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+        });
+
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+
+{% endblock %}

@@ -14,6 +14,7 @@ from src.admin_panel.services.media_services import UploadToPathAndRename
 
 class User(AbstractUser):
     upload_path = os.path.join(MEDIA_ROOT, "images", "site", "home_page", "articles")
+    # username = None
 
     class UserStatus(models.TextChoices):
         ACTIVE = 'ACTIVE', _('Активный')
@@ -40,3 +41,14 @@ class User(AbstractUser):
 
         """
         return reverse("users:detail", kwargs={"username": self.username})
+
+    def get_full_name(self):
+        return f'{self.last_name} {self.first_name} {self.patronymic}'
+
+    def serialize(self, pattern):
+        if pattern == 'select2':
+            text = self.get_full_name()
+            return {'id': self.id, 'text': text}
+
+    def __str__(self):
+        return self.get_full_name()

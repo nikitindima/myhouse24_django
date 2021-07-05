@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from django import forms
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
-from django.forms.widgets import URLInput, EmailInput, NumberInput
+from django.forms.widgets import URLInput, EmailInput, NumberInput, Select
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 from django_form_builder.forms import BaseDynamicForm
@@ -16,7 +16,7 @@ from .models import (
     SeoData,
     SiteAboutPage,
     GalleryImage,
-    Document, SiteContactsPage, House, Section, Floor,
+    Document, SiteContactsPage, House, Section, Floor, Flat,
 )
 
 # 2.5MB - 2621440
@@ -453,4 +453,80 @@ class HouseUpdateForm(HouseForm):
 class HouseCreateForm(HouseForm):
     class Meta(HouseForm.Meta):
         model = House
+
+
+# region FLAT
+class FlatForm(ModelForm):
+    # floor = forms.ChoiceField(widget=forms.Select, choices=[(x, str(x)) for x in range(10)])
+
+    class Meta:
+        model = Flat
+        fields = ['number', 'area', 'floor', 'section', 'house', 'owner', 'account', 'tariff']
+        widgets = {
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+            "area": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+            "section": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+            "floor": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите этаж",
+                }, choices=[(0, '---------')]
+            ),
+            "house": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+            "owner": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Выберите владельца",
+                }
+            ),
+            "account": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+            "tariff": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер квартиры",
+                }
+            ),
+        }
+        labels = {
+            'number': 'Номер квартиры',
+            'area': 'Площадь квартиры',
+            'floor': 'Этаж',
+            'section': 'Секция',
+            'house': 'Дом',
+            'owner': 'Владелец',
+            'account': 'Лицевой счет',
+            'tariff': 'Тариф',
+        }
+
+
+class FlatCreateForm(FlatForm):
+    class Meta(FlatForm.Meta):
+        model = Flat
+
+# endregion FLAT
 # endregion PROPERTY

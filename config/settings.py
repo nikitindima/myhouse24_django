@@ -86,7 +86,6 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "django_celery_beat",
     "robots",
-    # "django_summernote",
     "phonenumber_field",
 ]
 LOCAL_APPS = [
