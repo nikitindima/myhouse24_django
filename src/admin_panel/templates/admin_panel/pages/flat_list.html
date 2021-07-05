@@ -72,7 +72,7 @@
                                 <tbody>
                                 {% for flat in flat_list %}
 
-                                    <tr data-href="{% url 'admin_panel:home' %}"
+                                    <tr data-href="{% url 'admin_panel:flat_detail' flat.pk %}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ flat.number }}">{{ flat.number }}</td>
                                         <td data-filter="{{ flat.house.name }}">{{ flat.house.name }}</td>
@@ -82,11 +82,11 @@
                                         <td>0</td>
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                    {#                                                                                 href="{% url 'admin_panel:flat_update' flat.pk %}"#}
+                                                                                 href="{% url 'admin_panel:flat_update' flat.pk %}"
                                                                                  title="Редактировать"
                                                                                  data-toggle="tooltip">
                                                 <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                    {#                                                                                    href="{% url 'admin_panel:flat_delete' flat.pk %}"#}
+                                                                                    href="{% url 'admin_panel:flat_delete' flat.pk %}"
                                                                                     title="Удалить"
                                                                                     onClick="delete_object(event)">
                                                 <i class="fa fa-trash"></i></a></div>

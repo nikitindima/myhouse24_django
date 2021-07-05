@@ -528,5 +528,10 @@ class FlatCreateForm(FlatForm):
     class Meta(FlatForm.Meta):
         model = Flat
 
+
+class FlatUpdateForm(FlatForm):
+    class Meta(FlatForm.Meta):
+        model = Flat
+
 # endregion FLAT
 # endregion PROPERTY

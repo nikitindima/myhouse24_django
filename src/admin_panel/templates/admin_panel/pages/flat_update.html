@@ -5,7 +5,7 @@
 {% load static %}
 {% block nav_item_flat_list %}active{% endblock %}
 
-{% block title %}Новый дом{% endblock %}
+{% block title %}Квартира {{ object.name }}{% endblock %}
 
 {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
@@ -14,16 +14,17 @@
 
 {% block content %}
 
-    <div class="content-wrapper" style="min-height: 867px;">
+    <div class="content-wrapper" style="min-height: 345px;">
         <section class="content-header">
-            <h1>
-                Новая квартира </h1>
+            <h1>Квартира {{ object.name }}</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
                 <li><a href="{% url 'admin_panel:flat_list' %}">Квартиры</a></li>
-                <li class="active">Новая квартира</li>
+                <li><a href="{% url 'admin_panel:flat_detail' object.id %}">Квартира {{ object.name }}</a></li>
+                <li class="active">Редактирование</li>
             </ul>
+
         </section>
 
         <section class="content">
@@ -184,11 +185,23 @@
             select_section.on("select2:select", function () {
                 select_floor.select2("val", '0')
             });
+            set_default_floor(select_floor)
         })
 
         function redirect_after_save() {
             let redirect_status = $('#redirect')
             redirect_status.val('True');
+        }
+
+        function set_default_floor(select_floor) {
+            let data = {
+                id: {{ object.floor }},
+                text: 'Этаж ' + {{ object.floor }}
+            };
+            let newOptionFloor = new Option(data.text, data.id, false, false);
+            select_floor.append(newOptionFloor);
+            select_floor.val({{ object.floor }});
+            select_floor.trigger('change');
         }
     </script>
 

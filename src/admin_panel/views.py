@@ -12,7 +12,7 @@ from django.core import serializers
 from jsonview.decorators import json_view
 
 from .forms import SiteHomeForm, SiteAboutForm, SiteContactsForm, HouseCreateForm, SectionForm, FloorForm, HouseForm, \
-    HouseUpdateForm, FlatCreateForm
+    HouseUpdateForm, FlatCreateForm, FlatUpdateForm
 from .models import SiteHomePage, SiteAboutPage, GalleryImage, Document, Article, SiteServicesPage, SiteContactsPage, \
     House, Section, Flat
 from .services.forms_services import validate_forms, save_forms, create_formset, save_extra_forms
@@ -341,9 +341,51 @@ def flat_create_view(request):
     return render(request, "admin_panel/pages/flat_create.html", context=context)
 
 
+class FlatDetailView(DetailView):
+    template_name = "admin_panel/pages/flat_detail.html"
+    model = Flat
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # sections = Section.objects.filter(house=self.object)
+        # floors = sections.aggregate(Max('floors')).get('floors__max')
+        # context.update({
+        #     'sections': sections.count(),
+        #     'floors': floors
+        # })
+        return context
+
+
+def flat_update_view(request, pk):
+    flat = get_object_or_404(Flat, pk=pk)
+    form1 = FlatUpdateForm(request.POST or None, request.FILES or None, prefix="form1", instance=flat)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            if request.POST.get('redirect') == 'True':
+                return redirect("admin_panel:flat_create")
+            else:
+                return redirect("admin_panel:flat_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "object": flat,
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/flat_update.html", context=context)
+
+
 class FlatDeleteView(DeleteView):
-    model = House
-    success_url = reverse_lazy("admin_panel:house_list")
+    model = Flat
+    success_url = reverse_lazy("admin_panel:flat_list")
     success_message = "Квартира успешно удалена"
 
     def get(self, request, *args, **kwargs):
@@ -391,6 +433,4 @@ def api_users(request):
     print(results)
     return JsonResponse({'results': results})
 
-
 # endregion API
-

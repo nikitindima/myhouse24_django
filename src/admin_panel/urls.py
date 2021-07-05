@@ -15,9 +15,9 @@ urlpatterns = [
 
     path("flats/", views.FlatListView.as_view(), name="flat_list"),
     path("flats/create/", views.flat_create_view, name="flat_create"),
-    path("flats/detail/<int:pk>/", views.HouseDetailView.as_view(), name="flat_detail"),
-    path("flats/update/<int:pk>/", views.house_update_view, name="flat_update"),
-    path("flats/delete/<int:pk>/", views.HouseDeleteView.as_view(), name="flat_delete"),
+    path("flats/detail/<int:pk>/", views.FlatDetailView.as_view(), name="flat_detail"),
+    path("flats/update/<int:pk>/", views.flat_update_view, name="flat_update"),
+    path("flats/delete/<int:pk>/", views.FlatDeleteView.as_view(), name="flat_delete"),
 
     path("website/home/", views.site_home_view, name="site_home"),
     path("website/about/", views.site_about_view, name="site_about"),
