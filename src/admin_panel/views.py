@@ -2,20 +2,42 @@ from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.sitemaps import ping_google
-from django.db.models import Max
+from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect, HttpRequest, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.template.context_processors import csrf
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView, ListView, UpdateView, DetailView
-from django.core import serializers
-from jsonview.decorators import json_view
+from django.views.generic import DeleteView, ListView, DetailView
 
-from .forms import SiteHomeForm, SiteAboutForm, SiteContactsForm, HouseCreateForm, SectionForm, FloorForm, HouseForm, \
-    HouseUpdateForm, FlatCreateForm, FlatUpdateForm
-from .models import SiteHomePage, SiteAboutPage, GalleryImage, Document, Article, SiteServicesPage, SiteContactsPage, \
-    House, Section, Flat
-from .services.forms_services import validate_forms, save_forms, create_formset, save_extra_forms
+from .forms import (
+    SiteHomeForm,
+    SiteAboutForm,
+    SiteContactsForm,
+    HouseCreateForm,
+    SectionForm,
+    FloorForm,
+    HouseForm,
+    HouseUpdateForm,
+    FlatCreateForm,
+    FlatUpdateForm,
+)
+from .models import (
+    SiteHomePage,
+    SiteAboutPage,
+    GalleryImage,
+    Document,
+    Article,
+    SiteServicesPage,
+    SiteContactsPage,
+    House,
+    Section,
+    Flat,
+)
+from .services.forms_services import (
+    validate_forms,
+    save_forms,
+    create_formset,
+    save_extra_forms,
+)
 from .services.site_pages_services import (
     get_or_create_page_object,
     create_forms,
@@ -112,7 +134,9 @@ def site_services_view(request):
                     title = form.cleaned_data.get("title")
                     description = form.cleaned_data.get("description")
                     image = form.cleaned_data.get("image")
-                    new_service = Article(title=title, description=description, image=image)
+                    new_service = Article(
+                        title=title, description=description, image=image
+                    )
                     new_service.full_clean()
                     new_service.save()
                     obj.services.add(new_service)
@@ -229,7 +253,10 @@ def house_create_view(request):
 
         messages.error(request, f"Ошибка при сохранении формы.")
         if errors:
-            [messages.error(request, f"{field}, {error.as_text()}") for field, error in formset.errors[0].items()]
+            [
+                messages.error(request, f"{field}, {error.as_text()}")
+                for field, error in formset.errors[0].items()
+            ]
 
     formset = create_formset(SectionForm, request)
 
@@ -248,18 +275,19 @@ class HouseDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         sections = Section.objects.filter(house=self.object)
-        floors = sections.aggregate(Max('floors')).get('floors__max')
-        context.update({
-            'sections': sections.count(),
-            'floors': floors
-        })
+        floors = sections.aggregate(Max("floors")).get("floors__max")
+        context.update({"sections": sections.count(), "floors": floors})
         return context
 
 
 def house_update_view(request, pk):
     house = get_object_or_404(House, pk=pk)
-    form1 = HouseCreateForm(request.POST or None, request.FILES or None, prefix="form1", instance=house)
-    formset = create_formset(SectionForm, request, post=True, qs=Section.objects.filter(house=house))
+    form1 = HouseCreateForm(
+        request.POST or None, request.FILES or None, prefix="form1", instance=house
+    )
+    formset = create_formset(
+        SectionForm, request, post=True, qs=Section.objects.filter(house=house)
+    )
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1, formset)
@@ -302,19 +330,20 @@ class HouseDeleteView(DeleteView):
 
 def section_delete_view(request):
     if request.is_ajax():
-        pk = request.POST['pk']
+        pk = request.POST["pk"]
         section = get_object_or_404(Section, pk=pk)
         section.delete()
-    return JsonResponse({'success': 'true'})
+    return JsonResponse({"success": "true"})
 
 
 # endregion HOUSE
 
 # region FLAT
 
+
 class FlatListView(ListView):
     template_name = "admin_panel/pages/flat_list.html"
-    queryset = Flat.objects.select_related('section', 'house', 'owner')
+    queryset = Flat.objects.select_related("section", "house", "owner")
 
 
 def flat_create_view(request):
@@ -328,7 +357,7 @@ def flat_create_view(request):
 
             messages.success(request, "Данные успешно обновлены.")
 
-            if request.POST.get('redirect') == 'True':
+            if request.POST.get("redirect") == "True":
                 return redirect("admin_panel:flat_create")
             else:
                 return redirect("admin_panel:flat_list")
@@ -347,19 +376,14 @@ class FlatDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # sections = Section.objects.filter(house=self.object)
-        # floors = sections.aggregate(Max('floors')).get('floors__max')
-        # context.update({
-        #     'sections': sections.count(),
-        #     'floors': floors
-        # })
         return context
 
 
 def flat_update_view(request, pk):
     flat = get_object_or_404(Flat, pk=pk)
-    form1 = FlatUpdateForm(request.POST or None, request.FILES or None, prefix="form1", instance=flat)
+    form1 = FlatUpdateForm(
+        request.POST or None, request.FILES or None, prefix="form1", instance=flat
+    )
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
@@ -369,7 +393,7 @@ def flat_update_view(request, pk):
 
             messages.success(request, "Данные успешно обновлены.")
 
-            if request.POST.get('redirect') == 'True':
+            if request.POST.get("redirect") == "True":
                 return redirect("admin_panel:flat_create")
             else:
                 return redirect("admin_panel:flat_list")
@@ -402,35 +426,50 @@ class FlatDeleteView(DeleteView):
 
 # region API
 
+
 def api_sections(request, pk):
     sections = Section.objects.filter(house=pk)
     results = []
+
     for section in sections:
-        data = section.serialize(pattern='select2')
+        data = section.serialize(pattern="select2")
         results.append(data)
-    print(results)
-    return JsonResponse({'results': results})
+
+    return JsonResponse({"results": results})
 
 
 def api_floors(request, pk):
     section = get_object_or_404(Section, pk=pk)
     floors = section.floors
-    print(floors)
     results = []
+
     for floor in range(floors):
-        data = {'id': str(range(floors)[floor] + 1), 'text': f'Этаж {floor + 1}'}
+        data = {"id": str(range(floors)[floor] + 1), "text": f"Этаж {floor + 1}"}
         results.append(data)
-    print(results)
-    return JsonResponse({'results': results})
+
+    return JsonResponse({"results": results})
 
 
 def api_users(request):
     users = User.objects.filter(status="ACTIVE", is_staff=False)
     results = []
+
     for user in users:
-        data = user.serialize(pattern='select2')
+        data = user.serialize(pattern="select2")
         results.append(data)
-    print(results)
-    return JsonResponse({'results': results})
+
+    return JsonResponse({"results": results})
+
 
 # endregion API
+
+# region USERS
+
+
+class UserListView(ListView):
+    template_name = "admin_panel/pages/user_list.html"
+    queryset = User.objects.filter(status="ACTIVE").prefetch_related(
+        Prefetch("flats", queryset=Flat.objects.select_related("house"))
+    )
+
+# endregion USERS

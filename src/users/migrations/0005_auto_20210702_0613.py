@@ -7,29 +7,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_auto_20210702_0612'),
+        ("users", "0004_auto_20210702_0612"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='birthday',
+            model_name="user",
+            name="birthday",
             field=birthday.fields.BirthdayField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='birthday_dayofyear_internal',
-            field=models.PositiveSmallIntegerField(default=None, editable=False, null=True),
+            model_name="user",
+            name="birthday_dayofyear_internal",
+            field=models.PositiveSmallIntegerField(
+                default=None, editable=False, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='description',
+            model_name="user",
+            name="description",
             field=models.CharField(blank=True, max_length=3000, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='patronymic',
-            field=models.CharField(default='Viorelovich', max_length=150, verbose_name='patronymic'),
+            model_name="user",
+            name="patronymic",
+            field=models.CharField(
+                default="Viorelovich", max_length=150, verbose_name="patronymic"
+            ),
             preserve_default=False,
         ),
     ]

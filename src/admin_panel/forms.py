@@ -16,7 +16,12 @@ from .models import (
     SeoData,
     SiteAboutPage,
     GalleryImage,
-    Document, SiteContactsPage, House, Section, Floor, Flat,
+    Document,
+    SiteContactsPage,
+    House,
+    Section,
+    Floor,
+    Flat,
 )
 
 # 2.5MB - 2621440
@@ -42,6 +47,7 @@ class GalleryImageForm(ModelForm):
 # endregion SHARED_STAFF
 
 # region SITE_CONTROL
+
 
 class DocumentForm(ModelForm):
     name = forms.CharField(
@@ -195,7 +201,9 @@ class SiteAboutForm(ModelForm):
 class SiteContactsForm(ModelForm):
     class Meta:
         model = SiteContactsPage
-        exclude = ['seo_data', ]
+        exclude = [
+            "seo_data",
+        ]
         widgets = {
             "title": TextInput(
                 attrs={
@@ -314,9 +322,7 @@ class ArticleForm(ModelForm):
             img = forms.ImageField()
             img.to_python(uploaded_file)
         except forms.ValidationError:
-            raise forms.ValidationError(
-                "Вы можете загружать только изображения."
-            )
+            raise forms.ValidationError("Вы можете загружать только изображения.")
 
         return uploaded_file
 
@@ -397,17 +403,16 @@ class FloorForm(forms.ModelForm):
                 }
             ),
         }
-        labels = {
-            "name": "Название"
-        }
+        labels = {"name": "Название"}
 
 
 # endregion staff
 
+
 class HouseForm(ModelForm):
     class Meta:
         model = House
-        fields = ['name', 'address', 'image1', 'image2', 'image3', 'image4', 'image5']
+        fields = ["name", "address", "image1", "image2", "image3", "image4", "image5"]
 
         widgets = {
             "name": TextInput(
@@ -461,7 +466,16 @@ class FlatForm(ModelForm):
 
     class Meta:
         model = Flat
-        fields = ['number', 'area', 'floor', 'section', 'house', 'owner', 'account', 'tariff']
+        fields = [
+            "number",
+            "area",
+            "floor",
+            "section",
+            "house",
+            "owner",
+            "account",
+            "tariff",
+        ]
         widgets = {
             "number": TextInput(
                 attrs={
@@ -485,7 +499,8 @@ class FlatForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите этаж",
-                }, choices=[(0, '---------')]
+                },
+                choices=[(0, "---------")],
             ),
             "house": Select(
                 attrs={
@@ -513,14 +528,14 @@ class FlatForm(ModelForm):
             ),
         }
         labels = {
-            'number': 'Номер квартиры',
-            'area': 'Площадь квартиры',
-            'floor': 'Этаж',
-            'section': 'Секция',
-            'house': 'Дом',
-            'owner': 'Владелец',
-            'account': 'Лицевой счет',
-            'tariff': 'Тариф',
+            "number": "Номер квартиры",
+            "area": "Площадь квартиры",
+            "floor": "Этаж",
+            "section": "Секция",
+            "house": "Дом",
+            "owner": "Владелец",
+            "account": "Лицевой счет",
+            "tariff": "Тариф",
         }
 
 
@@ -532,6 +547,7 @@ class FlatCreateForm(FlatForm):
 class FlatUpdateForm(FlatForm):
     class Meta(FlatForm.Meta):
         model = Flat
+
 
 # endregion FLAT
 # endregion PROPERTY

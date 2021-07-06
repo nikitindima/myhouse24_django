@@ -8,24 +8,34 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0005_auto_20210702_0613'),
+        ("users", "0005_auto_20210702_0613"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/site/home_page/articles')),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/site/home_page/articles"
+                ),
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='phone',
-            field=phonenumber_field.modelfields.PhoneNumberField(default='+380677742321', max_length=128, region=None),
+            model_name="user",
+            name="phone",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                default="+380677742321", max_length=128, region=None
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='viber',
-            field=phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128, null=True, region=None),
+            model_name="user",
+            name="viber",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                blank=True, max_length=128, null=True, region=None
+            ),
         ),
     ]

@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0011_sitecontacts'),
+        ("admin_panel", "0011_sitecontacts"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='SiteContacts',
-            new_name='SiteContactsPage',
+            old_name="SiteContacts",
+            new_name="SiteContactsPage",
         ),
     ]

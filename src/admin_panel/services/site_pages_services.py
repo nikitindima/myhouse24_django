@@ -13,7 +13,8 @@ from src.admin_panel.models import (
     SeoData,
     Article,
     GalleryImage,
-    Document, SiteServicesPage,
+    Document,
+    SiteServicesPage,
 )
 
 
@@ -38,7 +39,11 @@ def get_or_create_page_object(obj_model):
 def create_formset_and_save_to_m2m_field(request, obj_m2m_field, formset_type):
     if formset_type is Article:
         formset_factory = modelformset_factory(
-            Article, form=ArticleForm, fields=["title", "description", "image"], extra=0, can_delete=True
+            Article,
+            form=ArticleForm,
+            fields=["title", "description", "image"],
+            extra=0,
+            can_delete=True,
         )
         formset = formset_factory(
             request.POST or None,

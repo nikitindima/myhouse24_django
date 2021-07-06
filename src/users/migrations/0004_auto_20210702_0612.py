@@ -6,25 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_alter_user_is_staff'),
+        ("users", "0003_alter_user_is_staff"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='user',
-            managers=[
-            ],
+            name="user",
+            managers=[],
         ),
         migrations.AddField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(default='Roman', max_length=150, verbose_name='first name'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(
+                default="Roman", max_length=150, verbose_name="first name"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(default='Cheban', max_length=150, verbose_name='last name'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                default="Cheban", max_length=150, verbose_name="last name"
+            ),
             preserve_default=False,
         ),
     ]

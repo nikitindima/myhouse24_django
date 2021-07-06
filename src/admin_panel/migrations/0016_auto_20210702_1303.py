@@ -8,19 +8,25 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0015_rename_section_section_house'),
+        ("admin_panel", "0015_rename_section_section_house"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='section',
-            name='floors',
-            field=models.PositiveIntegerField(default=10, validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="section",
+            name="floors",
+            field=models.PositiveIntegerField(
+                default=10, validators=[django.core.validators.MinValueValidator(1)]
+            ),
         ),
         migrations.AlterField(
-            model_name='section',
-            name='house',
-            field=models.ForeignKey(default=7, on_delete=django.db.models.deletion.CASCADE, to='admin_panel.house'),
+            model_name="section",
+            name="house",
+            field=models.ForeignKey(
+                default=7,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_panel.house",
+            ),
             preserve_default=False,
         ),
     ]

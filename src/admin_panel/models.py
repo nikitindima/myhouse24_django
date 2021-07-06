@@ -15,14 +15,16 @@ User = get_user_model()
 
 # region RECEIPTS
 
+
 class Tariff(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     changed = models.DateTimeField(auto_now=True)
+
     # services = models.ManyToManyField(Service)
 
     def __str__(self):
-        return self.name or ''
+        return self.name or ""
 
 
 # endregion RECEIPTS
@@ -132,32 +134,46 @@ class House(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=300, null=True, blank=True)
     house_staff = models.ManyToManyField(User)
-    image1 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
-    image2 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
-    image3 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
-    image4 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
-    image5 = models.ImageField(upload_to=UploadToPathAndRename(upload_path), null=True, blank=True)
+    image1 = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
+    image2 = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
+    image3 = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
+    image4 = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
+    image5 = models.ImageField(
+        upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
+    )
 
     def __str__(self):
-        return self.name or ''
+        return self.name or ""
 
 
 class Section(models.Model):
     name = models.CharField(max_length=100, blank=True)
-    floors = models.PositiveIntegerField(blank=True, default=10, validators=[MinValueValidator(1)])
+    floors = models.PositiveIntegerField(
+        blank=True, default=10, validators=[MinValueValidator(1)]
+    )
     house = models.ForeignKey(House, on_delete=models.CASCADE)
 
     def serialize(self, pattern):
-        if pattern == 'select2':
-            return {'id': self.id, 'text': self.name}
+        if pattern == "select2":
+            return {"id": self.id, "text": self.name}
 
     def __str__(self):
-        return self.name or ''
+        return self.name or ""
 
 
 class Floor(models.Model):
     name = models.CharField(max_length=100)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True)
+    section = models.ForeignKey(
+        Section, on_delete=models.CASCADE, null=True, blank=True
+    )
 
 
 class Account(models.Model):
@@ -170,10 +186,19 @@ class Flat(models.Model):
     area = models.DecimalField(max_digits=10, decimal_places=2)
 
     floor = models.CharField(max_length=100, null=True)
-    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True)
-    house = models.ForeignKey(House, on_delete=models.SET_NULL, null=True)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey(
+        Section, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    house = models.ForeignKey(
+        House, on_delete=models.SET_NULL, null=True, related_name="houses"
+    )
+    owner = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="flats"
+    )
+    account = models.ForeignKey(
+        Account, on_delete=models.SET_NULL, null=True, blank=True
+    )
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True, blank=True)
+
 
 # endregion PROPERTY

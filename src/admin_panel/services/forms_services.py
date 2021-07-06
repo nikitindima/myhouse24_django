@@ -74,9 +74,7 @@ def validate_image(form, name, max_size=None):
             img = forms.ImageField()
             img.to_python(uploaded_file)
         except forms.ValidationError:
-            raise forms.ValidationError(
-                "Вы можете загружать только изображения"
-            )
+            raise forms.ValidationError("Вы можете загружать только изображения")
 
 
 def create_formset(form, request, post=False, qs=None, can_delete=False):
@@ -104,9 +102,11 @@ def save_extra_forms(formset, model, **kwargs):
             name = form.cleaned_data.get("name")
 
             if model is Section:
-                new_object = Section(name=name, house=kwargs['house'])
+                new_object = Section(name=name, house=kwargs["house"])
             else:
-                raise Exception('You passed wrong model type to "save_extra_forms" function')
+                raise Exception(
+                    'You passed wrong model type to "save_extra_forms" function'
+                )
 
             new_object.full_clean()
             new_object.save()

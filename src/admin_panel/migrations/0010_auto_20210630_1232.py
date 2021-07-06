@@ -7,26 +7,31 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0009_rename_siteservicepage_siteservicespage'),
+        ("admin_panel", "0009_rename_siteservicepage_siteservicespage"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='article',
-            name='description',
-            field=models.CharField(default='something', max_length=3000),
+            model_name="article",
+            name="description",
+            field=models.CharField(default="something", max_length=3000),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='article',
-            name='image',
-            field=models.ImageField(default=1, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/site/home_page/articles')),
+            model_name="article",
+            name="image",
+            field=models.ImageField(
+                default=1,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/site/home_page/articles"
+                ),
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='article',
-            name='title',
-            field=models.CharField(default='1', max_length=100),
+            model_name="article",
+            name="title",
+            field=models.CharField(default="1", max_length=100),
             preserve_default=False,
         ),
     ]

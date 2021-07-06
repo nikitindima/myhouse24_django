@@ -7,33 +7,63 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0017_auto_20210702_1419'),
+        ("admin_panel", "0017_auto_20210702_1419"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='house',
-            name='image1',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/houses')),
+            model_name="house",
+            name="image1",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/houses"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='house',
-            name='image2',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/houses')),
+            model_name="house",
+            name="image2",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/houses"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='house',
-            name='image3',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/houses')),
+            model_name="house",
+            name="image3",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/houses"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='house',
-            name='image4',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/houses')),
+            model_name="house",
+            name="image4",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/houses"
+                ),
+            ),
         ),
         migrations.AlterField(
-            model_name='house',
-            name='image5',
-            field=models.ImageField(blank=True, null=True, upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('images/houses')),
+            model_name="house",
+            name="image5",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                    "images/houses"
+                ),
+            ),
         ),
     ]

@@ -1,7 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
 
-from src.admin_panel.models import SiteHomePage, SiteAboutPage, SiteServicesPage, SiteContactsPage
+from src.admin_panel.models import (
+    SiteHomePage,
+    SiteAboutPage,
+    SiteServicesPage,
+    SiteContactsPage,
+)
 from src.admin_panel.services.site_pages_services import (
     get_or_create_page_object,
 )
@@ -18,7 +23,7 @@ class HomeView(DetailView):
         context = super().get_context_data(**kwargs)
         contacts = get_or_create_page_object(SiteContactsPage)
 
-        context.update({'contacts': contacts})
+        context.update({"contacts": contacts})
         return context
 
     def get_object(self, queryset=None):

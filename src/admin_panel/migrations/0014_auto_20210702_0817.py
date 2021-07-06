@@ -6,42 +6,42 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0013_account_flat_floor_house_section'),
+        ("admin_panel", "0013_account_flat_floor_house_section"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='house',
-            name='gallery',
+            model_name="house",
+            name="gallery",
         ),
         migrations.AddField(
-            model_name='house',
-            name='image1',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="house",
+            name="image1",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
         migrations.AddField(
-            model_name='house',
-            name='image2',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="house",
+            name="image2",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
         migrations.AddField(
-            model_name='house',
-            name='image3',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="house",
+            name="image3",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
         migrations.AddField(
-            model_name='house',
-            name='image4',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="house",
+            name="image4",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
         migrations.AddField(
-            model_name='house',
-            name='image5',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="house",
+            name="image5",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
         migrations.AlterField(
-            model_name='flat',
-            name='number',
+            model_name="flat",
+            name="number",
             field=models.PositiveIntegerField(),
         ),
     ]
