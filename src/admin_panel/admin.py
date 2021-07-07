@@ -11,7 +11,8 @@ from .models import (
     House,
     Section,
     Flat,
-    Tariff, User,
+    Tariff,
+    User,
 )
 
 admin.site.register(SeoData)

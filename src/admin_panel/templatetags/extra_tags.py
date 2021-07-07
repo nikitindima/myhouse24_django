@@ -22,10 +22,10 @@ def get_id(value):
 
 @register.filter(name="get_unique_houses")
 def get_unique_houses(value):
-    return value.distinct('house')
+    print(value)
+    return value.distinct("house")
 
 
 @register.filter(name="test")
 def test(value):
-    print(value)
     return value

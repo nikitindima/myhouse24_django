@@ -1,14 +1,20 @@
 import datetime
 import os
 import unicodedata
-from collections import OrderedDict
 
+from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
-from django.forms.widgets import URLInput, EmailInput, NumberInput, Select, PasswordInput, DateInput
-from phonenumber_field.formfields import PhoneNumberField
+from django.forms.widgets import (
+    URLInput,
+    EmailInput,
+    NumberInput,
+    Select,
+    PasswordInput,
+    DateInput,
+)
 
 from .models import (
     SiteHomePage,
@@ -555,11 +561,51 @@ class FlatUpdateForm(FlatForm):
 
 # region USER
 
+
 class UserForm(ModelForm):
+    password1 = forms.CharField(
+        widget=PasswordInput(
+            attrs={
+                "class": "form-control pass-value",
+                "placeholder": "Введите новый пароль",
+                "autocomplete": "off",
+            }
+        ),
+        label="Новый пароль*",
+        help_text=password_validation.password_validators_help_text_html(),
+        required=False,
+        strip=False,
+    )
+    password2 = forms.CharField(
+        widget=PasswordInput(
+            attrs={
+                "class": "form-control pass-value",
+                "placeholder": "Повторите пароль",
+                "autocomplete": "off",
+            }
+        ),
+        label="Повторите пароль*",
+        help_text=password_validation.password_validators_help_text_html(),
+        required=False,
+        strip=False,
+    )
+
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'patronymic', 'birthday', 'phone', 'viber', 'telegram', 'email',
-                  'status', 'description', 'user_id', 'avatar']
+        fields = [
+            "first_name",
+            "last_name",
+            "patronymic",
+            "birthday",
+            "phone",
+            "viber",
+            "telegram",
+            "email",
+            "status",
+            "description",
+            "user_id",
+            "avatar",
+        ]
         widgets = {
             "first_name": TextInput(
                 attrs={
@@ -584,7 +630,7 @@ class UserForm(ModelForm):
                     "class": "form-control",
                     "placeholder": "Введите день рождения",
                     "data-date-format": "YYYY-MM-DD",
-                    "required": "required"
+                    "required": "required",
                 },
             ),
             "telegram": TextInput(
@@ -631,62 +677,103 @@ class UserForm(ModelForm):
                 }
             ),
         }
-        labels = {'first_name': 'Имя',
-                  'last_name': 'Фамилия',
-                  'patronymic': 'Отчество',
-                  'birthday': 'День рождения*',
-                  'phone': 'Телефон',
-                  'viber': 'Вайбер',
-                  'telegram': 'Телеграмм',
-                  'email': 'Email',
-                  'status': 'Статус',
-                  'user_id': 'ID',
-                  'avatar': 'Сменить изображение',
-                  'description': 'Описание'}
-
-
-class UserCreateForm(UserForm, UserCreationForm):
-    password1 = forms.CharField(
-        widget=PasswordInput(
-            attrs={'class': 'form-control pass-value', 'placeholder': 'Введите новый пароль', 'autocomplete': 'off'}),
-        label='Новый пароль*',
-        help_text=password_validation.password_validators_help_text_html(),
-        required=False, strip=False, )
-    password2 = forms.CharField(
-        widget=PasswordInput(
-            attrs={'class': 'form-control pass-value', 'placeholder': 'Повторите пароль', 'autocomplete': 'off'}),
-        label='Повторите пароль*',
-        help_text=password_validation.password_validators_help_text_html(),
-        required=False, strip=False, )
-
-    class Meta(UserForm.Meta):
-        model = User
-
-    def clean(self):
-        clean_data: dict = super().clean()
-
-        if not clean_data['password1'] or not clean_data['password2']:
-            raise forms.ValidationError('Для создания аккаунта необходим пароль !')
-
-        return clean_data
+        labels = {
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+            "patronymic": "Отчество",
+            "birthday": "День рождения*",
+            "phone": "Телефон",
+            "viber": "Вайбер",
+            "telegram": "Телеграмм",
+            "email": "Email",
+            "status": "Статус",
+            "user_id": "ID",
+            "avatar": "Сменить изображение",
+            "description": "Описание",
+        }
 
     def clean_email(self):
-        new_email = self.cleaned_data.get('email')
+        new_email = self.cleaned_data.get("email")
 
         if User.objects.filter(email__iexact=new_email).exists():
-            self.add_error('email', 'Email пользователя должен быть уникальным !')
+            self.add_error("email", "Email пользователя должен быть уникальным !")
 
         return new_email
 
     def clean_birthday(self):
-        birthday = self.cleaned_data.get('birthday')
+        birthday = self.cleaned_data.get("birthday")
 
         if birthday:
             if not (datetime.date(1900, 1, 1) <= birthday <= datetime.date.today()):
-                self.add_error('birthday', 'Введите корректную дату рождения с 1900 года до сегодня !')
+                self.add_error(
+                    "birthday",
+                    "Введите корректную дату рождения с 1900 года до сегодня !",
+                )
         else:
-            raise forms.ValidationError('Введите день рождения !')
+            raise forms.ValidationError("Введите день рождения !")
 
         return birthday
+
+
+class UserCreateForm(UserForm, UserCreationForm):
+    class Meta(UserForm.Meta):
+        model = User
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if not password1 or not password2:
+            raise forms.ValidationError("Необходимо ввести пароль !")
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
+        return password2
+
+
+class UserUpdateForm(UserForm):
+    class Meta(UserForm.Meta):
+        model = User
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+
+        if (password1 != "" or password2 != "") and password1 != password2:
+            print(password1 != password2)
+            raise ValidationError("Пароли не совпадают", code="password_mismatch")
+
+        if password1 != "" and password2 != "" and password1 == password2:
+            try:
+                password_validation.validate_password(password2, self.instance)
+            except ValidationError as error:
+                self.add_error("password2", error)
+
+        return password2
+
+    def clean_email(self):
+        old_email = self.instance.email
+        new_email = self.cleaned_data.get("email")
+
+        if new_email != old_email:
+            if User.objects.filter(email__iexact=new_email).exists():
+                self.add_error("email", "Email пользователя должен быть уникальным !")
+
+        return new_email
+
+    def save(self, commit=True):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        user = super().save(commit=False)
+
+        if password1 != "" and password2 != "":
+            user.set_password(self.cleaned_data["password2"])
+        if commit:
+            user.save()
+        return user
+
 
 # endregion USER

@@ -92,35 +92,34 @@
                                 </thead>
                                 <tbody>
                                 {% for user in user_list %}
-                                    <tr data-href=""
+                                    <tr data-href="{% url 'admin_panel:user_detail' user.pk %}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ user.user_id }}">{{ user.user_id }}</td>
                                         <td data-filter="{{ user.full_name }}">{{ user.full_name }}</td>
                                         <td data-filter="{{ user.phone }}">{{ user.phone }}</td>
                                         <td data-filter="{{ user.email }}">{{ user.email }}</td>
-                                        <td data-filter="
-                                                {% for flat in user.flats.all|get_unique_houses %}{{ flat.house.name }}|||{% endfor %}">
-                                            {% for flat in user.flats.all|get_unique_houses %}
+                                        <td class="houses" data-filter="{% for flat in user.flats.all %}{{ flat.house.name }}|||{% endfor %}">
+                                            {% for flat in user.flats.all %}
                                                 <a href="{% url 'admin_panel:house_detail' flat.house.id %}"><p>
                                                     {{ flat.house.name }}</p></a>
                                             {% endfor %}
                                         </td>
-                                        <td>
+                                        <td data-filter="{% for flat in user.flats.all %}{{ flat.house.name }}|||{{ flat.number }}|||{% endfor %}">
                                             {% for flat in user.flats.all %}
                                                 <a href="{% url 'admin_panel:flat_detail' flat.id %}"><p>
                                                     № {{ flat.number }}, {{ flat.house.name }}</p></a>
                                             {% endfor %}
                                         </td>
-                                        <td>{{ user.date_joined }}</td>
+                                        <td data-filter="{{ user.date_joined }}">{{ user.date_joined }}</td>
                                         <td data-filter="{{ user.status }}|||">{{ user.status }}</td>
                                         <td data-filter=""></td>
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                    {#                                                                                 href="{% url 'admin_panel:house_update' house.pk %}"#}
+                                                                                 href="{% url 'admin_panel:user_update' user.pk %}"
                                                                                  title="Редактировать"
                                                                                  data-toggle="tooltip">
                                                 <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                    {#                                                                                    href="{% url 'admin_panel:house_delete' house.pk %}"#}
+                                                                                    href="{% url 'admin_panel:user_delete' user.pk %}"
                                                                                     title="Удалить"
                                                                                     onClick="delete_object(event)">
                                                 <i class="fa fa-trash"></i></a></div>
@@ -168,21 +167,13 @@
                     }
                 });
             });
-            filters_row.slice(5, 7).each(function (i) {
-                let title = $(this).text();
-                $(this).html('<input type="text" placeholder="Поиск - ' + title + '" />');
-
-                $('input', this).on('keyup change', function () {
-                    if (table.column(i + 1).search() !== this.value) {
-                        table
-                            .column(i + 1)
-                            .search(this.value)
-                            .draw();
-                    }
-                });
-            });
+            delete_duplicate_houses()
+            make_search(filters_row, 5, 7, table)
             make_select(filters_row, 4, 5, table)
             make_select(filters_row, 7, 9, table)
+            $('#datatable thead tr:eq(1) th input').css(
+                {'width': '100%', 'display': 'inline-block'}
+            );
         });
 
         function make_datatable() {
@@ -193,9 +184,34 @@
                 lengthChange: false,
                 bInfo: false,
                 pageLength: 10,
-                drawCallback: add_links_to_rows
+                drawCallback: add_links_to_rows,
+                columns: [
+                    {"width": 20, "className": "dt-center"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                ],
             });
             return table;
+        }
+
+        function delete_duplicate_houses() {
+            $('.houses').each(function () {
+                let seen = {};
+                $(this).children('a').each(function () {
+                    let txt = $(this).text();
+                    if (seen[txt])
+                        $(this).remove()
+                    else
+                        seen[txt] = true;
+                })
+            })
         }
 
         function add_links_to_rows() {
@@ -241,6 +257,22 @@
 
                 $.each(statusItems, function (i, item) {
                     select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+        }
+
+        function make_search(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                $(this).html('<input type="text" placeholder="Поиск - ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i + slice1).search() !== this.value) {
+                        table
+                            .column(i + slice1)
+                            .search(this.value)
+                            .draw();
+                    }
                 });
             });
         }

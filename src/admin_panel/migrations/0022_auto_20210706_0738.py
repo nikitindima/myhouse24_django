@@ -7,18 +7,28 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0021_auto_20210706_0320'),
+        ("admin_panel", "0021_auto_20210706_0320"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flat',
-            name='house',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='houses', to='admin_panel.house'),
+            model_name="flat",
+            name="house",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="houses",
+                to="admin_panel.house",
+            ),
         ),
         migrations.AlterField(
-            model_name='flat',
-            name='section',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='admin_panel.section'),
+            model_name="flat",
+            name="section",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_panel.section",
+            ),
         ),
     ]

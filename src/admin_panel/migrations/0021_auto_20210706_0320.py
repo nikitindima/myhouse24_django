@@ -9,18 +9,29 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admin_panel', '0020_auto_20210704_0655'),
+        ("admin_panel", "0020_auto_20210704_0655"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flat',
-            name='house',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='houses', to='admin_panel.house'),
+            model_name="flat",
+            name="house",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="houses",
+                to="admin_panel.house",
+            ),
         ),
         migrations.AlterField(
-            model_name='flat',
-            name='owner',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='flats', to=settings.AUTH_USER_MODEL),
+            model_name="flat",
+            name="owner",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="flats",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -19,11 +19,12 @@
 
     <div class="content-wrapper" style="min-height: 867px;">
         <section class="content-header">
-            <h1>Новый владелец </h1>
+            <h1>Профиль владельца</h1>
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
                 <li><a href="{% url 'admin_panel:user_list' %}">Владельцы квартир</a></li>
-                <li class="active">Новый владелец</li>
+                <li><a href="{% url 'admin_panel:user_detail' object.pk %}">Профиль владельца</a></li>
+                <li class="active">Редактирование</li>
             </ul>
         </section>
 
@@ -38,10 +39,15 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-6">
                                 <div class="userAvatar">
-
-                                    <img class="img-circle pull-left img-responsive"
-                                         style="width: 160px; height: 160px; object-fit: cover;"
-                                         src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="">
+                                    {% if object.avatar %}
+                                        <img class="img-circle pull-left img-responsive"
+                                             style="width: 160px; height: 160px; object-fit: cover;"
+                                             src="{{ object.avatar.url }}" alt="">
+                                    {% else %}
+                                        <img class="img-circle pull-left img-responsive"
+                                             style="width: 160px; height: 160px; object-fit: cover;"
+                                             src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="">
+                                    {% endif %}
                                     <div class="form-group">
                                         {{ form1.avatar|as_crispy_field }}
                                     </div>
@@ -139,7 +145,7 @@
                                 <div class="form-group">
                                     {{ form1.password2.label_tag }}
                                     {{ form1.password2 }}
-                                    {{ form1.password2.help_text }}
+                                    {{ form1.password1.help_text }}
                                 </div>
                             </div>
                         </div>

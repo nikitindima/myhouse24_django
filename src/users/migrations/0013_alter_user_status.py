@@ -6,13 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0012_alter_user_status'),
+        ("users", "0012_alter_user_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='status',
-            field=models.CharField(choices=[('ACTIVE', 'ton'), ('INACTIVE', 'pound'), ('DEACTIVATED', 'vgs³')], max_length=11),
+            model_name="user",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("ACTIVE", "ton"),
+                    ("INACTIVE", "pound"),
+                    ("DEACTIVATED", "vgs³"),
+                ],
+                max_length=11,
+            ),
         ),
     ]

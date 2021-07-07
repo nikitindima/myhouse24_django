@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -6,7 +8,9 @@ from django.db.models import Max, Prefetch
 from django.http import HttpResponseRedirect, HttpRequest, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.timezone import utc
 from django.views.generic import DeleteView, ListView, DetailView
+from dateutil.utils import today
 
 from .forms import (
     SiteHomeForm,
@@ -15,7 +19,9 @@ from .forms import (
     HouseCreateForm,
     SectionForm,
     FlatCreateForm,
-    FlatUpdateForm, UserCreateForm,
+    FlatUpdateForm,
+    UserCreateForm,
+    UserUpdateForm,
 )
 from .models import (
     SiteHomePage,
@@ -448,11 +454,27 @@ def api_floors(request, pk):
 
 
 def api_users(request):
-    users = User.objects.filter(status="ACTIVE", is_staff=False)
+    users = User.objects.filter(status="ACTIVE")
     results = []
 
     for user in users:
         data = user.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
+def api_new_users(request):
+    day_today = today(tzinfo=utc)
+    day_week_ago = today(tzinfo=utc) - timedelta(days=7)
+
+    users = User.objects.filter(
+        status="ACTIVE", date_joined__range=[day_week_ago, day_today]
+    ).order_by("-date_joined")[:10]
+    results = []
+
+    for user in users:
+        data = user.serialize(pattern="api_new_users")
         results.append(data)
 
     return JsonResponse({"results": results})
@@ -465,9 +487,11 @@ def api_users(request):
 
 class UserListView(ListView):
     template_name = "admin_panel/pages/user_list.html"
-    queryset = User.objects.filter(status="ACTIVE").prefetch_related(
+    # queryset = User.objects.prefetch_related('flats', 'flats__house')
+
+    queryset = User.objects.prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
-    )
+    ).prefetch_related('flats__house')
 
 
 def user_create_view(request):
@@ -489,5 +513,51 @@ def user_create_view(request):
         "form1": form1,
     }
     return render(request, "admin_panel/pages/user_create.html", context=context)
+
+
+class UserDetailView(DetailView):
+    template_name = "admin_panel/pages/user_detail.html"
+
+    def get_queryset(self):
+        my_query = User.objects.all()
+        return my_query
+
+
+def user_update_view(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    form1 = UserUpdateForm(
+        request.POST or None, request.FILES or None, prefix="form1", instance=user
+    )
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:user_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "object": user,
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/user_update.html", context=context)
+
+
+class UserDeleteView(DeleteView):
+    model = User
+    success_url = reverse_lazy("admin_panel:user_list")
+    success_message = "Владелец успешно удален"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
 
 # endregion USERS

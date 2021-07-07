@@ -1,5 +1,6 @@
 import os
 
+from allauth.utils import build_absolute_uri
 from birthday.fields import BirthdayField
 from birthday.managers import BirthdayManager
 from django.conf.global_settings import MEDIA_ROOT
@@ -13,7 +14,7 @@ from src.admin_panel.services.media_services import UploadToPathAndRename
 
 
 class User(AbstractUser):
-    username = models.CharField(_('username'), max_length=150)
+    username = models.CharField(_("username"), max_length=150)
     upload_path = os.path.join(MEDIA_ROOT, "images", "site", "home_page", "articles")
 
     class UserStatus(models.TextChoices):
@@ -51,8 +52,11 @@ class User(AbstractUser):
 
     def serialize(self, pattern):
         if pattern == "select2":
-            text = self.full_name
-            return {"id": self.id, "text": text}
+            data = {"id": self.id, "text": self.full_name}
+            return data
+        if pattern == "api_new_users":
+            data = {"id": self.id, "full_name": self.full_name}
+            return data
 
     def __str__(self):
         return self.full_name
