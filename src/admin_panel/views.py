@@ -14,11 +14,8 @@ from .forms import (
     SiteContactsForm,
     HouseCreateForm,
     SectionForm,
-    FloorForm,
-    HouseForm,
-    HouseUpdateForm,
     FlatCreateForm,
-    FlatUpdateForm,
+    FlatUpdateForm, UserCreateForm,
 )
 from .models import (
     SiteHomePage,
@@ -471,5 +468,26 @@ class UserListView(ListView):
     queryset = User.objects.filter(status="ACTIVE").prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
     )
+
+
+def user_create_view(request):
+    form1 = UserCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:user_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/user_create.html", context=context)
 
 # endregion USERS

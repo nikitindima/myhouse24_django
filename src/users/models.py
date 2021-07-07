@@ -13,6 +13,7 @@ from src.admin_panel.services.media_services import UploadToPathAndRename
 
 
 class User(AbstractUser):
+    username = models.CharField(_('username'), max_length=150)
     upload_path = os.path.join(MEDIA_ROOT, "images", "site", "home_page", "articles")
 
     class UserStatus(models.TextChoices):
@@ -33,6 +34,7 @@ class User(AbstractUser):
     telegram = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(max_length=150)
     status = models.CharField(max_length=11, choices=UserStatus.choices)
+    user_id = models.CharField(max_length=20, unique=True)
 
     def get_absolute_url(self):
         """Get url for user's detail view.

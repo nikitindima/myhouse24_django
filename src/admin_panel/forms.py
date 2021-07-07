@@ -1,14 +1,14 @@
+import datetime
 import os
 import unicodedata
 from collections import OrderedDict
 
 from django import forms
+from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
-from django.forms.widgets import URLInput, EmailInput, NumberInput, Select
-from django.template.defaultfilters import filesizeformat
-from django.utils.translation import ugettext_lazy as _
-from django_form_builder.forms import BaseDynamicForm
-from django_form_builder import dynamic_fields
+from django.forms.widgets import URLInput, EmailInput, NumberInput, Select, PasswordInput, DateInput
+from phonenumber_field.formfields import PhoneNumberField
 
 from .models import (
     SiteHomePage,
@@ -35,6 +35,7 @@ from .models import (
 from .services.forms_services import check_filesize, validate_image
 
 MAX_UPLOAD_SIZE = 20971520
+User = get_user_model()
 
 
 # region SHARED_STAFF
@@ -551,3 +552,141 @@ class FlatUpdateForm(FlatForm):
 
 # endregion FLAT
 # endregion PROPERTY
+
+# region USER
+
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'patronymic', 'birthday', 'phone', 'viber', 'telegram', 'email',
+                  'status', 'description', 'user_id', 'avatar']
+        widgets = {
+            "first_name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите имя",
+                }
+            ),
+            "last_name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите фамилию",
+                }
+            ),
+            "patronymic": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите отчество",
+                }
+            ),
+            "birthday": DateInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите день рождения",
+                    "data-date-format": "YYYY-MM-DD",
+                    "required": "required"
+                },
+            ),
+            "telegram": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите telegram",
+                }
+            ),
+            "email": EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите email",
+                }
+            ),
+            "status": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Выберите статус",
+                }
+            ),
+            "user_id": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите id",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите описание",
+                }
+            ),
+            "avatar": FileInput(),
+            "phone": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите описание",
+                }
+            ),
+            "viber": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите описание",
+                }
+            ),
+        }
+        labels = {'first_name': 'Имя',
+                  'last_name': 'Фамилия',
+                  'patronymic': 'Отчество',
+                  'birthday': 'День рождения*',
+                  'phone': 'Телефон',
+                  'viber': 'Вайбер',
+                  'telegram': 'Телеграмм',
+                  'email': 'Email',
+                  'status': 'Статус',
+                  'user_id': 'ID',
+                  'avatar': 'Сменить изображение',
+                  'description': 'Описание'}
+
+
+class UserCreateForm(UserForm, UserCreationForm):
+    password1 = forms.CharField(
+        widget=PasswordInput(
+            attrs={'class': 'form-control pass-value', 'placeholder': 'Введите новый пароль', 'autocomplete': 'off'}),
+        label='Новый пароль*',
+        help_text=password_validation.password_validators_help_text_html(),
+        required=False, strip=False, )
+    password2 = forms.CharField(
+        widget=PasswordInput(
+            attrs={'class': 'form-control pass-value', 'placeholder': 'Повторите пароль', 'autocomplete': 'off'}),
+        label='Повторите пароль*',
+        help_text=password_validation.password_validators_help_text_html(),
+        required=False, strip=False, )
+
+    class Meta(UserForm.Meta):
+        model = User
+
+    def clean(self):
+        clean_data: dict = super().clean()
+
+        if not clean_data['password1'] or not clean_data['password2']:
+            raise forms.ValidationError('Для создания аккаунта необходим пароль !')
+
+        return clean_data
+
+    def clean_email(self):
+        new_email = self.cleaned_data.get('email')
+
+        if User.objects.filter(email__iexact=new_email).exists():
+            self.add_error('email', 'Email пользователя должен быть уникальным !')
+
+        return new_email
+
+    def clean_birthday(self):
+        birthday = self.cleaned_data.get('birthday')
+
+        if birthday:
+            if not (datetime.date(1900, 1, 1) <= birthday <= datetime.date.today()):
+                self.add_error('birthday', 'Введите корректную дату рождения с 1900 года до сегодня !')
+        else:
+            raise forms.ValidationError('Введите день рождения !')
+
+        return birthday
+
+# endregion USER

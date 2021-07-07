@@ -40,7 +40,7 @@
                             Выберите действие <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/user/create">Добавить владельца квартиры</a></li>
+                            <li><a href="{% url 'admin_panel:user_create' %}">Добавить владельца квартиры</a></li>
                             <li><a href="/admin/message/create?MessageAddress%5Buser_has_debt%5D=1">Отправить сообщение
                                 должникам</a></li>
                             <li><a href="/admin/user/invite">Отправить приглашение</a></li>
@@ -94,11 +94,12 @@
                                 {% for user in user_list %}
                                     <tr data-href=""
                                         style="cursor: pointer;">
-                                        <td data-filter="{{ user.id }}">{{ user.id }}</td>
+                                        <td data-filter="{{ user.user_id }}">{{ user.user_id }}</td>
                                         <td data-filter="{{ user.full_name }}">{{ user.full_name }}</td>
                                         <td data-filter="{{ user.phone }}">{{ user.phone }}</td>
                                         <td data-filter="{{ user.email }}">{{ user.email }}</td>
-                                        <td data-filter="{% for flat in user.flats.all|get_unique_houses %}{{ flat.house.name }}|||{% endfor %}">
+                                        <td data-filter="
+                                                {% for flat in user.flats.all|get_unique_houses %}{{ flat.house.name }}|||{% endfor %}">
                                             {% for flat in user.flats.all|get_unique_houses %}
                                                 <a href="{% url 'admin_panel:house_detail' flat.house.id %}"><p>
                                                     {{ flat.house.name }}</p></a>
@@ -111,8 +112,8 @@
                                             {% endfor %}
                                         </td>
                                         <td>{{ user.date_joined }}</td>
-                                        <td>{{ user.status }}</td>
-                                        <td></td>
+                                        <td data-filter="{{ user.status }}|||">{{ user.status }}</td>
+                                        <td data-filter=""></td>
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
                                                     {#                                                                                 href="{% url 'admin_panel:house_update' house.pk %}"#}
@@ -180,38 +181,8 @@
                     }
                 });
             });
-
-            filters_row.slice(4, 5).each(function (i) {
-                let title = $(this).text();
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo($(this).empty())
-                    .on('change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                        );
-                        table.column(i+4)
-                            .search(val ? $(this).val() : val, true, false)
-                            .draw();
-                    });
-
-                var statusItems = [];
-
-                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
-                table.column(4).nodes().to$().each(function (d, j) {
-                    var thisStatus = $(j).attr("data-filter");
-                    var data = thisStatus.split('|||')
-                    for (let k = 0; k < data.length - 1; k++) {
-                        let new_status = data[k]
-                        if ($.inArray(thisStatus, statusItems) === -1) statusItems.push(new_status);
-                    }
-                });
-
-                statusItems.sort();
-
-                $.each(statusItems, function (i, item) {
-                    select.append('<option value="' + item + '">' + item + '</option>');
-                });
-            });
+            make_select(filters_row, 4, 5, table)
+            make_select(filters_row, 7, 9, table)
         });
 
         function make_datatable() {
@@ -238,6 +209,40 @@
             } else {
                 event.preventDefault();
             }
+        }
+
+        function make_select(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        table.column(i + slice1)
+                            .search(val ? $(this).val() : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i + slice1).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    var data = thisStatus.split('|||')
+                    for (let k = 0; k < data.length - 1; k++) {
+                        let new_status = data[k]
+                        if ($.inArray(new_status, statusItems) === -1) statusItems.push(new_status);
+                    }
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
         }
     </script>
     {% include 'admin_panel/elements/messages.html' %}>

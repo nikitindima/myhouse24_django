@@ -187,10 +187,10 @@ class Flat(models.Model):
 
     floor = models.CharField(max_length=100, null=True)
     section = models.ForeignKey(
-        Section, on_delete=models.SET_NULL, null=True, blank=True
+        Section, on_delete=models.CASCADE, null=True, blank=True
     )
     house = models.ForeignKey(
-        House, on_delete=models.SET_NULL, null=True, related_name="houses"
+        House, on_delete=models.CASCADE, null=True, related_name="houses"
     )
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="flats"
