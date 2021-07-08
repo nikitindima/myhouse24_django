@@ -12,6 +12,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -55,7 +57,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"></h3>
                             <div class="box-tools">
-                                <a href="{% url 'admin_panel:house_list' %}" class="btn btn-default btn-sm">
+                                <a href="{% url 'admin_panel:user_list' %}" class="btn btn-default btn-sm">
                                     <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
                                                                               aria-hidden="true"></i>
                                 </a>
@@ -147,6 +149,7 @@
             src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" charset="utf8"
             src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -171,9 +174,14 @@
             make_search(filters_row, 5, 7, table)
             make_select(filters_row, 4, 5, table)
             make_select(filters_row, 7, 9, table)
-            $('#datatable thead tr:eq(1) th input').css(
-                {'width': '100%', 'display': 'inline-block'}
-            );
+
+            $('#datatable thead tr:eq(1) th select').select2({
+                theme: 'bootstrap',
+                width: 900,
+            })
+            $('#datatable thead tr:eq(1) th input')
+                .attr('class', 'form-control')
+                .attr('style', 'width: 100%; display: inline-block;');
         });
 
         function make_datatable() {
@@ -259,12 +267,13 @@
                     select.append('<option value="' + item + '">' + item + '</option>');
                 });
             });
+
         }
 
         function make_search(filters_row, slice1, slice2, table) {
             filters_row.slice(slice1, slice2).each(function (i) {
                 let title = $(this).text();
-                $(this).html('<input type="text" placeholder="Поиск - ' + title + '" />');
+                $(this).html('<input class="form-control" type="text" placeholder="Поиск - ' + title + '" />');
 
                 $('input', this).on('keyup change', function () {
                     if (table.column(i + slice1).search() !== this.value) {

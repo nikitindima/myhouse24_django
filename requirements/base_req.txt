@@ -39,5 +39,9 @@ django-robots  # https://django-robots.readthedocs.io/en/latest/#installation
 # Summernote
 django_summernote
 
-# Validation
+# Json
 django-jsonview
+
+# Fields
+django-phonenumber-field[phonenumbers]
+django-birthday
