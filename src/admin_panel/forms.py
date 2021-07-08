@@ -27,7 +27,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service,
+    Flat, Measure, Service, Tariff, ServicePrice,
 )
 
 # 2.5MB - 2621440
@@ -821,4 +821,52 @@ class ServiceForm(forms.ModelForm):
             "measure": "Ед. изм.",
         }
 
+
+class TariffCreateForm(ModelForm):
+    class Meta:
+        model = Tariff
+        fields = ["name", "description"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название тарифа",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите описание тарифа",
+                    "rows": 7
+                }
+            ),
+        }
+        labels = {
+            "name": "Название тарифа",
+            "description": "Описание тарифа",
+        }
+
+
+class ServicePriceForm(ModelForm):
+    class Meta:
+        model = ServicePrice
+        fields = ["service", "price"]
+        widgets = {
+            "service": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Выберите...",
+                }
+            ),
+            "price": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите цену",
+                }
+            ),
+        }
+        labels = {
+            "service": "Услуга",
+            "price": "Цена",
+        }
 # endregion USER

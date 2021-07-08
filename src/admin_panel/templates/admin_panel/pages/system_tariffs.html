@@ -1,0 +1,99 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active menu-open{% endblock %}
+{% block nav_item_system_tariffs %}active{% endblock %}
+
+{% block title %}Редактирование тарифов{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Тарифы</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Тарифы</li>
+            </ul>
+
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <!--<div class="col-xs-12 col-sm-6">-->
+                <!--<h2 class="page-header">Квартиры</h2>-->
+                <!--</div>-->
+                <div class="col-xs-12">
+
+                    <div class="pull-right margin-bottom">
+                        <a class="btn btn-success" href="{% url 'admin_panel:system_tariffs_create' %}">Добавить тариф</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div id="w0" class="grid-view">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-bordered table-hover table-striped linkedRow">
+                                    <thead>
+                                    <tr>
+                                        <th><a href="{% url 'admin_panel:system_tariffs' %}?sort=name" data-sort="name">Название
+                                            тарифа</a></th>
+                                        <th>Описание тарифа</th>
+                                        <th>Дата редактирования</th>
+                                        <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for object in object_list %}
+                                        <tr data-href="/admin/tariff/14" data-key="14">
+                                            <td>{{ object.name }}</td>
+                                            <td>{{ object.description}}</td>
+                                            <td>{{ object.changed }}</td>
+                                            <td>
+                                                <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
+                                                                                     href="/admin/tariff/create?tariff_id=14"
+                                                                                     title="Копировать"
+                                                                                     data-toggle="tooltip"><i
+                                                        class="fa fa-clone"></i></a> <a class="btn btn-default btn-sm"
+                                                                                        href="/admin/tariff/update/14"
+                                                                                        title="Редактировать"
+                                                                                        data-toggle="tooltip"><i
+                                                        class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
+                                                                                         href="/admin/tariff/delete/14"
+                                                                                         title="Удалить"
+                                                                                         data-toggle="tooltip"
+                                                                                         data-pjax="0"
+                                                                                         data-method="post"
+                                                                                         data-confirm="Вы уверены, что хотите удалить этот элемент?"><i
+                                                        class="fa fa-trash"></i></a></div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}
+{% endblock %}

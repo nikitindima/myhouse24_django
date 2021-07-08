@@ -27,6 +27,9 @@ class Service(models.Model):
     is_shown = models.BooleanField()
     measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 class Tariff(models.Model):
     name = models.CharField(max_length=100)

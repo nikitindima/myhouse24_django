@@ -31,6 +31,7 @@ urlpatterns = [
     path("api/floors/<int:pk>/", views.api_floors, name="api_floors"),
     path("api/users/", views.api_users, name="api_users"),
     path("api/users/new/", views.api_new_users, name="api_new_users"),
+    path("api/measure/", views.api_measure_name, name="api_measure_name"),
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),
@@ -43,4 +44,7 @@ urlpatterns = [
     path("system/services/delete/service/<int:pk>/", views.ServiceDeleteView.as_view(), name="delete_service"),
     path("system/services/check/measure/<int:pk>/", views.check_measure, name="check_measure"),
     path("system/services/check/service/<int:pk>/", views.check_service, name="check_service"),
+
+    path("system/tariffs/", views.SystemTariffsListView.as_view(), name="system_tariffs"),
+    path("system/tariffs/create/", views.system_tariffs_create_view, name="system_tariffs_create"),
 ]

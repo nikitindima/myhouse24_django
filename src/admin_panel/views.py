@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect, HttpRequest, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.timezone import utc
-from django.views.generic import DeleteView, ListView, DetailView
+from django.views.generic import DeleteView, ListView, DetailView, CreateView
 from dateutil.utils import today
 
 from .forms import (
@@ -21,7 +21,7 @@ from .forms import (
     FlatCreateForm,
     FlatUpdateForm,
     UserCreateForm,
-    UserUpdateForm, MeasureForm, ServiceForm,
+    UserUpdateForm, MeasureForm, ServiceForm, TariffCreateForm, ServicePriceForm,
 )
 from .models import (
     SiteHomePage,
@@ -33,7 +33,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat, Measure, Service,
+    Flat, Measure, Service, Tariff,
 )
 from .services.forms_services import (
     validate_forms,
@@ -453,6 +453,13 @@ def api_floors(request, pk):
     return JsonResponse({"results": results})
 
 
+def api_measure_name(request):
+    service_id = request.GET.get('id', None)
+    service = get_object_or_404(Service, pk=service_id)
+
+    return JsonResponse({"text": service.measure.name})
+
+
 def api_users(request):
     users = User.objects.filter(status="ACTIVE")
     results = []
@@ -631,5 +638,32 @@ def system_services(request):
     }
     return render(request, "admin_panel/pages/system_services.html", context=context)
 
+
+class SystemTariffsListView(ListView):
+    template_name = "admin_panel/pages/system_tariffs.html"
+    model = Tariff
+
+
+def system_tariffs_create_view(request):
+    form1 = TariffCreateForm(request.POST or None, prefix="form1")
+    formset = create_formset(ServicePriceForm, request, post=True, prefix='formset')
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_tariffs")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+        "formset": formset
+    }
+    return render(request, "admin_panel/pages/system_tariffs_create.html", context=context)
 
 # endregion SYSTEM_SETTINGS
