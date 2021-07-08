@@ -41,6 +41,25 @@
     {% endfor %}
 {% endfor %}
 
+{#<-----formset2.errors----->#}
+{% for error in formset2.non_field_errors %}
+    <script>
+        msg = alertify.error('{{ error }}', 10);
+    </script>
+{% endfor %}
+
+{% for form in formset2 %}
+    {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <script>
+                    alertify.error('{{ field.name }} - {{ error|escape }}', 10);
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
 {#<-----seo_data_form.errors----->#}
 {% for error in seo_data_form.non_field_errors %}
     <script>

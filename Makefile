@@ -15,8 +15,8 @@ WSGI_PORT=8000
 
 # ##########################################################################
 # common commands
-validators:
-	$(MANAGE) transpile_validators
+black:
+	black $(SOURCE) --exclude 'urls.py'
 celerybeat:
 	celery -A config.celery_app beat -l info
 celeryworker:

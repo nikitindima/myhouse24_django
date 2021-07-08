@@ -1,11 +1,11 @@
 import os
 
+from django.contrib.postgres.fields import DateRangeField
 from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import ManyToManyField, URLField
-from django.urls import reverse
+from django.db.models import ManyToManyField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from .services.media_services import UploadToPathAndRename
@@ -13,19 +13,35 @@ from .services.media_services import UploadToPathAndRename
 User = get_user_model()
 
 
-# region RECEIPTS
+# region Tariff
+class Measure(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name or ''
+
+
+class Service(models.Model):
+    name = models.CharField(max_length=100)
+    is_removable = models.BooleanField(default=True)
+    is_shown = models.BooleanField()
+    measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
 
 
 class Tariff(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     changed = models.DateTimeField(auto_now=True)
-
-    # services = models.ManyToManyField(Service)
+    services = models.ManyToManyField(Service, through='ServicePrice')
 
     def __str__(self):
         return self.name or ""
 
+
+class ServicePrice(models.Model):
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
 
 # endregion RECEIPTS
 
@@ -202,3 +218,34 @@ class Flat(models.Model):
 
 
 # endregion PROPERTY
+class ReceiptTemplate(models.Model):
+    upload_path = os.path.join(MEDIA_ROOT, "receipts", "templates")
+
+    name = models.CharField(max_length=100)
+    template = models.FileField(upload_to=UploadToPathAndRename(upload_path))
+    is_deleted = models.BooleanField()
+
+
+class Receipt(models.Model):
+    is_passed = models.BooleanField()
+    is_paid = models.BooleanField()
+    period = DateRangeField()
+    created = models.DateTimeField()
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
+    services = models.ManyToManyField(Service, through='Bill')
+
+
+class Bill(models.Model):
+    consumption = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+
+
+class MeterData(models.Model):
+    number = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE)

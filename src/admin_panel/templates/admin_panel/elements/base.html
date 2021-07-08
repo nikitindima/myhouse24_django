@@ -162,19 +162,19 @@
                         </li>
                     </ul>
                 </li>
-                <li class="treeview"><a href="#!"><i class="fa fa-cogs"></i> <span>Настройки системы</span> <span
+                <li class="{% block nav_item_system_control %}{% endblock %} treeview"><a href="#!"><i class="fa fa-cogs"></i> <span>Настройки системы</span> <span
                         class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                     <ul class='treeview-menu'>
-                        <li><a href="/admin_panel/service/index"><i class="fa fa-briefcase"></i> <span>Услуги</span></a>
+                        <li class="{% block nav_item_system_services %}{% endblock %}"><a href="{% url 'admin_panel:system_services' %}"><i class="fa fa-briefcase"></i> <span>Услуги</span></a>
                         </li>
-                        <li><a href="/admin_panel/tariff/index"><i class="fa fa-money"></i> <span>Тарифы</span></a></li>
-                        <li><a href="/admin_panel/user-admin/role"><i class="fa fa-user"></i> <span>Роли</span></a></li>
-                        <li><a href="/admin_panel/user-admin/index"><i class="fa fa-user-plus"></i>
+                        <li class="{% block nav_item_system_tariffs %}{% endblock %}"><a href="/admin_panel/tariff/index"><i class="fa fa-money"></i> <span>Тарифы</span></a></li>
+                        <li class="{% block nav_item_system_roles %}{% endblock %}"><a href="/admin_panel/user-admin/role"><i class="fa fa-user"></i> <span>Роли</span></a></li>
+                        <li class="{% block nav_item_system_users %}{% endblock %}"><a href="/admin_panel/user-admin/index"><i class="fa fa-user-plus"></i>
                             <span>Пользователи</span></a>
                         </li>
-                        <li><a href="/admin_panel/pay-company/index"><i class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
+                        <li class="{% block nav_item_system_ %}{% endblock %}"><a href="/admin_panel/pay-company/index"><i class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
                         </li>
-                        <li><a href="/admin_panel/transaction-purpose/index"><i class="fa fa-list-ol"></i> <span>Статьи платежей</span></a>
+                        <li class="{% block nav_item_sysyem_ %}{% endblock %}"><a href="/admin_panel/transaction-purpose/index"><i class="fa fa-list-ol"></i> <span>Статьи платежей</span></a>
                         </li>
                     </ul>
                 </li>

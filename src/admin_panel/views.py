@@ -21,7 +21,7 @@ from .forms import (
     FlatCreateForm,
     FlatUpdateForm,
     UserCreateForm,
-    UserUpdateForm,
+    UserUpdateForm, MeasureForm, ServiceForm,
 )
 from .models import (
     SiteHomePage,
@@ -33,7 +33,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat,
+    Flat, Measure, Service,
 )
 from .services.forms_services import (
     validate_forms,
@@ -491,7 +491,7 @@ class UserListView(ListView):
 
     queryset = User.objects.prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
-    ).prefetch_related('flats__house')
+    ).prefetch_related("flats__house")
 
 
 def user_create_view(request):
@@ -560,4 +560,76 @@ class UserDeleteView(DeleteView):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
 
+
 # endregion USERS
+
+# region SYSTEM_SETTINGS
+
+# region STAFF
+
+class MeasureDeleteView(DeleteView):
+    model = Measure
+    success_url = reverse_lazy("admin_panel:system_services")
+    success_message = "Еденица измерения успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+def check_service(request, pk):
+    return JsonResponse({"result": "success"})
+
+
+def check_measure(request, pk):
+    result = 'can_delete'
+    measure = get_object_or_404(Measure, pk=pk)
+    services = Service.objects.filter(measure=measure)
+    if services.exists():
+        result = 'cant_delete'
+
+    return JsonResponse({"result": result})
+
+
+class ServiceDeleteView(DeleteView):
+    model = Service
+    success_url = reverse_lazy("admin_panel:system_services")
+    success_message = "Услуга успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+# endregion STAFF
+
+
+def system_services(request):
+    formset = create_formset(MeasureForm, request, post=True, qs=Measure.objects.all(), prefix='formset')
+    formset2 = create_formset(ServiceForm, request, post=True, qs=Service.objects.select_related('measure'), prefix='formset2')
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(formset, formset2)
+
+        if forms_valid_status:
+            save_forms(formset, formset2)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_services")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "formset": formset,
+        "formset2": formset2,
+    }
+    return render(request, "admin_panel/pages/system_services.html", context=context)
+
+
+# endregion SYSTEM_SETTINGS

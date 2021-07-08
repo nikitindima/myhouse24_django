@@ -37,3 +37,8 @@ indent_style = tab
 [nginx.conf]
 indent_style = space
 indent_size = 2
+
+[black]
+line-length = 80
+target-version = ['py38']
+exclude = 'urls.py'

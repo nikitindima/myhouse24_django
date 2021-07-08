@@ -27,7 +27,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat,
+    Flat, Measure, Service,
 )
 
 # 2.5MB - 2621440
@@ -775,5 +775,50 @@ class UserUpdateForm(UserForm):
             user.save()
         return user
 
+
+class MeasureForm(forms.ModelForm):
+    class Meta:
+        model = Measure
+        fields = ["name"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите еденицу измерения",
+                }
+            ),
+        }
+        labels = {
+            "name": "Ед. изм."
+        }
+
+
+class ServiceForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = ["name", "measure", "is_shown"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название услуги",
+                }
+            ),
+            "is_shown": CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "measure": Select(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+        }
+        labels = {
+            "name": "Услуга",
+            "is_shown": "Показывать в счетчиках",
+            "measure": "Ед. изм.",
+        }
 
 # endregion USER
