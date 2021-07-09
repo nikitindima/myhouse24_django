@@ -47,4 +47,8 @@ urlpatterns = [
 
     path("system/tariffs/", views.SystemTariffsListView.as_view(), name="system_tariffs"),
     path("system/tariffs/create/", views.system_tariffs_create_view, name="system_tariffs_create"),
+    path("system/tariffs/update/<int:pk>/", views.system_tariffs_update_view, name="system_tariffs_update"),
+    path("system/tariffs/delete/<int:pk>/", views.TariffDeleteView.as_view(), name="system_tariffs_delete"),
+    path("system/tariffs/clone/<int:pk>/", views.system_tariffs_clone_view, name="system_tariffs_clone"),
+    path("system/tariffs/detail/<int:pk>/", views.TariffDetailView.as_view(), name="system_tariffs_detail"),
 ]

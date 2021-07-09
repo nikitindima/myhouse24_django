@@ -1,0 +1,92 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active menu-open{% endblock %}
+{% block nav_item_system_tariffs %}active{% endblock %}
+
+{% block title %}Квартира {{ object.name }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Тариф: {{ object.name }} </h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:system_tariffs' %}">Тарифы</a></li>
+                <li class="active">Тариф: {{ object.name }}</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"></h3>
+                    <div class="box-tools">
+                        <a href="{% url 'admin_panel:system_tariffs_update' object.pk %}"
+                           class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать тариф</span><i class="fa fa-pencil visible-xs"
+                                                                                 aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table class="table table-bordered table-striped table-view">
+                        <tbody>
+                        <tr>
+                            <td>Название тарифа</td>
+                            <td>
+                                {{ object.name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Описание</td>
+                            <td>{{ object.description }}</td>
+                        </tr>
+                        <tr>
+                            <td>Дата редактирования</td>
+                            <td>{{ object.changed }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-responsive no-padding margin-top-15">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Услуга</th>
+                                <th>Ед. изм.</th>
+                                <th>Цена за ед., грн</th>
+                                <th>Валюта</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for service_price in object.service_price.all %}
+                                <tr role="row">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ service_price.service.name }}</td>
+                                    <td>{{ service_price.service.measure.name }}</td>
+                                    <td>{{ service_price.price }}</td>
+                                    <td>грн</td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

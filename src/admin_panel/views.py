@@ -21,7 +21,7 @@ from .forms import (
     FlatCreateForm,
     FlatUpdateForm,
     UserCreateForm,
-    UserUpdateForm, MeasureForm, ServiceForm, TariffCreateForm, ServicePriceForm,
+    UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm,
 )
 from .models import (
     SiteHomePage,
@@ -524,10 +524,7 @@ def user_create_view(request):
 
 class UserDetailView(DetailView):
     template_name = "admin_panel/pages/user_detail.html"
-
-    def get_queryset(self):
-        my_query = User.objects.all()
-        return my_query
+    model = User
 
 
 def user_update_view(request, pk):
@@ -613,6 +610,22 @@ class ServiceDeleteView(DeleteView):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
 
+
+class TariffDeleteView(DeleteView):
+    model = Tariff
+    success_url = reverse_lazy("admin_panel:system_tariffs")
+    success_message = "Тариф успешно удален"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        tariff = self.get_object()
+        for service_price in tariff.service_price.all():
+            service_price.delete()
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
 # endregion STAFF
 
 
@@ -645,14 +658,20 @@ class SystemTariffsListView(ListView):
 
 
 def system_tariffs_create_view(request):
-    form1 = TariffCreateForm(request.POST or None, prefix="form1")
+    form1 = TariffForm(request.POST or None, prefix="form1")
     formset = create_formset(ServicePriceForm, request, post=True, prefix='formset')
 
     if request.method == "POST":
-        forms_valid_status = validate_forms(form1)
+        forms_valid_status = validate_forms(form1, formset)
 
         if forms_valid_status:
-            save_forms(form1)
+            tariff = form1.save(commit=True)
+
+            for form in formset:
+                if form.cleaned_data.get("price") is not None:
+                    service = form.save(commit=True)
+                    tariff.service_price.add(service)
+                    tariff.save()
 
             messages.success(request, "Данные успешно обновлены.")
 
@@ -666,4 +685,65 @@ def system_tariffs_create_view(request):
     }
     return render(request, "admin_panel/pages/system_tariffs_create.html", context=context)
 
+
+def system_tariffs_update_view(request, pk):
+    tariff = get_object_or_404(Tariff, pk=pk)
+    form1 = TariffForm(request.POST or None, prefix="form1", instance=tariff)
+    formset = create_formset(ServicePriceForm, request, post=True, prefix='formset', qs=tariff.service_price.all())
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1, formset)
+
+        if forms_valid_status:
+            save_forms(formset)
+            tariff = form1.save(commit=True)
+
+            for form in formset:
+                if form.cleaned_data.get("price") is not None:
+                    service = form.save(commit=True)
+                    tariff.service_price.add(service)
+                    tariff.save()
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_tariffs")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+        "formset": formset
+    }
+    return render(request, "admin_panel/pages/system_tariffs_update.html", context=context)
+
+
+def system_tariffs_clone_view(request, pk):
+    tariff = get_object_or_404(Tariff, pk=pk)
+    service_prices_copy = []
+
+    for service_price in tariff.service_price.all():
+        service_price.pk = None
+        service_price._state.adding = True
+        service_price.save()
+        service_prices_copy.append(service_price)
+
+    tariff.pk = None
+    tariff._state.adding = True
+    tariff.save()
+    tariff.service_price.add(*service_prices_copy)
+
+    return redirect('admin_panel:system_tariffs')
+
+
+class TariffDetailView(DetailView):
+    template_name = "admin_panel/pages/system_tariffs_detail.html"
+    queryset = Tariff.objects.prefetch_related("service_price__service__measure")
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #
+    #     sections = Section.objects.filter(house=self.object)
+    #     floors = sections.aggregate(Max("floors")).get("floors__max")
+    #     context.update({"sections": sections.count(), "floors": floors})
+    #     return context
 # endregion SYSTEM_SETTINGS

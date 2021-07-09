@@ -5,7 +5,7 @@
 {% block nav_item_system_control %}active menu-open{% endblock %}
 {% block nav_item_system_tariffs %}active{% endblock %}
 
-{% block title %}Новый тариф{% endblock %}
+{% block title %}Тариф: {{ form1.instance.name }}{% endblock %}
 
 {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
@@ -15,12 +15,13 @@
 {% block content %}
     <div class="content-wrapper" style="min-height: 867px;">
         <section class="content-header">
-            <h1>Новый тариф</h1>
+            <h1>Тариф: {{ form1.instance.name }}</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
                 <li><a href="{% url 'admin_panel:system_tariffs' %}">Тарифы</a></li>
-                <li class="active">Новый тариф</li>
+                <li class="active">Тариф: {{ form1.instance.name }}</li>
+                <li class="active">Редактирование</li>
             </ul>
         </section>
 
@@ -120,8 +121,8 @@
                                                         <option value="">Выберите...</option>
                                                         <option value="0">asg.</option>
                                                     </select> <span class="input-group-btn">
-                                                    <button onclick="delete_parent(this, 4)" type="button" class="btn btn-default form-row-remove-btn"><i
-                                                            class="fa fa-trash"></i></button>
+                                    <button type="button" class="btn btn-default form-row-remove-btn"><i
+                                            class="fa fa-trash"></i></button>
                                                 </span>
                                                 </div>
                                             </div>
@@ -154,8 +155,12 @@
 {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        $(document).ready(function () {
+        });
+
         let form_counters = $('#id_formset-TOTAL_FORMS').val()
         let form_initial = $('#id_formset-INITIAL_FORMS').val()
+        define_measures_for_initial_formset_forms()
         $('#add-more').click(function () {
             form_counters++
             $('#form-service-price-rows').append($('#form-service-price-empty-form').html().replace(/__prefix__/g, (form_counters - 1)));
@@ -170,28 +175,32 @@
             select_house.on("select2:select", function () {
                 send_ajax(select_house.val(), measure)
             });
-
-            function send_ajax(id, measure) {
-                $.ajax({
-                    url: '{% url 'admin_panel:api_measure_name' %}',
-                    data: {
-                        'id': id
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        measure.text(data.text)
-                    }
-                });
-            }
         })
 
-        function delete_parent(elem, level) {
-            let form_set = elem.parentElement;
-            for (let i = 0; i < level; i++) {
-                form_set = form_set.parentElement;
-            }
-            form_set.remove()
+        function send_ajax(id, measure) {
+            $.ajax({
+                url: '{% url 'admin_panel:api_measure_name' %}',
+                data: {
+                    'id': id
+                },
+                dataType: 'json',
+                success: function (data) {
+                    measure.text(data.text)
+                }
+            });
         }
+
+        function define_measures_for_initial_formset_forms() {
+            for (let i = 0; i < form_initial; i++) {
+                let select_house = $('#id_formset-' + i + '-service')
+                let measure = $('#basic-measure-' + i + ' > option:nth-child(1)')
+                select_house.select2({
+                    theme: 'bootstrap',
+                })
+                send_ajax(select_house.val(), measure)
+            }
+        }
+
     </script>
     {% include 'admin_panel/elements/messages.html' %}
 {% endblock %}

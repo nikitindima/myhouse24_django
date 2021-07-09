@@ -31,7 +31,8 @@
                 <div class="col-xs-12">
 
                     <div class="pull-right margin-bottom">
-                        <a class="btn btn-success" href="{% url 'admin_panel:system_tariffs_create' %}">Добавить тариф</a>
+                        <a class="btn btn-success" href="{% url 'admin_panel:system_tariffs_create' %}">Добавить
+                            тариф</a>
                     </div>
                 </div>
             </div>
@@ -43,8 +44,9 @@
                                 <table class="table table-bordered table-hover table-striped linkedRow">
                                     <thead>
                                     <tr>
-                                        <th><a href="{% url 'admin_panel:system_tariffs' %}?sort=name" data-sort="name">Название
-                                            тарифа</a></th>
+{#                                        <th><a href="{% url 'admin_panel:system_tariffs' %}?sort=name" data-sort="name">Название#}
+{#                                            тарифа</a></th>#}
+                                        <th>Название тарифа</a></th>
                                         <th>Описание тарифа</th>
                                         <th>Дата редактирования</th>
                                         <th style="width: 114px; min-width: 114px">&nbsp;</th>
@@ -53,26 +55,26 @@
                                     <tbody>
 
                                     {% for object in object_list %}
-                                        <tr data-href="/admin/tariff/14" data-key="14">
+                                        <tr data-href="{% url 'admin_panel:system_tariffs_detail' object.pk %}">
                                             <td>{{ object.name }}</td>
-                                            <td>{{ object.description}}</td>
+                                            <td>{{ object.description }}</td>
                                             <td>{{ object.changed }}</td>
                                             <td>
                                                 <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                                                     href="/admin/tariff/create?tariff_id=14"
+                                                                                     href="{% url 'admin_panel:system_tariffs_clone' object.pk %}"
                                                                                      title="Копировать"
                                                                                      data-toggle="tooltip"><i
                                                         class="fa fa-clone"></i></a> <a class="btn btn-default btn-sm"
-                                                                                        href="/admin/tariff/update/14"
+                                                                                        href="{% url 'admin_panel:system_tariffs_update' object.pk %}"
                                                                                         title="Редактировать"
                                                                                         data-toggle="tooltip"><i
                                                         class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                                                         href="/admin/tariff/delete/14"
+                                                                                         href="{% url 'admin_panel:system_tariffs_delete' object.pk %}"
                                                                                          title="Удалить"
+                                                                                         onclick="delete_object(event)"
                                                                                          data-toggle="tooltip"
                                                                                          data-pjax="0"
-                                                                                         data-method="post"
-                                                                                         data-confirm="Вы уверены, что хотите удалить этот элемент?"><i
+                                                                                         data-method="post"><i
                                                         class="fa fa-trash"></i></a></div>
                                             </td>
                                         </tr>
@@ -92,8 +94,20 @@
 
 {% block scripts %}
     <script>
-        $(document).ready(function () {
-        });
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+
+        add_links_to_rows()
     </script>
     {% include 'admin_panel/elements/messages.html' %}
 {% endblock %}

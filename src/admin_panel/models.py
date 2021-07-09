@@ -31,21 +31,19 @@ class Service(models.Model):
         return self.name
 
 
+class ServicePrice(models.Model):
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+
+
 class Tariff(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     changed = models.DateTimeField(auto_now=True)
-    services = models.ManyToManyField(Service, through='ServicePrice')
+    service_price = models.ManyToManyField(ServicePrice, related_name="service_price")
 
     def __str__(self):
         return self.name or ""
-
-
-class ServicePrice(models.Model):
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-
 # endregion RECEIPTS
 
 # region SITE_CONTROL

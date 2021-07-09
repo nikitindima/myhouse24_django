@@ -13,6 +13,26 @@ from phonenumber_field.modelfields import PhoneNumberField
 from src.admin_panel.services.media_services import UploadToPathAndRename
 
 
+class UserRole(models.Model):
+    name = models.CharField(max_length=255)
+
+    statistics_access = models.BooleanField(default=0)
+    flat_access = models.BooleanField(default=0)
+    house_user_access = models.BooleanField(default=0)
+    house_access = models.BooleanField(default=0)
+    message_access = models.BooleanField(default=0)
+    measures_access = models.BooleanField(default=0)
+    site_access = models.BooleanField(default=0)
+    service_access = models.BooleanField(default=0)
+    tariff_access = models.BooleanField(default=0)
+    role_access = models.BooleanField(default=0)
+    staff_access = models.BooleanField(default=0)
+    payments_detail_access = models.BooleanField(default=0)
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractUser):
     username = models.CharField(_("username"), max_length=150)
     upload_path = os.path.join(MEDIA_ROOT, "images", "site", "home_page", "articles")

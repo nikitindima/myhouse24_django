@@ -12,7 +12,7 @@ from .models import (
     Section,
     Flat,
     Tariff,
-    User, Service,
+    User, Service, ServicePrice,
 )
 
 admin.site.register(SeoData)
@@ -28,3 +28,4 @@ admin.site.register(Section)
 admin.site.register(Tariff)
 admin.site.register(User)
 admin.site.register(Service)
+admin.site.register(ServicePrice)

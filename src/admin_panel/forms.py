@@ -822,7 +822,7 @@ class ServiceForm(forms.ModelForm):
         }
 
 
-class TariffCreateForm(ModelForm):
+class TariffForm(ModelForm):
     class Meta:
         model = Tariff
         fields = ["name", "description"]
