@@ -14,14 +14,18 @@ from src.admin_panel.services.media_services import UploadToPathAndRename
 
 
 class UserRole(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     statistics_access = models.BooleanField(default=0)
+    cashbox_access = models.BooleanField(default=0)
+    receipt_access = models.BooleanField(default=0)
+    account_access = models.BooleanField(default=0)
     flat_access = models.BooleanField(default=0)
     house_user_access = models.BooleanField(default=0)
     house_access = models.BooleanField(default=0)
     message_access = models.BooleanField(default=0)
-    measures_access = models.BooleanField(default=0)
+    call_request_access = models.BooleanField(default=0)
+    meter_data_access = models.BooleanField(default=0)
     site_access = models.BooleanField(default=0)
     service_access = models.BooleanField(default=0)
     tariff_access = models.BooleanField(default=0)
@@ -39,8 +43,8 @@ class User(AbstractUser):
 
     class UserStatus(models.TextChoices):
         ACTIVE = "ACTIVE", _("Активный")
-        INACTIVE = "INACTIVE", _("Неактивный")
-        DEACTIVATED = "DEACTIVATED", _("Деактивированный")
+        INACTIVE = "NEW", _("Новый")
+        DEACTIVATED = "DEACTIVATED", _("Отключен")
 
     first_name = models.CharField(_("first name"), max_length=150)
     last_name = models.CharField(_("last name"), max_length=150)
@@ -56,6 +60,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=150)
     status = models.CharField(max_length=11, choices=UserStatus.choices)
     user_id = models.CharField(max_length=20, unique=True)
+    role = models.ForeignKey(UserRole, null=True, blank=True, on_delete=models.SET_NULL)
 
     def get_absolute_url(self):
         """Get url for user's detail view.

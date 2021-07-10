@@ -39,6 +39,7 @@ from .models import (
 # 250MB - 214958080
 # 500MB - 429916160
 from .services.forms_services import check_filesize, validate_image
+from ..users.models import UserRole
 
 MAX_UPLOAD_SIZE = 20971520
 User = get_user_model()
@@ -869,4 +870,61 @@ class ServicePriceForm(ModelForm):
             "service": "Услуга",
             "price": "Цена",
         }
+
+
+class UserRoleForm(ModelForm):
+    class Meta:
+        model = UserRole
+        exclude = ['name']
+        widgets = {
+            'statistics_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'cashbox_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'receipt_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'account_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'flat_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'house_user_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'house_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'message_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'call_request_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'meter_data_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'site_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'service_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'tariff_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'role_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'staff_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+            'payments_detail_access': forms.CheckboxInput(attrs={
+                'class': 'custom-control-input',
+            }),
+        }
+
 # endregion USER

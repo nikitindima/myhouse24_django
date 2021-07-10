@@ -1,15 +1,16 @@
 from datetime import timedelta
 
-from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sitemaps import ping_google
 from django.db.models import Max, Prefetch
-from django.http import HttpResponseRedirect, HttpRequest, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.timezone import utc
-from django.views.generic import DeleteView, ListView, DetailView, CreateView
+from django.views.generic import DeleteView, ListView, DetailView
 from dateutil.utils import today
 
 from .forms import (
@@ -21,7 +22,7 @@ from .forms import (
     FlatCreateForm,
     FlatUpdateForm,
     UserCreateForm,
-    UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm,
+    UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm,
 )
 from .models import (
     SiteHomePage,
@@ -47,15 +48,20 @@ from .services.site_pages_services import (
     create_formset_and_save_to_m2m_field,
     save_new_objects_to_many_to_many_field,
 )
+from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
+    tariff_access, role_access, staff_access
+from ..users.models import UserRole
 
 User = get_user_model()
 
 
+@user_passes_test(statistics_access)
 def home_view(request):
     return render(request, "admin_panel/pages/home.html")
 
 
 # region SITE_CONTROL
+@user_passes_test(site_access)
 def site_home_view(request):
     obj = get_or_create_page_object(SiteHomePage)
     form1, seo_data_form = create_forms(request, obj, SiteHomeForm)
@@ -81,6 +87,7 @@ def site_home_view(request):
     return render(request, "admin_panel/pages/site_home.html", context=context)
 
 
+@user_passes_test(site_access)
 def site_about_view(request):
     obj = get_or_create_page_object(SiteAboutPage)
     form1, seo_data_form = create_forms(request, obj, SiteAboutForm)
@@ -121,6 +128,7 @@ def site_about_view(request):
     return render(request, "admin_panel/pages/site_about.html", context=context)
 
 
+@user_passes_test(site_access)
 def site_services_view(request):
     obj = get_or_create_page_object(SiteServicesPage)
     seo_data_form = create_forms(request, obj, only_seo=True)
@@ -158,6 +166,7 @@ def site_services_view(request):
     return render(request, "admin_panel/pages/site_services.html", context=context)
 
 
+@user_passes_test(site_access)
 def site_contacts_view(request):
     obj = get_or_create_page_object(SiteContactsPage)
     form1, seo_data_form = create_forms(request, obj, SiteContactsForm)
@@ -185,12 +194,14 @@ def site_contacts_view(request):
 # region SERVICES
 
 
+@user_passes_test(site_access)
 def update_sitemap_view(request):
     ping_google(sitemap_url="/sitemap.xml")
     messages.success(request, "sitemap.xml был успешно обновлён!")
     return redirect(request.META.get("HTTP_REFERER", "admin_panel:site_home"))
 
 
+@method_decorator(user_passes_test(site_access), name='dispatch')
 class ArticleDeleteView(DeleteView):
     model = Article
     success_url = reverse_lazy("admin_panel:site_services")
@@ -204,6 +215,7 @@ class ArticleDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@method_decorator(user_passes_test(site_access), name='dispatch')
 class GalleryImageDeleteView(DeleteView):
     model = GalleryImage
     success_url = reverse_lazy("admin_panel:site_about")
@@ -214,6 +226,7 @@ class GalleryImageDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@method_decorator(user_passes_test(site_access), name='dispatch')
 class DocumentDeleteView(DeleteView):
     model = Document
     success_url = reverse_lazy("admin_panel:site_about")
@@ -231,11 +244,13 @@ class DocumentDeleteView(DeleteView):
 # region PROPERTY
 
 # region HOUSE
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class HouseListView(ListView):
     template_name = "admin_panel/pages/house_list.html"
     model = House
 
 
+@user_passes_test(house_user_access)
 def house_create_view(request):
     errors = []
     form1 = HouseCreateForm(request.POST or None, request.FILES or None, prefix="form1")
@@ -270,6 +285,7 @@ def house_create_view(request):
     return render(request, "admin_panel/pages/house_create.html", context=context)
 
 
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class HouseDetailView(DetailView):
     template_name = "admin_panel/pages/house_detail.html"
     model = House
@@ -283,6 +299,7 @@ class HouseDetailView(DetailView):
         return context
 
 
+@user_passes_test(house_user_access)
 def house_update_view(request, pk):
     house = get_object_or_404(House, pk=pk)
     form1 = HouseCreateForm(
@@ -318,6 +335,7 @@ def house_update_view(request, pk):
     return render(request, "admin_panel/pages/house_update.html", context=context)
 
 
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class HouseDeleteView(DeleteView):
     model = House
     success_url = reverse_lazy("admin_panel:house_list")
@@ -344,11 +362,13 @@ def section_delete_view(request):
 # region FLAT
 
 
+@method_decorator(user_passes_test(flat_access), name='dispatch')
 class FlatListView(ListView):
     template_name = "admin_panel/pages/flat_list.html"
     queryset = Flat.objects.select_related("section", "house", "owner")
 
 
+@user_passes_test(flat_access)
 def flat_create_view(request):
     form1 = FlatCreateForm(request.POST or None, request.FILES or None, prefix="form1")
 
@@ -373,6 +393,7 @@ def flat_create_view(request):
     return render(request, "admin_panel/pages/flat_create.html", context=context)
 
 
+@method_decorator(user_passes_test(flat_access), name='dispatch')
 class FlatDetailView(DetailView):
     template_name = "admin_panel/pages/flat_detail.html"
     model = Flat
@@ -382,6 +403,7 @@ class FlatDetailView(DetailView):
         return context
 
 
+@user_passes_test(flat_access)
 def flat_update_view(request, pk):
     flat = get_object_or_404(Flat, pk=pk)
     form1 = FlatUpdateForm(
@@ -410,6 +432,7 @@ def flat_update_view(request, pk):
     return render(request, "admin_panel/pages/flat_update.html", context=context)
 
 
+@method_decorator(user_passes_test(flat_access), name='dispatch')
 class FlatDeleteView(DeleteView):
     model = Flat
     success_url = reverse_lazy("admin_panel:flat_list")
@@ -492,6 +515,7 @@ def api_new_users(request):
 # region USERS
 
 
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class UserListView(ListView):
     template_name = "admin_panel/pages/user_list.html"
     # queryset = User.objects.prefetch_related('flats', 'flats__house')
@@ -501,6 +525,7 @@ class UserListView(ListView):
     ).prefetch_related("flats__house")
 
 
+@user_passes_test(house_user_access)
 def user_create_view(request):
     form1 = UserCreateForm(request.POST or None, request.FILES or None, prefix="form1")
 
@@ -522,11 +547,13 @@ def user_create_view(request):
     return render(request, "admin_panel/pages/user_create.html", context=context)
 
 
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class UserDetailView(DetailView):
     template_name = "admin_panel/pages/user_detail.html"
     model = User
 
 
+@user_passes_test(house_user_access)
 def user_update_view(request, pk):
     user = get_object_or_404(User, pk=pk)
     form1 = UserUpdateForm(
@@ -552,6 +579,7 @@ def user_update_view(request, pk):
     return render(request, "admin_panel/pages/user_update.html", context=context)
 
 
+@method_decorator(user_passes_test(house_user_access), name='dispatch')
 class UserDeleteView(DeleteView):
     model = User
     success_url = reverse_lazy("admin_panel:user_list")
@@ -571,6 +599,7 @@ class UserDeleteView(DeleteView):
 
 # region STAFF
 
+@method_decorator(user_passes_test(service_access), name='dispatch')
 class MeasureDeleteView(DeleteView):
     model = Measure
     success_url = reverse_lazy("admin_panel:system_services")
@@ -584,10 +613,12 @@ class MeasureDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@user_passes_test(service_access)
 def check_service(request, pk):
     return JsonResponse({"result": "success"})
 
 
+@user_passes_test(service_access)
 def check_measure(request, pk):
     result = 'can_delete'
     measure = get_object_or_404(Measure, pk=pk)
@@ -598,6 +629,7 @@ def check_measure(request, pk):
     return JsonResponse({"result": result})
 
 
+@method_decorator(user_passes_test(service_access), name='dispatch')
 class ServiceDeleteView(DeleteView):
     model = Service
     success_url = reverse_lazy("admin_panel:system_services")
@@ -611,6 +643,7 @@ class ServiceDeleteView(DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@method_decorator(user_passes_test(tariff_access), name='dispatch')
 class TariffDeleteView(DeleteView):
     model = Tariff
     success_url = reverse_lazy("admin_panel:system_tariffs")
@@ -626,12 +659,15 @@ class TariffDeleteView(DeleteView):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
 
+
 # endregion STAFF
 
 
+@user_passes_test(service_access)
 def system_services(request):
     formset = create_formset(MeasureForm, request, post=True, qs=Measure.objects.all(), prefix='formset')
-    formset2 = create_formset(ServiceForm, request, post=True, qs=Service.objects.select_related('measure'), prefix='formset2')
+    formset2 = create_formset(ServiceForm, request, post=True, qs=Service.objects.select_related('measure'),
+                              prefix='formset2')
 
     if request.method == "POST":
         forms_valid_status = validate_forms(formset, formset2)
@@ -652,11 +688,13 @@ def system_services(request):
     return render(request, "admin_panel/pages/system_services.html", context=context)
 
 
+@method_decorator(user_passes_test(tariff_access), name='dispatch')
 class SystemTariffsListView(ListView):
     template_name = "admin_panel/pages/system_tariffs.html"
     model = Tariff
 
 
+@user_passes_test(tariff_access)
 def system_tariffs_create_view(request):
     form1 = TariffForm(request.POST or None, prefix="form1")
     formset = create_formset(ServicePriceForm, request, post=True, prefix='formset')
@@ -686,6 +724,7 @@ def system_tariffs_create_view(request):
     return render(request, "admin_panel/pages/system_tariffs_create.html", context=context)
 
 
+@user_passes_test(tariff_access)
 def system_tariffs_update_view(request, pk):
     tariff = get_object_or_404(Tariff, pk=pk)
     form1 = TariffForm(request.POST or None, prefix="form1", instance=tariff)
@@ -717,6 +756,7 @@ def system_tariffs_update_view(request, pk):
     return render(request, "admin_panel/pages/system_tariffs_update.html", context=context)
 
 
+@user_passes_test(tariff_access)
 def system_tariffs_clone_view(request, pk):
     tariff = get_object_or_404(Tariff, pk=pk)
     service_prices_copy = []
@@ -735,15 +775,44 @@ def system_tariffs_clone_view(request, pk):
     return redirect('admin_panel:system_tariffs')
 
 
+@method_decorator(user_passes_test(tariff_access), name='dispatch')
 class TariffDetailView(DetailView):
     template_name = "admin_panel/pages/system_tariffs_detail.html"
     queryset = Tariff.objects.prefetch_related("service_price__service__measure")
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #
-    #     sections = Section.objects.filter(house=self.object)
-    #     floors = sections.aggregate(Max("floors")).get("floors__max")
-    #     context.update({"sections": sections.count(), "floors": floors})
-    #     return context
 # endregion SYSTEM_SETTINGS
+
+
+@user_passes_test(role_access)
+def system_user_role_view(request):
+    qs = UserRole.objects.all()
+    if not qs.exists():
+        role_list = ['Директор', 'Управляющий', 'Бухгалтер', 'Электрик', 'Сантехник']
+        for role in role_list:
+            UserRole(name=role).save()
+        qs = UserRole.objects.all()
+
+    formset = create_formset(UserRoleForm, request, post=True, prefix='formset', qs=qs)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(formset)
+        print(formset)
+        if forms_valid_status:
+            save_forms(formset)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_user_roles")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "formset": formset
+    }
+    return render(request, "admin_panel/pages/system_user_roles.html", context=context)
+
+
+@method_decorator(user_passes_test(staff_access), name='dispatch')
+class StaffListView(ListView):
+    queryset = User.objects.filter(is_staff=True)
+    template_name = "admin_panel/pages/system_staff_list.html"

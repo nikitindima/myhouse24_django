@@ -1,0 +1,242 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active{% endblock %}
+{% block nav_item_system_staff %}active{% endblock %}
+
+{% block title %}Квартиры{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Пользователи</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Пользователи</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <!--<div class="col-xs-12 col-sm-6">-->
+                <!--<h2 class="page-header">Квартиры</h2>-->
+                <!--</div>-->
+                <div class="col-xs-12">
+
+                    <div class="pull-right margin-bottom">
+                        <a class="btn btn-success" href="/admin/user-admin/create">Создать пользователя</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"></h3>
+                            <div class="box-tools">
+                                <a href="{% url 'admin_panel:system_staff_list' %}" class="btn btn-default btn-sm">
+                                    <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
+                                                                              aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="w0" class="grid-view">
+                            <div class="box-body table-responsive no-padding">
+                                <table id="datatable" class="table table-bordered table-hover table-striped linkedRow"
+                                       style="width:99%">
+                                    <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Пользователь</th>
+                                        <th>Роль</th>
+                                        <th>Телефон</th>
+                                        <th>Email (логин)</th>
+                                        <th>Статус</th>
+                                        <th style="width: 114px; min-width: 114px"></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="dt-center">№</th>
+                                        <th>Пользователь</th>
+                                        <th>Роль</th>
+                                        <th>Телефон</th>
+                                        <th>Email (логин)</th>
+                                        <th>Статус</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                    {% for user in user_list %}
+                                        <tr data-href="/admin/user-admin/1">
+                                            <td data-filter="{{ forloop.counter }}">{{ forloop.counter }}</td>
+                                            <td data-filter="{{ user.full_name }}">{{ user.full_name }}</td>
+                                            <td data-filter="
+                                                    {% if user.role %}{{ user.role }}{% endif %}|||">{{ user.role }}</td>
+                                            <td data-filter="{{ user.phone }}">{{ user.phone }}</td>
+                                            <td data-filter="{{ user.email }}">{{ user.email }}</td>
+                                            <td data-filter="{% if user.status == 'ACTIVE' %}Активен{% elif user.status == 'NEW' %}Новый{% elif user.status == 'DEACTIVATED' %}Отключен{% endif %}|||">
+                                                {% if user.status == 'ACTIVE' %}
+                                                    <small class="label label-success">Активен</small>
+                                                {% elif user.status == 'NEW' %}
+                                                    <small class="label label-primary">Новый</small>
+                                                {% elif user.status == 'DEACTIVATED' %}
+                                                    <small class="label label-error">Отключен</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
+                                                                                     href="/admin/user-admin/invite/1"
+                                                                                     title="Отправить приглашение"
+                                                                                     data-toggle="tooltip"><i
+                                                        class="fa fa-repeat"></i></a> <a class="btn btn-default btn-sm"
+                                                                                         href="/admin/user-admin/update/1"
+                                                                                         title="Редактировать"
+                                                                                         data-toggle="tooltip"><i
+                                                        class="fa fa-pencil"></i></a>
+                                                    <button class="btn btn-default btn-sm disabled"><i
+                                                            class="fa fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
+            const table = $('#datatable').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                sDom: '<"top"i>rt<"bottom"lp><"clear">',
+                lengthChange: false,
+                bInfo: false,
+                pageLength: 10,
+                drawCallback: add_links_to_rows,
+                columns: [
+                    {"width": "8%", "className": "dt-center"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    {"width": "8%", "className": "dt-center"},
+                    null,
+                ],
+
+            });
+            const filters_row = $('#datatable thead tr:eq(1) th')
+            make_search(filters_row, 0, 2, table)
+            make_search(filters_row, 3, 5, table)
+            make_select(filters_row, 2, 3, table)
+            make_select(filters_row, 5, 6, table)
+
+            $('#datatable thead tr:eq(1) th select').select2({
+                theme: 'bootstrap',
+                width: 900,
+            })
+            $('#datatable thead tr:eq(1) th input')
+                .attr('class', 'form-control')
+                .attr('style', 'width: 100%; display: inline-block;');
+        });
+
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+
+        function make_select(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        table.column(i + slice1)
+                            .search(val ? $(this).val() : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i + slice1).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    var data = thisStatus.split('|||')
+                    for (let k = 0; k < data.length - 1; k++) {
+                        let new_status = data[k]
+                        if ($.inArray(new_status, statusItems) === -1) statusItems.push(new_status);
+                    }
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+
+        }
+
+        function make_search(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                $(this).html('<input class="form-control" type="text" placeholder="Поиск - ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i + slice1).search() !== this.value) {
+                        table
+                            .column(i + slice1)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+
+{% endblock %}

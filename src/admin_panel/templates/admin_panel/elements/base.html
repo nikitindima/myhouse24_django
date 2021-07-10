@@ -168,8 +168,8 @@
                         <li class="{% block nav_item_system_services %}{% endblock %}"><a href="{% url 'admin_panel:system_services' %}"><i class="fa fa-briefcase"></i> <span>Услуги</span></a>
                         </li>
                         <li class="{% block nav_item_system_tariffs %}{% endblock %}"><a href="{% url 'admin_panel:system_tariffs' %}"><i class="fa fa-money"></i> <span>Тарифы</span></a></li>
-                        <li class="{% block nav_item_system_roles %}{% endblock %}"><a href="/admin_panel/user-admin/role"><i class="fa fa-user"></i> <span>Роли</span></a></li>
-                        <li class="{% block nav_item_system_users %}{% endblock %}"><a href="/admin_panel/user-admin/index"><i class="fa fa-user-plus"></i>
+                        <li class="{% block nav_item_system_user_roles %}{% endblock %}"><a href="{% url 'admin_panel:system_user_roles' %}"><i class="fa fa-user"></i> <span>Роли</span></a></li>
+                        <li class="{% block nav_item_system_staff %}{% endblock %}"><a href="{% url 'admin_panel:system_staff_list' %}"><i class="fa fa-user-plus"></i>
                             <span>Пользователи</span></a>
                         </li>
                         <li class="{% block nav_item_system_ %}{% endblock %}"><a href="/admin_panel/pay-company/index"><i class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>

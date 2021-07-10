@@ -51,4 +51,6 @@ urlpatterns = [
     path("system/tariffs/delete/<int:pk>/", views.TariffDeleteView.as_view(), name="system_tariffs_delete"),
     path("system/tariffs/clone/<int:pk>/", views.system_tariffs_clone_view, name="system_tariffs_clone"),
     path("system/tariffs/detail/<int:pk>/", views.TariffDetailView.as_view(), name="system_tariffs_detail"),
+    path("system/users/roles/", views.system_user_role_view, name="system_user_roles"),
+    path("system/users/staff/", views.StaffListView.as_view(), name="system_staff_list"),
 ]
