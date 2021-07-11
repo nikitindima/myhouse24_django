@@ -5,12 +5,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sitemaps import ping_google
 from django.db.models import Max, Prefetch
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.timezone import utc
-from django.views.generic import DeleteView, ListView, DetailView
+from django.views.generic import DeleteView, ListView, DetailView, CreateView
 from dateutil.utils import today
 
 from .forms import (
@@ -22,7 +22,7 @@ from .forms import (
     FlatCreateForm,
     FlatUpdateForm,
     UserCreateForm,
-    UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm,
+    UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
 )
 from .models import (
     SiteHomePage,
@@ -49,7 +49,7 @@ from .services.site_pages_services import (
     save_new_objects_to_many_to_many_field,
 )
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
-    tariff_access, role_access, staff_access
+    tariff_access, role_access, staff_access, house_access
 from ..users.models import UserRole
 
 User = get_user_model()
@@ -244,13 +244,13 @@ class DocumentDeleteView(DeleteView):
 # region PROPERTY
 
 # region HOUSE
-@method_decorator(user_passes_test(house_user_access), name='dispatch')
+@method_decorator(user_passes_test(house_access), name='dispatch')
 class HouseListView(ListView):
     template_name = "admin_panel/pages/house_list.html"
     model = House
 
 
-@user_passes_test(house_user_access)
+@user_passes_test(house_access)
 def house_create_view(request):
     errors = []
     form1 = HouseCreateForm(request.POST or None, request.FILES or None, prefix="form1")
@@ -285,7 +285,7 @@ def house_create_view(request):
     return render(request, "admin_panel/pages/house_create.html", context=context)
 
 
-@method_decorator(user_passes_test(house_user_access), name='dispatch')
+@method_decorator(user_passes_test(house_access), name='dispatch')
 class HouseDetailView(DetailView):
     template_name = "admin_panel/pages/house_detail.html"
     model = House
@@ -299,7 +299,7 @@ class HouseDetailView(DetailView):
         return context
 
 
-@user_passes_test(house_user_access)
+@user_passes_test(house_access)
 def house_update_view(request, pk):
     house = get_object_or_404(House, pk=pk)
     form1 = HouseCreateForm(
@@ -335,7 +335,7 @@ def house_update_view(request, pk):
     return render(request, "admin_panel/pages/house_update.html", context=context)
 
 
-@method_decorator(user_passes_test(house_user_access), name='dispatch')
+@method_decorator(user_passes_test(house_access), name='dispatch')
 class HouseDeleteView(DeleteView):
     model = House
     success_url = reverse_lazy("admin_panel:house_list")
@@ -520,7 +520,7 @@ class UserListView(ListView):
     template_name = "admin_panel/pages/user_list.html"
     # queryset = User.objects.prefetch_related('flats', 'flats__house')
 
-    queryset = User.objects.prefetch_related(
+    queryset = User.objects.filter(is_staff=False).prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
     ).prefetch_related("flats__house")
 
@@ -802,17 +802,56 @@ def system_user_role_view(request):
 
             messages.success(request, "Данные успешно обновлены.")
 
-            return redirect("admin_panel:system_user_roles")
+            return redirect("admin_panel:system_staff_roles")
 
         messages.error(request, f"Ошибка при сохранении формы.")
 
     context = {
         "formset": formset
     }
-    return render(request, "admin_panel/pages/system_user_roles.html", context=context)
+    return render(request, "admin_panel/pages/system_staff_roles.html", context=context)
 
 
 @method_decorator(user_passes_test(staff_access), name='dispatch')
 class StaffListView(ListView):
     queryset = User.objects.filter(is_staff=True)
     template_name = "admin_panel/pages/system_staff_list.html"
+
+
+@user_passes_test(staff_access)
+def staff_create_view(request):
+    form1 = StaffCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+        print(form1.errors)
+
+        if forms_valid_status:
+            staff_user = form1.save()
+            staff_user.is_staff = True
+            staff_user.save()
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_staff_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/system_staff_create.html", context=context)
+
+
+@method_decorator(user_passes_test(staff_access), name='dispatch')
+class StaffDeleteView(DeleteView):
+    queryset = User.objects.filter(is_staff=True, is_superuser=False)
+    success_url = reverse_lazy("admin_panel:system_staff_list")
+    success_message = "Пользователь успешно удален"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)

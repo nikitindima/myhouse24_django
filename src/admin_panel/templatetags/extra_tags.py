@@ -1,5 +1,7 @@
 from django import template
 
+from src.admin_panel.services.user_passes_test import check_access
+
 register = template.Library()
 
 
@@ -29,3 +31,9 @@ def get_unique_houses(value):
 @register.filter(name="test")
 def test(value):
     return value
+
+
+@register.filter(name="check_access")
+def check_user_access(user, variable):
+    print(user, variable)
+    return check_access(user, variable)

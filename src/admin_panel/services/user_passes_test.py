@@ -11,7 +11,7 @@ def check_access(user, access_type):
         if user.role is not None:
             access_check = getattr(user.role, access_type)
             pass2 = user.role.name == "Директор"
-            pass3 = access_check()
+            pass3 = access_check
 
         return any([pass1, pass2, pass3])
 

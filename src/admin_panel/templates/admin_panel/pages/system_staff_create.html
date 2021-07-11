@@ -1,0 +1,213 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active{% endblock %}
+{% block nav_item_system_staff_list %}active{% endblock %}
+
+{% block title %}Новый дом{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Новый владелец </h1>
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:user_list' %}">Владельцы квартир</a></li>
+                <li class="active">Новый владелец</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-body">
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="userAvatar">
+
+                                    <img class="img-circle pull-left img-responsive"
+                                         style="width: 160px; height: 160px; object-fit: cover;"
+                                         src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}" alt="">
+                                    <div class="form-group">
+                                        {{ form1.avatar|as_crispy_field }}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+
+                                <div class="form-group">
+                                    {{ form1.status|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.user_id|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.role|as_crispy_field }}
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+
+                                <div class="form-group">
+                                    {{ form1.last_name|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.first_name|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.patronymic|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.birthday.label_tag }}
+                                    <div class="input-group">
+                                        {{ form1.birthday }}
+                                        <span class="input-group-addon kv-date-calendar" title="Выбрать дату"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+
+                                <div class="form-group">
+                                    {{ form1.description|as_crispy_field }}
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-md-6">
+                                <h2 class="page-header">Контактные данные</h2>
+
+                                <div class="form-group">
+                                    {{ form1.phone|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.viber|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.telegram|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.email|as_crispy_field }}
+                                </div>
+
+                            </div>
+                            <div class="col-xs-12 col-md-6">
+
+                                <h2 class="page-header">Изменить пароль</h2>
+                                <div class="form-group">
+
+                                    {{ form1.password1.label_tag }}
+                                    <div class="input-group">
+                                        {{ form1.password1 }}
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"
+                                                    onclick="generatePassword('.pass-value')">
+                                                Сгенерировать
+                                            </button>
+
+                                            <button type="button" class="btn btn-primary" id="showPass">
+                                                <i class="fa fa-eye" id="eye" aria-hidden="true"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+
+                                    {{ form1.password1.errors }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form1.password2.label_tag }}
+                                    {{ form1.password2 }}
+                                    {{ form1.password2.help_text }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <a href="{% url 'admin_panel:user_create' %}" class="btn btn-default">Отменить</a>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+            integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $('#showPass').click(function () {
+            let passwords = $('.pass-value')
+            if ('password' === $(passwords[0]).attr('type')) {
+                $(passwords[0]).prop('type', 'text');
+                $(passwords[1]).prop('type', 'text');
+                $('#eye').prop('class', 'fa fa-eye-slash');
+            } else {
+                $(passwords[0]).prop('type', 'password');
+                $(passwords[1]).prop('type', 'password');
+                $('#eye').prop('class', 'fa fa-eye');
+            }
+        });
+
+        function generatePassword(targetSelector) {
+            let pass = Math.random().toString(36).substring(4);
+            $('input' + targetSelector).val(pass);
+            $('span' + targetSelector).text(pass);
+        }
+
+        !function (a) {
+            a.fn.datepicker.dates.ru = {
+                days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                daysShort: ["Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб"],
+                daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+                today: "Сегодня",
+                clear: "Очистить",
+                format: "dd.mm.yyyy",
+                weekStart: 1,
+                monthsTitle: "Месяцы"
+            }
+        }(jQuery);
+
+        $('#id_form1-birthday').datepicker({
+            format: 'yyyy-mm-dd',
+            startDate: '-100y',
+            endDate: '+0d',
+            language: 'ru'
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

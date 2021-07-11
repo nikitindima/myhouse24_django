@@ -2,10 +2,10 @@ import datetime
 import os
 import unicodedata
 
-from django.core.exceptions import ValidationError
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
 from django.forms.widgets import (
     URLInput,
@@ -29,7 +29,6 @@ from .models import (
     Floor,
     Flat, Measure, Service, Tariff, ServicePrice,
 )
-
 # 2.5MB - 2621440
 # 5MB - 5242880
 # 10MB - 10485760
@@ -733,6 +732,14 @@ class UserCreateForm(UserForm, UserCreationForm):
                 code="password_mismatch",
             )
         return password2
+
+
+class StaffCreateForm(UserCreateForm):
+    class Meta(UserForm.Meta):
+        model = User
+        fields = UserForm.Meta.fields + ['role']
+        labels = UserForm.Meta.labels
+        labels['role'] = 'Роль'
 
 
 class UserUpdateForm(UserForm):

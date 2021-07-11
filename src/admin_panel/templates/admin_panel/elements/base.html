@@ -1,3 +1,4 @@
+{% load extra_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru-RU">
@@ -120,62 +121,112 @@
         <section class="sidebar">
 
             <ul class="sidebar-menu" data-widget="tree">
-                <li class="{% block nav_item_home %}{% endblock %}"><a href="/admin_panel"><i
-                        class="fa fa-line-chart"></i> <span>Статистика</span></a>
-                </li>
-                <li><a href="/admin_panel/account-transaction/index"><i class="fa fa-dollar"></i> <span>Касса</span></a>
-                </li>
-                <li><a href="/admin_panel/invoice/index"><i class="fa fa-files-o"></i> <span>Квитанции на оплату</span></a>
-                </li>
-                <li><a href="/admin_panel/account/index"><i class="fa fa-credit-card"></i>
-                    <span>Лицевые счета</span></a></li>
-                <li class="{% block nav_item_flat_list %}{% endblock %}"><a href="{% url 'admin_panel:flat_list' %}"><i
-                        class="fa fa-key"></i> <span>Квартиры</span></a></li>
-                <li class="{% block nav_item_user_list %}{% endblock %}"><a href="{% url 'admin_panel:user_list' %}"><i
-                        class="fa fa-users"></i> <span>Владельцы квартир</span></a>
-                </li>
-                <li class="{% block nav_item_house_list %}{% endblock %}"><a
-                        href="{% url 'admin_panel:house_list' %}"><i class="fa fa-building"></i> <span>Дома</span></a>
-                </li>
-                <li><a href="/admin_panel/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
-                </li>
-                <li><a href="/admin_panel/master-request/index"><i class="fa fa-wrench"></i>
-                    <span>Заявки вызова мастера</span></a></li>
-                <li><a href="/admin_panel/counter-data/counters"><i class="fa fa-dashboard"></i>
-                    <span>Показания счетчиков</span></a></li>
-                <li class="{% block nav_item_site_control %}{% endblock %} treeview"><a href="#!"><i
-                        class="fa fa-desktop"></i> <span>Управление сайтом</span> <span
+                {% if request.user|check_access:'statistics_access' == True %}
+                    {#                {% if request.user.role.statistics_access == 'True' or request.user.is_superuser or request.user.role.name == 'Директор' %}#}
+                    <li class="{% block nav_item_home %}{% endblock %}"><a href="/admin_panel"><i
+                            class="fa fa-line-chart"></i> <span>Статистика</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'cashbox_access' == True %}
+                    <li><a href="/admin_panel/account-transaction/index"><i class="fa fa-dollar"></i> <span>Касса</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'receipt_access' == True %}
+                    <li><a href="/admin_panel/invoice/index"><i class="fa fa-files-o"></i>
+                        <span>Квитанции на оплату</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'account_access' == True %}
+                    <li><a href="/admin_panel/account/index"><i class="fa fa-credit-card"></i>
+                        <span>Лицевые счета</span></a></li>
+                {% endif %}
+                {% if request.user|check_access:'flat_access' == True %}
+                    <li class="{% block nav_item_flat_list %}{% endblock %}"><a
+                            href="{% url 'admin_panel:flat_list' %}"><i
+                            class="fa fa-key"></i> <span>Квартиры</span></a></li>
+                {% endif %}
+                {% if request.user|check_access:'house_user_access' == True %}
+                    <li class="{% block nav_item_user_list %}{% endblock %}"><a
+                            href="{% url 'admin_panel:user_list' %}"><i
+                            class="fa fa-users"></i> <span>Владельцы квартир</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'house_access' == True %}
+                    <li class="{% block nav_item_house_list %}{% endblock %}"><a
+                            href="{% url 'admin_panel:house_list' %}"><i class="fa fa-building"></i>
+                        <span>Дома</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'message_access' == True %}
+                    <li><a href="/admin_panel/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
+                    </li>
+                {% endif %}
+                {% if request.user|check_access:'call_request_access' == True %}
+                    <li><a href="/admin_panel/master-request/index"><i class="fa fa-wrench"></i>
+                        <span>Заявки вызова мастера</span></a></li>
+                {% endif %}
+                {% if request.user|check_access:'meter_data_access' == True %}
+                    <li><a href="/admin_panel/counter-data/counters"><i class="fa fa-dashboard"></i>
+                        <span>Показания счетчиков</span></a></li>
+                {% endif %}
+                {% if request.user|check_access:'site_access' == True %}
+                    <li class="{% block nav_item_site_control %}{% endblock %} treeview"><a href="#!"><i
+                            class="fa fa-desktop"></i> <span>Управление сайтом</span> <span
+                            class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                        <ul class='treeview-menu'>
+                            <li class="{% block nav_item_site_home %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:site_home' %}"><i class="fa fa-circle-o"></i>
+                                <span>Главная страница</span></a></li>
+                            <li class="{% block nav_item_site_about %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:site_about' %}"><i class="fa fa-circle-o"></i>
+                                <span>О нас</span></a></li>
+                            <li class="{% block nav_item_site_services %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:site_services' %}"><i class="fa fa-circle-o"></i>
+                                <span>Услуги</span></a>
+                            </li>
+                            <li class="{% block nav_item_site_contacts %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:site_contacts' %}"><i class="fa fa-circle-o"></i> <span>Контакты</span></a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+                <li class="{% block nav_item_system_control %}{% endblock %} treeview"><a href="#!"><i
+                        class="fa fa-cogs"></i> <span>Настройки системы</span> <span
                         class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                     <ul class='treeview-menu'>
-                        <li class="{% block nav_item_site_home %}{% endblock %}"><a
-                                href="{% url 'admin_panel:site_home' %}"><i class="fa fa-circle-o"></i>
-                            <span>Главная страница</span></a></li>
-                        <li class="{% block nav_item_site_about %}{% endblock %}"><a
-                                href="{% url 'admin_panel:site_about' %}"><i class="fa fa-circle-o"></i>
-                            <span>О нас</span></a></li>
-                        <li class="{% block nav_item_site_services %}{% endblock %}"><a
-                                href="{% url 'admin_panel:site_services' %}"><i class="fa fa-circle-o"></i>
-                            <span>Услуги</span></a>
-                        </li>
-                        <li class="{% block nav_item_site_contacts %}{% endblock %}"><a
-                                href="{% url 'admin_panel:site_contacts' %}"><i class="fa fa-circle-o"></i> <span>Контакты</span></a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="{% block nav_item_system_control %}{% endblock %} treeview"><a href="#!"><i class="fa fa-cogs"></i> <span>Настройки системы</span> <span
-                        class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                    <ul class='treeview-menu'>
-                        <li class="{% block nav_item_system_services %}{% endblock %}"><a href="{% url 'admin_panel:system_services' %}"><i class="fa fa-briefcase"></i> <span>Услуги</span></a>
-                        </li>
-                        <li class="{% block nav_item_system_tariffs %}{% endblock %}"><a href="{% url 'admin_panel:system_tariffs' %}"><i class="fa fa-money"></i> <span>Тарифы</span></a></li>
-                        <li class="{% block nav_item_system_user_roles %}{% endblock %}"><a href="{% url 'admin_panel:system_user_roles' %}"><i class="fa fa-user"></i> <span>Роли</span></a></li>
-                        <li class="{% block nav_item_system_staff %}{% endblock %}"><a href="{% url 'admin_panel:system_staff_list' %}"><i class="fa fa-user-plus"></i>
-                            <span>Пользователи</span></a>
-                        </li>
-                        <li class="{% block nav_item_system_ %}{% endblock %}"><a href="/admin_panel/pay-company/index"><i class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
-                        </li>
-                        <li class="{% block nav_item_sysyem_ %}{% endblock %}"><a href="/admin_panel/transaction-purpose/index"><i class="fa fa-list-ol"></i> <span>Статьи платежей</span></a>
-                        </li>
+                        {% if request.user|check_access:'service_access' == True %}
+                            <li class="{% block nav_item_system_services %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:system_services' %}"><i class="fa fa-briefcase"></i>
+                                <span>Услуги</span></a>
+                            </li>
+                        {% endif %}
+                        {% if request.user|check_access:'tariff_access' == True %}
+                            <li class="{% block nav_item_system_tariffs %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:system_tariffs' %}"><i class="fa fa-money"></i>
+                                <span>Тарифы</span></a></li>
+                        {% endif %}
+                        {% if request.user|check_access:'role_access' == True %}
+                            <li class="{% block nav_item_system_staff_roles %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:system_staff_roles' %}"><i class="fa fa-user"></i>
+                                <span>Роли</span></a></li>
+                        {% endif %}
+                        {% if request.user|check_access:'staff_access' == True %}
+                            <li class="{% block nav_item_system_staff_list %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:system_staff_list' %}"><i class="fa fa-user-plus"></i>
+                                <span>Пользователи</span></a>
+                            </li>
+                        {% endif %}
+                        {% if request.user|check_access:'payments_detail_access' == True %}
+                            <li class="{% block nav_item_system_ %}{% endblock %}"><a
+                                    href="/admin_panel/pay-company/index"><i
+                                    class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
+                            </li>
+                        {% endif %}
+                        {% if request.user|check_access:'payments_detail_access' == True %}
+                            <li class="{% block nav_item_sysyem_ %}{% endblock %}"><a
+                                    href="/admin_panel/transaction-purpose/index"><i class="fa fa-list-ol"></i> <span>Статьи платежей</span></a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             </ul>

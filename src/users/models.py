@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from src.admin_panel.services.media_services import UploadToPathAndRename
+from src.admin_panel.services.user_passes_test import check_access
 
 
 class UserRole(models.Model):
@@ -54,12 +55,12 @@ class User(AbstractUser):
     avatar = models.ImageField(
         upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
     )
-    phone = PhoneNumberField()
+    phone = PhoneNumberField(null=True, blank=True)
     viber = PhoneNumberField(null=True, blank=True)
     telegram = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(max_length=150)
     status = models.CharField(max_length=11, choices=UserStatus.choices)
-    user_id = models.CharField(max_length=20, unique=True)
+    user_id = models.CharField(max_length=20, null=True, blank=True)
     role = models.ForeignKey(UserRole, null=True, blank=True, on_delete=models.SET_NULL)
 
     def get_absolute_url(self):
