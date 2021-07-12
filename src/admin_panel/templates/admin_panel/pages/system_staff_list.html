@@ -3,7 +3,7 @@
 {% load crispy_forms_filters %}
 {% load static %}
 {% block nav_item_system_control %}active{% endblock %}
-{% block nav_item_system_staff %}active{% endblock %}
+{% block nav_item_system_staff_list %}active{% endblock %}
 
 {% block title %}Пользователи{% endblock %}
 
@@ -83,7 +83,7 @@
                                     <tbody>
 
                                     {% for user in user_list %}
-                                        <tr data-href="/admin/user-admin/1">
+                                        <tr data-href="{% url 'admin_panel:system_staff_detail' user.pk %}">
                                             <td data-filter="{{ forloop.counter }}">{{ forloop.counter }}</td>
                                             <td data-filter="{{ user.full_name }}">{{ user.full_name }}</td>
                                             <td data-filter="{% if user.role %}{{ user.role }}{% endif %}|||">{{ user.role }}</td>

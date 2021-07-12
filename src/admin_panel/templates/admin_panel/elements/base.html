@@ -217,13 +217,13 @@
                             </li>
                         {% endif %}
                         {% if request.user|check_access:'payments_detail_access' == True %}
-                            <li class="{% block nav_item_system_ %}{% endblock %}"><a
-                                    href="/admin_panel/pay-company/index"><i
+                            <li class="{% block nav_item_system_credentials %}{% endblock %}"><a
+                                    href="{% url 'admin_panel:system_credentials' %}"><i
                                     class="fa fa-credit-card"></i> <span>Платежные реквизиты</span></a>
                             </li>
                         {% endif %}
                         {% if request.user|check_access:'payments_detail_access' == True %}
-                            <li class="{% block nav_item_sysyem_ %}{% endblock %}"><a
+                            <li class="{% block nav_item_sys %}{% endblock %}"><a
                                     href="/admin_panel/transaction-purpose/index"><i class="fa fa-list-ol"></i> <span>Статьи платежей</span></a>
                             </li>
                         {% endif %}
@@ -250,7 +250,6 @@
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
-    {#    <script src="{% static 'admin_panel/js/main.js' %}"></script>#}
     <script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
 
     {% block scripts %}{% endblock %}
@@ -272,7 +271,6 @@
                     let link = '{% url 'admin_panel:user_detail' 1 %}'.slice(0, -2)
 
                     let list_element = '<li><a href="' + link + id + '">' + full_name + '</a></li>';
-                    {#new_users.append(list_element)#}
                     $(new_users).append($(list_element))
                 }
                 let users_count = $('#new-users-count').html(data.length)

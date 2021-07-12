@@ -250,3 +250,8 @@ class MeterData(models.Model):
     status = models.CharField(max_length=20)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
+
+
+class CompanyCredentials(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=3000, null=True, blank=True)

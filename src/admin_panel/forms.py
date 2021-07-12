@@ -27,7 +27,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service, Tariff, ServicePrice,
+    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -942,4 +942,29 @@ class UserRoleForm(ModelForm):
             }),
         }
 
+
 # endregion USER
+
+class CredentialsForm(ModelForm):
+    class Meta:
+        model = CompanyCredentials
+        fields = ["name", "description"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название компании",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите информацию",
+                    "rows": 7
+                }
+            ),
+        }
+        labels = {
+            "name": "Название компании",
+            "description": "Информация",
+        }

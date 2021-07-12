@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import utc
 from django.views.generic import DeleteView, ListView, DetailView, CreateView
 from dateutil.utils import today
+from pip._internal.network.auth import Credentials
 
 from .forms import (
     SiteHomeForm,
@@ -23,7 +24,7 @@ from .forms import (
     FlatUpdateForm,
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
-    StaffUpdateForm,
+    StaffUpdateForm, CredentialsForm,
 )
 from .models import (
     SiteHomePage,
@@ -35,7 +36,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat, Measure, Service, Tariff,
+    Flat, Measure, Service, Tariff, CompanyCredentials,
 )
 from .services.forms_services import (
     validate_forms,
@@ -879,3 +880,35 @@ def staff_update_view(request, pk):
         "form1": form1,
     }
     return render(request, "admin_panel/pages/system_staff_update.html", context=context)
+
+
+@method_decorator(user_passes_test(staff_access), name='dispatch')
+class StaffDetailView(DetailView):
+    template_name = "admin_panel/pages/system_staff_detail.html"
+    queryset = User.objects.filter(is_staff=True, is_superuser=False)
+
+
+def credentials_update_view(request):
+    obj = CompanyCredentials.objects.last()
+    if obj is None:
+        obj = CompanyCredentials()
+        obj.save()
+
+    form1 = CredentialsForm(request.POST or None, prefix="form1", instance=obj)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_credentials")
+
+        messages.error(request, "Ошибка при сохранении формы.")
+
+    context = {
+        "obj": obj,
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/system_credentials.html", context=context)

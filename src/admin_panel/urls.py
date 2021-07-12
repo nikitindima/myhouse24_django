@@ -57,4 +57,7 @@ urlpatterns = [
     path("system/staff/create/", views.staff_create_view, name="system_staff_create"),
     path("system/staff/update/<int:pk>/", views.staff_update_view, name="system_staff_update"),
     path("system/staff/delete/<int:pk>/", views.StaffDeleteView.as_view(), name="system_staff_delete"),
+    path("system/staff/detail/<int:pk>/", views.StaffDetailView.as_view(), name="system_staff_detail"),
+
+    path("system/credentials/", views.credentials_update_view, name="system_credentials"),
 ]

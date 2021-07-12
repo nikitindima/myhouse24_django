@@ -1,0 +1,82 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active{% endblock %}
+{% block nav_item_system_staff_list %}active{% endblock %}
+
+{% block title %}Пользователь{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Пользователь</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
+                <li><a href="{% url 'admin_panel:system_staff_list' %}">Пользователи</a></li>
+                <li class="active">Пользователь</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title"></h3>
+                    <div class="box-tools">
+                        <a href="{% url 'admin_panel:system_staff_update' object.pk %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать пользователя</span><i class="fa fa-pencil visible-xs"
+                                                                                        aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12 col-lg-4">
+                            <table class="table table-bordered table-striped table-view">
+                                <tbody>
+                                <tr>
+                                    <td>Пользователь</td>
+                                    <td>{{ object.full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Роль</td>
+                                    <td>{{ object.role }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Телефон</td>
+                                    <td>{{ object.phone }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Email(логин)</td>
+                                    <td>{{ object.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Статус</td>
+                                    <td>{% if user.status == 'ACTIVE' %}
+                                        <small class="label label-success">Активен</small>
+                                    {% elif user.status == 'NEW' %}
+                                        <small class="label label-primary">Новый</small>
+                                    {% elif user.status == 'DEACTIVATED' %}
+                                        <small class="label label-error">Отключен</small>
+                                    {% endif %}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}
