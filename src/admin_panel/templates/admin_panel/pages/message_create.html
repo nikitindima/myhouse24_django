@@ -1,0 +1,172 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load i18n %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_message_list %}active{% endblock %}
+
+{% block title %}Сообщения{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Новое сообщение</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:message_list' %}">Сообщения</a></li>
+                <li class="active">Новое сообщение</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Создание нового сообщения</h3>
+                    </div>
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            {{ form1.title }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form1.description }}
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xs-12 col-md-6">
+                                <h4>Кому отправить:</h4>
+
+                                <div class="form-group">
+                                    {{ form1.to_debtors|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.house|as_crispy_field }}
+                                </div>
+{##}
+                                <div class="form-group">
+                                    {{ form1.section|as_crispy_field }}
+                                </div>
+{##}
+                                <div class="form-group">
+                                    {{ form1.floor|as_crispy_field }}
+                                </div>
+{##}
+                                <div class="form-group">
+                                    {{ form1.flat|as_crispy_field }}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="pull-right">
+                            <button type="submit" class="btn btn-success"><i class="fa fa-envelope-o"></i> Отправить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#id_form1-description').summernote({
+                height: 150,
+                disableResizeEditor: true
+            })
+            const select_house = $('select[name=form1-house]')
+            const select_section = $('select[name=form1-section]')
+            const select_floor = $('select[name=form1-floor]')
+            const select_flat = $('select[name=form1-flat]')
+
+            select_house.select2({
+                theme: 'bootstrap',
+            })
+            select_section.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/sections/' + select_house.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_floor.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/floors/' + select_section.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_flat.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/flats/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            section_id: select_section.val(),
+                            floor: select_floor.val(),
+                        };
+                    }
+                }
+            });
+
+            select_house.on("select2:select", function () {
+                select_section.select2("val", 0)
+                select_floor.select2("val", '0')
+                select_flat.select2("val", '0')
+            });
+            select_section.on("select2:select", function () {
+                select_floor.select2("val", '0')
+                select_flat.select2("val", '0')
+            });
+            select_floor.on("select2:select", function () {
+                select_flat.select2("val", '0')
+            });
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

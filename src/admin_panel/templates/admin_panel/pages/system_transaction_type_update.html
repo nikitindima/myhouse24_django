@@ -1,0 +1,63 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active menu-open{% endblock %}
+{% block nav_item_system_transaction_type_list %}active{% endblock %}
+
+{% block title %}Редактирование{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Редактирование</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:system_transaction_type_list' %}">Статьи приходов/расходов</a></li>
+                <li class="active">Редактирование</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-body">
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-xs-12 col-lg-7">
+
+                                <div class="form-group">
+                                    {{ form1.name|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.type|as_crispy_field }}
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <div class="form-group">
+                                    <a href="{% url 'admin_panel:system_transaction_type_create' %}" class="btn btn-default">Отменить</a>
+                                    <button type="submit" class="btn btn-success">Сохранить</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}
+{% endblock %}

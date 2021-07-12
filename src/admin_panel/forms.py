@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput
+from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput, CharField
 from django.forms.widgets import (
     URLInput,
     EmailInput,
@@ -27,7 +27,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials,
+    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -967,4 +967,58 @@ class CredentialsForm(ModelForm):
         labels = {
             "name": "Название компании",
             "description": "Информация",
+        }
+
+
+class TransactionTypeForm(ModelForm):
+    class Meta:
+        model = TransactionType
+        fields = ["name", "type"]
+        widgets = {
+            "name": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите название",
+                }
+            ),
+            "type": Select(),
+        }
+        labels = {
+            "name": "Название",
+            "description": "Приход/Расход",
+        }
+
+
+class MessageForm(ModelForm):
+    flat = CharField(widget=Select(choices=[(0, "---------")]), label='Квартира')
+
+    class Meta:
+        model = Message
+        fields = ["title", "description", "to_debtors", "house", "section", "floor"]
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите тему",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите текст",
+                }
+            ),
+            "to_debtors": CheckboxInput(),
+            "house": Select(),
+            "section": Select(),
+            "floor": Select(choices=[(0, "---------")]),
+        }
+        labels = {
+            "title": "Тема",
+            "description": "Текст",
+            "receiver": "",
+            "to_debtors": "Владельцам с задолженностями",
+            "house": "Дом",
+            "section": "Секция",
+            "floor": "Этаж",
         }

@@ -25,13 +25,14 @@ urlpatterns = [
     path("website/update-sitemap/", views.update_sitemap_view, name="update_sitemap"),
     path("website/delete-gallery-image/<int:pk>/", views.GalleryImageDeleteView.as_view(), name="delete_gallery_image"),
     path("website/delete-document/<int:pk>/", views.DocumentDeleteView.as_view(), name="delete_document"),
-    path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article",),
+    path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article", ),
 
     path("api/sections/<int:pk>/", views.api_sections, name="api_sections"),
     path("api/floors/<int:pk>/", views.api_floors, name="api_floors"),
     path("api/users/", views.api_users, name="api_users"),
     path("api/users/new/", views.api_new_users, name="api_new_users"),
     path("api/measure/", views.api_measure_name, name="api_measure_name"),
+    path("api/flats/", views.api_flats, name="api_flats"),
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),
@@ -60,4 +61,12 @@ urlpatterns = [
     path("system/staff/detail/<int:pk>/", views.StaffDetailView.as_view(), name="system_staff_detail"),
 
     path("system/credentials/", views.credentials_update_view, name="system_credentials"),
+    path("system/transactions/types/", views.TransactionTypeListView.as_view(), name="system_transaction_type_list"),
+    path("system/transactions/types/create/", views.transaction_type_create_view,
+         name="system_transaction_type_create"),
+    path("system/transactions/types/update/<int:pk>/", views.transaction_type_update_view,
+         name="system_transaction_type_update"),
+
+    path("messages/", views.MessageListView.as_view(), name="message_list"),
+    path("messages/create/", views.message_create_view, name="message_create"),
 ]

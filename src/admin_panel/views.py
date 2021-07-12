@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import house as house
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test
@@ -24,7 +25,7 @@ from .forms import (
     FlatUpdateForm,
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
-    StaffUpdateForm, CredentialsForm,
+    StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm,
 )
 from .models import (
     SiteHomePage,
@@ -36,7 +37,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat, Measure, Service, Tariff, CompanyCredentials,
+    Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message,
 )
 from .services.forms_services import (
     validate_forms,
@@ -51,7 +52,7 @@ from .services.site_pages_services import (
     save_new_objects_to_many_to_many_field,
 )
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
-    tariff_access, role_access, staff_access, house_access
+    tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access
 from ..users.models import UserRole
 
 User = get_user_model()
@@ -496,6 +497,21 @@ def api_users(request):
     return JsonResponse({"results": results})
 
 
+def api_flats(request):
+    section_id = request.GET.get('section_id', None)
+    floor = request.GET.get('floor', None)
+
+    flats = Flat.objects.filter(section__id=section_id, floor=floor)
+
+    results = []
+
+    for flat in flats:
+        data = flat.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
 def api_new_users(request):
     day_today = today(tzinfo=utc)
     day_week_ago = today(tzinfo=utc) - timedelta(days=7)
@@ -692,7 +708,7 @@ def system_services(request):
 
 @method_decorator(user_passes_test(tariff_access), name='dispatch')
 class SystemTariffsListView(ListView):
-    template_name = "admin_panel/pages/system_tariffs.html"
+    template_name = "admin_panel/pages/system_tariffs_list.html"
     model = Tariff
 
 
@@ -888,6 +904,7 @@ class StaffDetailView(DetailView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)
 
 
+@user_passes_test(staff_access)
 def credentials_update_view(request):
     obj = CompanyCredentials.objects.last()
     if obj is None:
@@ -912,3 +929,105 @@ def credentials_update_view(request):
         "form1": form1,
     }
     return render(request, "admin_panel/pages/system_credentials.html", context=context)
+
+
+@method_decorator(user_passes_test(payments_detail_access), name='dispatch')
+class TransactionTypeListView(ListView):
+    model = TransactionType
+    template_name = "admin_panel/pages/system_transaction_type_list.html"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs
+
+
+@user_passes_test(payments_detail_access)
+def transaction_type_create_view(request):
+    form1 = TransactionTypeForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:system_transaction_type_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/system_transaction_type_create.html", context=context)
+
+
+@user_passes_test(payments_detail_access)
+def transaction_type_update_view(request, pk):
+    transaction_type = get_object_or_404(TransactionType, pk=pk)
+    form1 = TransactionTypeForm(request.POST or None, prefix="form1", instance=transaction_type)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_transaction_type_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/system_transaction_type_update.html", context=context)
+
+
+@method_decorator(user_passes_test(message_access), name='dispatch')
+class MessageListView(ListView):
+    queryset = Message.objects.select_related('house', 'section', 'flat').order_by('-created')
+    template_name = "admin_panel/pages/message_list.html"
+
+
+@user_passes_test(message_access)
+def message_create_view(request):
+    form1 = MessageForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            title = form1.cleaned_data.get("title")
+            description = form1.cleaned_data.get("description")
+            to_debtors = form1.cleaned_data.get("to_debtors")
+            house_inst = form1.cleaned_data.get("house")
+            section = form1.cleaned_data.get("section")
+            floor = form1.cleaned_data.get("floor")
+            flat_pk = form1.cleaned_data.get("flat")
+            if flat_pk != '0' and flat_pk != '':
+                flat = get_object_or_404(Flat, pk=flat_pk)
+            else:
+                flat = None
+            floor = None if floor == 0 else floor
+
+            message = Message(title=title, description=description, created_by=request.user,
+                              house=house_inst, section=section, floor=floor, flat=flat,
+                              to_debtors=to_debtors)
+            if house_inst == '' and section == '' and floor == '' and flat == '':
+                message.to_all = True
+
+            message.save()
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:message_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/message_create.html", context=context)

@@ -1,14 +1,16 @@
 import os
 
-from django.contrib.postgres.fields import DateRangeField
 from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import DateRangeField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ManyToManyField
 from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.translation import ugettext_lazy as _
 
 from .services.media_services import UploadToPathAndRename
+from ..users.models import UserRole
 
 User = get_user_model()
 
@@ -44,6 +46,8 @@ class Tariff(models.Model):
 
     def __str__(self):
         return self.name or ""
+
+
 # endregion RECEIPTS
 
 # region SITE_CONTROL
@@ -217,6 +221,13 @@ class Flat(models.Model):
     )
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True, blank=True)
 
+    def serialize(self, pattern):
+        if pattern == "select2":
+            data = {"id": self.id, "text": f'{self.house.name}, кв. {self.number}'}
+            return data
+
+    def __str__(self):
+        return f'{self.house.name}, кв. {self.number}'
 
 # endregion PROPERTY
 class ReceiptTemplate(models.Model):
@@ -255,3 +266,48 @@ class MeterData(models.Model):
 class CompanyCredentials(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.CharField(max_length=3000, null=True, blank=True)
+
+
+class TransactionType(models.Model):
+    class Type(models.TextChoices):
+        INCOME = "INCOME", _("Приход")
+        EXPENSE = "EXPENSE", _("Расход")
+
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=7, choices=Type.choices)
+
+
+class Transaction(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=3000)
+    is_passed = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True)
+    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+class Message(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=3000)
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
+
+    house = models.ForeignKey(House, on_delete=models.CASCADE, null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True)
+    floor = models.IntegerField(null=True, blank=True)
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, null=True, blank=True)
+
+    to_debtors = models.BooleanField(default=False)
+    to_all = models.BooleanField(default=False)
+
+
+class CallRequest(models.Model):
+    description = models.CharField(max_length=3000)
+    master_type = models.ForeignKey(UserRole, on_delete=models.SET_NULL, null=True, blank=True)
+    comment = models.CharField(max_length=3000)
+    status = models.CharField(max_length=100)
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)

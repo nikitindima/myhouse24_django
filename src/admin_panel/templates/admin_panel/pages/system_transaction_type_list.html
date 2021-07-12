@@ -1,0 +1,102 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_system_control %}active menu-open{% endblock %}
+{% block nav_item_system_transaction_type_list %}active{% endblock %}
+
+{% block title %}Статьи приходов/расходов{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Статьи приходов/расходов</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Статьи приходов/расходов</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+
+            <div class="row">
+                <div class="col-xs-12">
+
+                    <div class="pull-right margin-bottom">
+                        <a class="btn btn-success" href="{% url 'admin_panel:system_transaction_type_create' %}">Добавить статью</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div id="w0" class="grid-view">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-bordered table-hover table-striped linkedRow">
+                                    <thead>
+                                    <tr>
+                                        <th>Название</th>
+                                        <th><a class="desc"
+                                               href="{% url 'admin_panel:system_transaction_type_list' %}?type=transaction"
+                                               data-sort="type">Приход/расход</a></th>
+                                        <th style="width: 80px; min-width: 80px">&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for object in object_list %}
+                                        <tr data-href="/admin/transaction-purpose/update/2">
+                                            <td>{{ object.name }}</td>
+                                            <td>{% if object.type == 'INCOME' %}<span class="text text-green">Приход</span>
+                                            {% else %}<span class="text text-red">Расход</span>{% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
+                                                                                     href="{% url 'admin_panel:system_transaction_type_update' object.pk %}"
+                                                                                     title="Редактировать"
+                                                                                     data-toggle="tooltip"><i
+                                                        class="fa fa-pencil"></i></a>
+                                                    <button class="btn btn-default btn-sm disabled"
+                                                            data-confirm="Этот элемент используется в системе. Его нельзя удалить.">
+                                                        <i class="fa fa-trash"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+
+        add_links_to_rows()
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}
+{% endblock %}
