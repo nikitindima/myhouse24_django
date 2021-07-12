@@ -114,7 +114,6 @@ def save_new_objects_to_many_to_many_field(field, new_objects_name, request):
             field.add(*objects)
 
     elif field.model == Document:
-        print(request.FILES)
         for file in request.FILES:
             pass
             # file = request.FILES.getlist(file)

@@ -112,7 +112,15 @@
                                             {% endfor %}
                                         </td>
                                         <td data-filter="{{ user.date_joined }}">{{ user.date_joined }}</td>
-                                        <td data-filter="{{ user.status }}|||">{{ user.status }}</td>
+                                        <td data-filter="{% if user.status == 'ACTIVE' %}Активен{% elif user.status == 'NEW' %}Новый{% elif user.status == 'DEACTIVATED' %}Отключен{% endif %}|||">
+                                            {% if user.status == 'ACTIVE' %}
+                                                <small class="label label-success">Активен</small>
+                                            {% elif user.status == 'NEW' %}
+                                                <small class="label label-primary">Новый</small>
+                                            {% elif user.status == 'DEACTIVATED' %}
+                                                <small class="label label-error">Отключен</small>
+                                            {% endif %}
+                                        </td>
                                         <td data-filter=""></td>
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
@@ -200,7 +208,7 @@
                     null,
                     null,
                     null,
-                    null,
+                    {"width": "8%", "className": "dt-center"},
                     null,
                     null,
                 ],

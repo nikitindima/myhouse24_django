@@ -55,5 +55,6 @@ urlpatterns = [
     path("system/staff/", views.StaffListView.as_view(), name="system_staff_list"),
     path("system/staff/roles", views.system_user_role_view, name="system_staff_roles"),
     path("system/staff/create/", views.staff_create_view, name="system_staff_create"),
-    path("system/staff/delete/<int:pk>/", views.UserDeleteView.as_view(), name="system_staff_delete"),
+    path("system/staff/update/<int:pk>/", views.staff_update_view, name="system_staff_update"),
+    path("system/staff/delete/<int:pk>/", views.StaffDeleteView.as_view(), name="system_staff_delete"),
 ]

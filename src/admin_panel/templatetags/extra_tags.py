@@ -35,5 +35,4 @@ def test(value):
 
 @register.filter(name="check_access")
 def check_user_access(user, variable):
-    print(user, variable)
     return check_access(user, variable)

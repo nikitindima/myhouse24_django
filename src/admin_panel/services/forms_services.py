@@ -107,7 +107,6 @@ def save_extra_forms(formset, model, **kwargs):
             elif model is Measure:
                 new_object = Measure(name=name)
             elif model is Service:
-                print(form.cleaned_data)
                 continue
                 # new_object = Measure(name=name)
             else:

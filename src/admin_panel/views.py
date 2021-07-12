@@ -23,6 +23,7 @@ from .forms import (
     FlatUpdateForm,
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
+    StaffUpdateForm,
 )
 from .models import (
     SiteHomePage,
@@ -520,7 +521,7 @@ class UserListView(ListView):
     template_name = "admin_panel/pages/user_list.html"
     # queryset = User.objects.prefetch_related('flats', 'flats__house')
 
-    queryset = User.objects.filter(is_staff=False).prefetch_related(
+    queryset = User.objects.filter(is_staff=False, is_superuser=False).prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
     ).prefetch_related("flats__house")
 
@@ -814,7 +815,7 @@ def system_user_role_view(request):
 
 @method_decorator(user_passes_test(staff_access), name='dispatch')
 class StaffListView(ListView):
-    queryset = User.objects.filter(is_staff=True)
+    queryset = User.objects.filter(is_staff=True, is_superuser=False)
     template_name = "admin_panel/pages/system_staff_list.html"
 
 
@@ -824,14 +825,13 @@ def staff_create_view(request):
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
-        print(form1.errors)
 
         if forms_valid_status:
             staff_user = form1.save()
             staff_user.is_staff = True
             staff_user.save()
 
-            messages.success(request, "Данные успешно обновлены.")
+            messages.success(request, "Данные успешно cохранены.")
 
             return redirect("admin_panel:system_staff_list")
 
@@ -855,3 +855,27 @@ class StaffDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+
+@user_passes_test(staff_access)
+def staff_update_view(request, pk):
+    user = get_object_or_404(User.objects.filter(is_staff=True, is_superuser=False), pk=pk)
+    form1 = StaffUpdateForm(request.POST or None, request.FILES or None, prefix="form1", instance=user)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            staff_user = form1.save()
+            staff_user.save()
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:system_staff_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/system_staff_update.html", context=context)

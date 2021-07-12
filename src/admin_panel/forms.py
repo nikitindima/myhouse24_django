@@ -734,14 +734,6 @@ class UserCreateForm(UserForm, UserCreationForm):
         return password2
 
 
-class StaffCreateForm(UserCreateForm):
-    class Meta(UserForm.Meta):
-        model = User
-        fields = UserForm.Meta.fields + ['role']
-        labels = UserForm.Meta.labels
-        labels['role'] = 'Роль'
-
-
 class UserUpdateForm(UserForm):
     class Meta(UserForm.Meta):
         model = User
@@ -782,6 +774,22 @@ class UserUpdateForm(UserForm):
         if commit:
             user.save()
         return user
+
+
+class StaffCreateForm(UserCreateForm):
+    class Meta(UserForm.Meta):
+        model = User
+        fields = UserForm.Meta.fields + ['role']
+        labels = UserForm.Meta.labels
+        labels['role'] = 'Роль'
+
+
+class StaffUpdateForm(UserUpdateForm):
+    class Meta(UserUpdateForm.Meta):
+        model = User
+        fields = UserUpdateForm.Meta.fields + ['role']
+        labels = UserUpdateForm.Meta.labels
+        labels['role'] = 'Роль'
 
 
 class MeasureForm(forms.ModelForm):
