@@ -33,6 +33,7 @@ urlpatterns = [
     path("api/users/new/", views.api_new_users, name="api_new_users"),
     path("api/measure/", views.api_measure_name, name="api_measure_name"),
     path("api/flats/", views.api_flats, name="api_flats"),
+    path("api/messages/delete/", views.api_delete_messages, name="api_delete_messages"),
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),

@@ -1,3 +1,4 @@
+from ast import literal_eval
 from datetime import timedelta
 
 import house as house
@@ -512,6 +513,12 @@ def api_flats(request):
     return JsonResponse({"results": results})
 
 
+def api_delete_messages(request):
+    id_list = literal_eval(request.GET.get('id_list', None))
+    Message.objects.filter(pk__in=id_list).delete()
+    return JsonResponse({"results": "Success"})
+
+
 def api_new_users(request):
     day_today = today(tzinfo=utc)
     day_week_ago = today(tzinfo=utc) - timedelta(days=7)
@@ -1016,7 +1023,8 @@ def message_create_view(request):
             message = Message(title=title, description=description, created_by=request.user,
                               house=house_inst, section=section, floor=floor, flat=flat,
                               to_debtors=to_debtors)
-            if house_inst == '' and section == '' and floor == '' and flat == '':
+
+            if house_inst is None:
                 message.to_all = True
 
             message.save()

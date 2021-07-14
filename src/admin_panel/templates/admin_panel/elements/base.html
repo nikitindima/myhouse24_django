@@ -158,7 +158,9 @@
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'message_access' == True %}
-                    <li class="{% block nav_item_message_list %}{% endblock %}"><a href="{% url 'admin_panel:message_list' %}"><i class="fa fa-envelope-o"></i><span>Сообщения</span></a>
+                    <li class="{% block nav_item_message_list %}{% endblock %}"><a
+                            href="{% url 'admin_panel:message_list' %}"><i
+                            class="fa fa-envelope-o"></i><span>Сообщения</span></a>
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'call_request_access' == True %}
@@ -224,7 +226,8 @@
                         {% endif %}
                         {% if request.user|check_access:'payments_detail_access' == True %}
                             <li class="{% block nav_item_system_transaction_type_list %}{% endblock %}"><a
-                                    href="{% url 'admin_panel:system_transaction_type_list' %}"><i class="fa fa-list-ol"></i><span>Статьи платежей</span></a>
+                                    href="{% url 'admin_panel:system_transaction_type_list' %}"><i
+                                    class="fa fa-list-ol"></i><span>Статьи платежей</span></a>
                             </li>
                         {% endif %}
                     </ul>
@@ -238,6 +241,7 @@
     {% include 'admin_panel/elements/footer.html' %}
 
     <script src="{% static 'admin_panel/js/jquery.js' %}"></script>
+    {#<script src="https://code.jquery.com/jquery-3.5.1.js"></script>#}
     <script src="{% static 'admin_panel/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/fastclick/fastclick.js' %}"></script>
