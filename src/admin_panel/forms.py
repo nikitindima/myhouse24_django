@@ -15,6 +15,7 @@ from django.forms.widgets import (
     PasswordInput,
     DateInput,
 )
+from django.shortcuts import get_object_or_404
 
 from .models import (
     SiteHomePage,
@@ -27,7 +28,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message,
+    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -480,7 +481,7 @@ class FlatForm(ModelForm):
             "section",
             "house",
             "owner",
-            "account",
+            # "account",
             "tariff",
         ]
         widgets = {
@@ -521,12 +522,12 @@ class FlatForm(ModelForm):
                     "placeholder": "Выберите владельца",
                 }
             ),
-            "account": Select(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Введите номер квартиры",
-                }
-            ),
+            # "account": Select(
+            #     attrs={
+            #         "class": "form-control",
+            #         "placeholder": "Введите номер квартиры",
+            #     }
+            # ),
             "tariff": Select(
                 attrs={
                     "class": "form-control",
@@ -1022,3 +1023,93 @@ class MessageForm(ModelForm):
             "section": "Секция",
             "floor": "Этаж",
         }
+
+
+class AccountForm(ModelForm):
+    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
+                      required=True)
+    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
+                        required=True)
+    flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
+                     required=True)
+
+    class Meta:
+        model = Account
+        fields = ["number", "is_active"]
+        widgets = {
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер счета",
+                }
+            ),
+            "is_active": Select(),
+        }
+        labels = {
+            "number": "Номер счета",
+            "is_active": "Статус",
+            "house": "Дом",
+            "section": "Секция",
+            "flat": "Квартира",
+        }
+
+    def clean_number(self):
+        number = self.cleaned_data.get("number")
+        if number == '':
+            raise forms.ValidationError('Введите номер счета')
+        return number
+
+    def clean_house(self):
+        house = self.cleaned_data.get("house")
+        if house == '0':
+            raise forms.ValidationError('Выберите дом')
+        return house
+
+    def clean_section(self):
+        section = self.cleaned_data.get("section")
+        if section == '0':
+            raise forms.ValidationError('Выберите секцию')
+        return section
+
+    def clean_flat(self):
+        flat_pk = self.cleaned_data.get("flat")
+        if flat_pk == '0':
+            raise forms.ValidationError('Выберите квартиру')
+        return flat_pk
+
+
+class AccountCreateForm(AccountForm):
+    class Meta(AccountForm.Meta):
+        model = Account
+
+    def clean_flat(self):
+        flat_pk = self.cleaned_data.get("flat")
+
+        if flat_pk == '0':
+            raise forms.ValidationError('Выберите квартиру')
+
+        else:
+            flat_inst = Flat.objects.filter(pk=flat_pk)
+            if flat_inst is not None:
+                raise forms.ValidationError('К этой квартире уже привязан счёт')
+
+        return flat_pk
+
+
+class AccountUpdateForm(AccountForm):
+    class Meta(AccountForm.Meta):
+        model = Account
+
+    def clean_flat(self):
+        flat_pk = self.cleaned_data.get("flat")
+
+        if flat_pk == '0':
+            raise forms.ValidationError('Выберите квартиру')
+
+        else:
+            old_flat_pk = self.instance.account_flat.pk
+            if flat_pk != str(old_flat_pk):
+                if Account.objects.filter(account_flat=flat_pk).exists():
+                    raise forms.ValidationError('К этой квартире уже привязан счёт')
+
+        return flat_pk

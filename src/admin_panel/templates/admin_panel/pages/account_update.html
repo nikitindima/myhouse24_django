@@ -1,0 +1,178 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_account_list %}active{% endblock %}
+
+{% block title %}Лицевой счет{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Лицевой счет</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:account_list' %}">Лицевые счета</a></li>
+                <li><a href="{% url 'admin_panel:account_list' %}">Лицевой счет {{ object.number }}</a></li>
+                <li class="active">Новый лицевой счет</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-12 col-md-7 col-lg-6">
+                        <div class="page-header-spec">
+                            <div class="form-group field-account-uid required">
+                                <div class="input-group">
+                                    <div class="input-group-addon">№</div>
+                                    {{ form1.number }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    {{ form1.is_active|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.house|as_crispy_field }}
+
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.section|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.flat|as_crispy_field }}
+                                </div>
+
+                                <p><b>Владелец:</b> <span id="user-fullname">{{ flat.owner }}</span></p>
+                                <p><b>Телефон:</b> <span id="user-phone">{{ flat.owner.phone }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-right">
+                            <div class="form-group">
+                                <a href="{% url 'admin_panel:account_create' %}" class="btn btn-default">Отменить</a>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const select_status = $('select[name=form1-is_active]')
+            const select_house = $('select[name=form1-house]')
+            const select_section = $('select[name=form1-section]')
+            const select_flat = $('select[name=form1-flat]')
+
+            select_status.select2({
+                theme: 'bootstrap',
+            })
+            select_house.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/houses/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_section.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/sections/' + select_house.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_flat.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/flats/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            section_id: select_section.val(),
+                        };
+                    }
+                }
+            });
+
+            select_house.on("select2:select", function () {
+                select_section.select2("val", "0")
+                select_flat.select2("val", '0')
+            });
+            select_section.on("select2:select", function () {
+                select_flat.select2("val", '0')
+            });
+
+
+            let data_house = {
+                id: {{ flat.house.id }},
+                text: '{{ flat.house }}'
+            };
+            let data_section = {
+                id: {{ flat.section.id }},
+                text: '{{ flat.section }}'
+            };
+            let data_flat = {
+                id: {{ flat.id }},
+                text: '{{ flat }}'
+            };
+            let newOptionHouse = new Option(data_house.text, data_house.id, false, false);
+            select_house.append(newOptionHouse).val(data_house.id).trigger('change')
+            let newOptionSection = new Option(data_section.text, data_section.id, false, false);
+            select_section.append(newOptionSection).val(data_section.id).trigger('change')
+            let newOptionFlat = new Option(data_flat.text, data_flat.id, false, false);
+            select_flat.append(newOptionFlat).val(data_flat.id).trigger('change')
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

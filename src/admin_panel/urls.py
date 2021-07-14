@@ -4,6 +4,15 @@ from . import views
 
 app_name = "admin_panel"
 urlpatterns = [
+    path("cashbox/receipts/", views.ReceiptListView.as_view(), name="receipt_list"),
+
+    path("accounts/", views.AccountListView.as_view(), name="account_list"),
+    path("accounts/create/", views.account_create_view, name="account_create"),
+    path("accounts/detail/<int:pk>/", views.AccountDetailView.as_view(), name="account_detail"),
+    path("accounts/update/<int:pk>/", views.account_update_view, name="account_update"),
+    path("accounts/delete/<int:pk>/", views.AccountDeleteView.as_view(), name="account_delete"),
+    path("accounts/xls/", views.account_xls_list, name="account_list_xls"),
+
     path("", views.home_view, name="home"),
     path("houses/", views.HouseListView.as_view(), name="house_list"),
     path("houses/create/", views.house_create_view, name="house_create"),
@@ -27,6 +36,7 @@ urlpatterns = [
     path("website/delete-document/<int:pk>/", views.DocumentDeleteView.as_view(), name="delete_document"),
     path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article", ),
 
+    path("api/houses/", views.api_houses, name="api_houses"),
     path("api/sections/<int:pk>/", views.api_sections, name="api_sections"),
     path("api/floors/<int:pk>/", views.api_floors, name="api_floors"),
     path("api/users/", views.api_users, name="api_users"),

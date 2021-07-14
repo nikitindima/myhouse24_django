@@ -82,13 +82,13 @@
                                         <td data-filter="Дом {{ object.house }}, Секция {{ object.section }}, Этаж
                                                 {{ object.floor }}, кв. {{ object.flat.number }}">
                                             {% if object.flat != None %}
-                                                Дом {{ object.house }}, Секция {{ object.section }}, Этаж
+                                                Дом {{ object.house }}, {{ object.section }}, Этаж
                                                 {{ object.floor }}, кв. {{ object.flat.number }}
                                             {% elif object.floor != None %}
-                                                Дом {{ object.house }}, Секция {{ object.section }}, Этаж
+                                                Дом {{ object.house }}, {{ object.section }}, Этаж
                                                 {{ object.floor }}
                                             {% elif object.section != None %}
-                                                Дом {{ object.house }}, Секция {{ object.section }}
+                                                Дом {{ object.house }}, {{ object.section }}
                                             {% elif object.house != None %}
                                                 Дом {{ object.house }}
                                             {% elif object.to_all == True %}

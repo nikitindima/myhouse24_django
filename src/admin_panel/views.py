@@ -1,20 +1,20 @@
+import io
 from ast import literal_eval
 from datetime import timedelta
 
-import house as house
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sitemaps import ping_google
 from django.db.models import Max, Prefetch
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.timezone import utc
 from django.views.generic import DeleteView, ListView, DetailView, CreateView
 from dateutil.utils import today
-from pip._internal.network.auth import Credentials
+from xlsxwriter.workbook import Workbook
 
 from .forms import (
     SiteHomeForm,
@@ -26,7 +26,8 @@ from .forms import (
     FlatUpdateForm,
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
-    StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm,
+    StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
+    AccountUpdateForm,
 )
 from .models import (
     SiteHomePage,
@@ -38,7 +39,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message,
+    Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt,
 )
 from .services.forms_services import (
     validate_forms,
@@ -53,7 +54,8 @@ from .services.site_pages_services import (
     save_new_objects_to_many_to_many_field,
 )
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
-    tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access
+    tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access, account_access, \
+    cashbox_access
 from ..users.models import UserRole
 
 User = get_user_model()
@@ -456,6 +458,16 @@ class FlatDeleteView(DeleteView):
 
 # region API
 
+def api_houses(request):
+    houses = House.objects.all()
+    results = []
+
+    for house_inst in houses:
+        data = house_inst.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
 
 def api_sections(request, pk):
     sections = Section.objects.filter(house=pk)
@@ -502,7 +514,9 @@ def api_flats(request):
     section_id = request.GET.get('section_id', None)
     floor = request.GET.get('floor', None)
 
-    flats = Flat.objects.filter(section__id=section_id, floor=floor)
+    flats = Flat.objects.filter(section__id=section_id)
+    if floor is not None:
+        flats.filter(floor=floor)
 
     results = []
 
@@ -805,6 +819,7 @@ class TariffDetailView(DetailView):
     template_name = "admin_panel/pages/system_tariffs_detail.html"
     queryset = Tariff.objects.prefetch_related("service_price__service__measure")
 
+
 # endregion SYSTEM_SETTINGS
 
 
@@ -943,10 +958,6 @@ class TransactionTypeListView(ListView):
     model = TransactionType
     template_name = "admin_panel/pages/system_transaction_type_list.html"
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs
-
 
 @user_passes_test(payments_detail_access)
 def transaction_type_create_view(request):
@@ -1039,3 +1050,138 @@ def message_create_view(request):
         "form1": form1,
     }
     return render(request, "admin_panel/pages/message_create.html", context=context)
+
+
+@method_decorator(user_passes_test(account_access), name='dispatch')
+class AccountListView(ListView):
+    queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__owner',
+                                              'account_flat__section')
+    template_name = "admin_panel/pages/account_list.html"
+
+
+@user_passes_test(account_access)
+def account_create_view(request):
+    form1 = AccountCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            number = form1.cleaned_data.get("number")
+            is_active = form1.cleaned_data.get("is_active")
+            flat_id = form1.cleaned_data.get("flat")
+            flat = get_object_or_404(Flat, pk=flat_id)
+
+            account = Account(account_flat=flat, number=number, is_active=is_active)
+            account.save()
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:account_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/account_create.html", context=context)
+
+
+@method_decorator(user_passes_test(account_access), name='dispatch')
+class AccountDeleteView(DeleteView):
+    model = Account
+    success_url = reverse_lazy("admin_panel:account_list")
+    success_message = "Счёт успешно удален"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+@user_passes_test(account_access)
+def account_update_view(request, pk):
+    account = get_object_or_404(Account, pk=pk)
+    flat = Flat.objects.filter(flat_account=pk).select_related('section', 'house', 'owner')[0]
+
+    form1 = AccountUpdateForm(request.POST or None, prefix="form1", instance=account)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            flat_id = form1.cleaned_data.get("flat")
+            flat = get_object_or_404(Flat, pk=flat_id)
+
+            save_forms(form1)
+            account.account_flat = flat
+            account.save()
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:account_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+        "flat": flat,
+    }
+    return render(request, "admin_panel/pages/account_update.html", context=context)
+
+
+@method_decorator(user_passes_test(account_access), name='dispatch')
+class AccountDetailView(DetailView):
+    template_name = "admin_panel/pages/account_detail.html"
+    # queryset = Account.objects.all()
+    queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section')
+
+
+@user_passes_test(account_access)
+def account_xls_list(request):
+    output = io.BytesIO()
+
+    workbook = Workbook(output, {'in_memory': True})
+
+    worksheet = workbook.add_worksheet()
+    worksheet.write(0, 0, '№')
+    worksheet.write(0, 1, 'Статус')
+    worksheet.write(0, 2, 'Квартира')
+    worksheet.write(0, 3, 'Дом')
+    worksheet.write(0, 4, 'Секция')
+    worksheet.write(0, 5, 'Владелец')
+    worksheet.write(0, 6, 'Остаток')
+    worksheet.set_default_row(70)
+
+    cell_format = workbook.add_format()
+    cell_format.set_text_wrap()
+
+    queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section', 'account_flat__owner')
+    row = 1
+    for obj in queryset.iterator():
+        worksheet.write(row, 0, obj.number, cell_format)
+        worksheet.write(row, 1, obj.is_active, cell_format)
+        worksheet.write(row, 2, obj.account_flat.number, cell_format)
+        worksheet.write(row, 3, obj.account_flat.house.__str__(), cell_format)
+        worksheet.write(row, 4, obj.account_flat.section.__str__(), cell_format)
+        worksheet.write(row, 5, obj.account_flat.owner.__str__(), cell_format)
+        worksheet.write(row, 6, 'TODO', cell_format)
+        row += 1
+
+    workbook.close()
+    output.seek(0)
+
+    response = HttpResponse(output.read(), content_type="application/vnd.ms-excel")
+    response['Content-Disposition'] = "attachment; filename=account_data.xlsx"
+
+    output.close()
+
+    return response
+
+
+@method_decorator(user_passes_test(cashbox_access), name='dispatch')
+class ReceiptListView(ListView):
+    queryset = Receipt.objects.select_related('account', 'tariff')
+    template_name = "admin_panel/pages/account_list.html"

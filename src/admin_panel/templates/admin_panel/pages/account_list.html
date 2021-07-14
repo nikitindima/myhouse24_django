@@ -1,0 +1,295 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load i18n %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_account_list %}active{% endblock %}
+
+{% block title %}Дома{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 345px;">
+        <section class="content-header">
+            <h1>Лицевые счета</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
+                <li class="active">Лицевые счета</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <!--<div class="col-xs-12 col-sm-6">-->
+                <!--<h2 class="page-header">Квартиры</h2>-->
+                <!--</div>-->
+                <div class="col-xs-12 col-lg-9">
+
+                    <div class="row">
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-green overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Состояние кассы</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-blue overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Баланс по счетам</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-red overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Задолженность по счетам</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-lg-3">
+                    <div class="btn-group pull-right margin-bottom">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            Выберите действие <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url 'admin_panel:account_create' %}">Добавить лицевой счет</a></li>
+                            <li><a href="{% url 'admin_panel:account_list_xls' %}">Выгрузить в Excel</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"></h3>
+                            <div class="box-tools">
+                                <a href="{% url 'admin_panel:account_list' %}" class="btn btn-default btn-sm">
+                                    <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
+                                                                              aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive" style="padding:10px">
+                            <table id="datatable" class="display" style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Статус</th>
+                                    <th>Квартира</th>
+                                    <th>Дом</th>
+                                    <th>Секция</th>
+                                    <th>Владелец</th>
+                                    <th>Остаток</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Статус</th>
+                                    <th>Квартира</th>
+                                    <th>Дом</th>
+                                    <th>Секция</th>
+                                    <th>Владелец</th>
+                                    <th>Остаток</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for object in object_list %}
+                                    <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
+                                        style="cursor: pointer;">
+                                        <td data-filter="{{ object.number }}">{{ object.number }}</td>
+                                        <td data-filter="{% if object.is_active == 'Active' %}Активный{% elif object.is_active == 'Inactive' %}Неактивный{% endif %}|||">
+                                            {% if object.is_active == 'Active' %}
+                                                <small class="label label-success">Активный</small>
+                                            {% elif object.is_active == 'Inactive' %}
+                                                <small class="label label-error">Неактивный</small>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </td>
+                                        <td data-filter="{{ object.account_flat.number }}">{{ object.account_flat.number }}</td>
+                                        <td data-filter="{{ object.account_flat.house }}|||">{{ object.account_flat.house }}</td>
+                                        <td data-filter="{{ object.account_flat.section }}|||">{{ object.account_flat.section }}</td>
+                                        <td data-filter="{{ object.account_flat.owner }}|||">{{ object.account_flat.owner }}</td>
+                                        <td data-filter="|||"></td>
+
+                                        <td>
+                                            <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
+                                                                                 href="{% url 'admin_panel:account_update' object.pk %}"
+                                                                                 title="Редактировать"
+                                                                                 data-toggle="tooltip">
+                                                <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
+                                                                                    href="{% url 'admin_panel:account_delete' object.pk %}"
+                                                                                    title="Удалить"
+                                                                                    onClick="delete_object(event)">
+                                                <i class="fa fa-trash"></i></a></div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="box-footer">
+                            <div>Количество владельцев: <span class="text-bold">{{ user_list.count }}</span></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Setup - add a text input to each footer cell
+            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
+            let table = make_datatable()
+            const filters_row = $('#datatable thead tr:eq(1) th')
+            make_search(filters_row, 0, 1, table)
+            make_search(filters_row, 2, 3, table)
+            make_select(filters_row, 1, 2, table)
+            make_select(filters_row, 3, 7, table)
+
+            $('#datatable thead tr:eq(1) th select').select2({
+                theme: 'bootstrap',
+                width: 900,
+            })
+            $('#datatable thead tr:eq(1) th input')
+                .attr('class', 'form-control')
+                .attr('style', 'width: 100%; display: inline-block;');
+        });
+
+        function make_datatable() {
+            let table = $('#datatable').DataTable({
+                orderCellsTop: true,
+                fixedHeader: true,
+                sDom: '<"top"i>rt<"bottom"lp><"clear">',
+                lengthChange: false,
+                bInfo: false,
+                pageLength: 10,
+                drawCallback: add_links_to_rows,
+                columns: [
+                    {"width": "10%", "className": "dt-center"},
+                    {"className": "dt-center"},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    {"width": "8%", "className": "dt-center"},
+                ],
+            });
+            return table;
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить данные?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+
+        function make_select(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        table.column(i + slice1)
+                            .search(val ? $(this).val() : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i + slice1).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    var data = thisStatus.split('|||')
+                    for (let k = 0; k < data.length - 1; k++) {
+                        let new_status = data[k]
+                        if ($.inArray(new_status, statusItems) === -1) statusItems.push(new_status);
+                    }
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+
+        }
+
+        function make_search(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                $(this).html('<input class="form-control" type="text" placeholder="Поиск - ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i + slice1).search() !== this.value) {
+                        table
+                            .column(i + slice1)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+
+{% endblock %}

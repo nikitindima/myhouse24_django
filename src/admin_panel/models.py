@@ -171,6 +171,10 @@ class House(models.Model):
         upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
     )
 
+    def serialize(self, pattern):
+        if pattern == "select2":
+            return {"id": self.id, "text": self.name}
+
     def __str__(self):
         return self.name or ""
 
@@ -197,11 +201,6 @@ class Floor(models.Model):
     )
 
 
-class Account(models.Model):
-    number = models.CharField(max_length=40)
-    is_active = models.BooleanField()
-
-
 class Flat(models.Model):
     number = models.PositiveIntegerField()
     area = models.DecimalField(max_digits=10, decimal_places=2)
@@ -216,9 +215,6 @@ class Flat(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name="flats"
     )
-    account = models.ForeignKey(
-        Account, on_delete=models.SET_NULL, null=True, blank=True
-    )
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True, blank=True)
 
     def serialize(self, pattern):
@@ -228,6 +224,18 @@ class Flat(models.Model):
 
     def __str__(self):
         return f'{self.house.name}, кв. {self.number}'
+
+
+class Account(models.Model):
+    class AccountStatus(models.TextChoices):
+        ACTIVE = "Active", _("Активный")
+        INACTIVE = "Inactive", _("Неактивный")
+
+    account_flat = models.OneToOneField(Flat, on_delete=models.CASCADE, related_name="flat_account")
+
+    number = models.CharField(max_length=40, unique=True, blank=True)
+    is_active = models.CharField(max_length=10, choices=AccountStatus.choices)
+
 
 # endregion PROPERTY
 class ReceiptTemplate(models.Model):
@@ -243,6 +251,7 @@ class Receipt(models.Model):
     is_paid = models.BooleanField()
     period = DateRangeField()
     created = models.DateTimeField()
+
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
     services = models.ManyToManyField(Service, through='Bill')

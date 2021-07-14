@@ -137,7 +137,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'account_access' == True %}
-                    <li><a href="/admin_panel/account/index"><i class="fa fa-credit-card"></i>
+                    <li class="{% block nav_item_account_list %}{% endblock %}"><a href="{% url 'admin_panel:account_list' %}"><i class="fa fa-credit-card"></i>
                         <span>Лицевые счета</span></a></li>
                 {% endif %}
                 {% if request.user|check_access:'flat_access' == True %}

@@ -1,0 +1,132 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_account_list %}active{% endblock %}
+
+{% block title %}Лицевой счет{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 839px;">
+        <section class="content-header">
+            <h1>Лицевой счет</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:account_list' %}">Лицевые счета</a></li>
+                <li class="active">Лицевой счет № {{ object.number }}</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12 col-md-7 col-lg-6">
+                    <div class="page-header-spec">
+                        <div class="form-group">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    №
+                                </div>
+                                <div class="form-control pull-right">{{ object.number }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Просмотр лицевого счета</h3>
+                    <div class="box-tools">
+                        <a href="/admin/account-transaction/create?type=in&amp;account_id=105"
+                           class="btn btn-default btn-sm">
+                            <span class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span><i
+                                class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                        </a>
+                        <a href="/admin/invoice/create?flat_id=40" class="btn btn-default btn-sm">
+                            <span class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span><i
+                                class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                        </a>
+                        <a href="{% url 'admin_panel:account_update' object.pk %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать счет</span><i class="fa fa-pencil visible-xs"
+                                                                                aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table class="table table-bordered table-striped table-view">
+                                <tbody>
+                                <tr>
+                                    <td>Статус</td>
+                                    <td>
+                                        <small class="label label-success">
+                                            {% if object.is_active == 'Active' %}
+                                                <small class="label-success">Активный</small>
+                                            {% elif object.is_active == 'Inactive' %}
+                                                <small class="label-error">Неактивный</small>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Дом</td>
+                                    <td>
+                                        <a href="{% url 'admin_panel:house_detail' object.account_flat.house.pk %}">
+                                            {{ object.account_flat.house.name }} </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Секция</td>
+                                    <td>{{ object.account_flat.section }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Квартира</td>
+                                    <td>
+                                        <a href="{% url 'admin_panel:flat_detail' object.account_flat.pk %}">
+                                            {{ object.account_flat.number }} </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Владелец</td>
+                                    <td>
+                                        <a href="{% url 'admin_panel:user_detail' object.account_flat.owner.pk %}">
+                                            {{ object.account_flat.owner }} </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Остаток, грн.</td>
+                                    <td>
+                                        <span class="text-green">00 000.00</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <p><a href="/admin/counter-data/counter-list?CounterDataSearch%5Bflat_id%5D=40">Посмотреть
+                                    показания счетчиков</a></p>
+                                <p>
+                                    <a href="/admin/account-transaction/index?AccountTransactionSearch%5Baccount_id%5D=105&amp;AccountTransactionSearch%5Btype%5D=in">Посмотреть
+                                        приходы</a></p>
+                                <p><a href="/admin/invoice/index?InvoiceSearch%5Bflat_id%5D=40">Посмотреть квитанции</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

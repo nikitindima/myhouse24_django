@@ -12,9 +12,10 @@ from .models import (
     Section,
     Flat,
     Tariff,
-    User, Service, ServicePrice, Message,
+    User, Service, ServicePrice, Message, Account,
 )
 
+admin.site.register(Account)
 admin.site.register(SeoData)
 admin.site.register(Article)
 admin.site.register(SiteHomePage)
