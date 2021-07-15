@@ -27,7 +27,7 @@ from .forms import (
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
     StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
-    AccountUpdateForm, TransactionIncomeCreateForm,
+    AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm,
 )
 from .models import (
     SiteHomePage,
@@ -56,6 +56,7 @@ from .services.site_pages_services import (
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
     tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access, account_access, \
     cashbox_access
+from .services.xls_services import make_in_memory_worksheet
 from ..users.models import UserRole
 
 User = get_user_model()
@@ -1176,25 +1177,12 @@ class AccountDetailView(DetailView):
 
 @user_passes_test(account_access)
 def account_xls_list(request):
-    output = io.BytesIO()
-
-    workbook = Workbook(output, {'in_memory': True})
-
-    worksheet = workbook.add_worksheet()
-    worksheet.write(0, 0, '№')
-    worksheet.write(0, 1, 'Статус')
-    worksheet.write(0, 2, 'Квартира')
-    worksheet.write(0, 3, 'Дом')
-    worksheet.write(0, 4, 'Секция')
-    worksheet.write(0, 5, 'Владелец')
-    worksheet.write(0, 6, 'Остаток')
-    worksheet.set_default_row(70)
-
-    cell_format = workbook.add_format()
-    cell_format.set_text_wrap()
+    columns = ['№', 'Статус', 'Квартира', 'Дом', 'Секция', 'Владелец', 'Остаток']
+    cell_format, output, workbook, worksheet = make_in_memory_worksheet(columns)
 
     queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section',
                                               'account_flat__owner')
+
     row = 1
     for obj in queryset.iterator():
         worksheet.write(row, 0, obj.number, cell_format)
@@ -1246,6 +1234,28 @@ def transaction_income_create_view(request):
     return render(request, "admin_panel/pages/transaction_income_create.html", context=context)
 
 
+@user_passes_test(cashbox_access)
+def transaction_expense_create_view(request):
+    form1 = TransactionExpenseCreateForm(request.POST or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:transaction_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/transaction_expense_create.html", context=context)
+
+
 @method_decorator(user_passes_test(cashbox_access), name='dispatch')
 class TransactionDeleteView(DeleteView):
     model = Transaction
@@ -1258,3 +1268,62 @@ class TransactionDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+
+@user_passes_test(payments_detail_access)
+def transaction_update_view(request, pk):
+    transaction = get_object_or_404(Transaction, pk=pk)
+    if transaction.transaction_type.type == 'EXPENSE':
+        form1 = TransactionExpenseCreateForm(request.POST or None, prefix="form1", instance=transaction)
+    else:
+        form1 = TransactionIncomeCreateForm(request.POST or None, prefix="form1", instance=transaction)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:transaction_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/transaction_update.html", context=context)
+
+
+@user_passes_test(account_access)
+def transaction_xls_list(request):
+    columns = ['№', 'Дата', 'Статус', 'Тип платежа', 'Владелец', 'Лицевой счет', 'Приход/Расход', 'Сумма (грн)']
+    cell_format, output, workbook, worksheet = make_in_memory_worksheet(columns)
+
+    queryset = Transaction.objects.select_related('account__account_flat__owner', 'receipt', 'transaction_type',
+                                                  'created_by').order_by('-created')
+
+    row = 1
+    for obj in queryset.iterator():
+        is_passed = 'Проведена' if obj.is_passed == 1 else 'Не проведена'
+        account_number = obj.account.number if obj.account is not None else '-'
+        worksheet.write(row, 0, obj.number, cell_format)
+        worksheet.write(row, 1, obj.created, cell_format)
+        worksheet.write(row, 2, is_passed, cell_format)
+        worksheet.write(row, 3, obj.transaction_type.name, cell_format)
+        worksheet.write(row, 4, obj.created_by.__str__(), cell_format)
+        worksheet.write(row, 5, account_number, cell_format)
+        worksheet.write(row, 6, obj.transaction_type.type, cell_format)
+        worksheet.write(row, 7, obj.amount, cell_format)
+        row += 1
+
+    workbook.close()
+    output.seek(0)
+
+    response = HttpResponse(output.read(), content_type="application/vnd.ms-excel")
+    response['Content-Disposition'] = "attachment; filename=account_data.xlsx"
+
+    output.close()
+
+    return response

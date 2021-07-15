@@ -36,3 +36,8 @@ def test(value):
 @register.filter(name="check_access")
 def check_user_access(user, variable):
     return check_access(user, variable)
+
+
+@register.filter(name="decimalFormat")
+def decimal_format(value):
+    return "{:,}".format(value)

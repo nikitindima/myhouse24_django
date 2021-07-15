@@ -1161,3 +1161,47 @@ class TransactionIncomeCreateForm(ModelForm):
             "created": "Создано",
             "description": "Комментарий"
         }
+
+
+class TransactionExpenseCreateForm(ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['number', 'created', 'transaction_type', 'manager', 'amount', 'description', 'is_passed']
+        widgets = {
+            "transaction_type": Select(),
+            "amount": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите сумму",
+                }
+            ),
+            "manager": Select(),
+            "is_passed": CheckboxInput(),
+            "created": DateInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер ведомости",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите комментарий",
+                    "rows": 6
+                }
+            )
+        }
+        labels = {
+            "transaction_type": "Статья",
+            "amount": "Сумма",
+            "manager": "Менеджер",
+            "is_passed": "Проведен",
+            "number": "Номер",
+            "created": "Создано",
+            "description": "Комментарий",
+        }
