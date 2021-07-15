@@ -84,8 +84,8 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="{% url 'admin_panel:transaction_income_create' %}">Создать приход</a></li>
-                            <li><a href="/admin/account-transaction/create?type=out">Создать расход</a></li>
-                            <li><a href="/admin/account-transaction/export">Выгрузить в Excel</a></li>
+                            <li><a href="{% url 'admin_panel:transaction_expense_create' %}">Создать расход</a></li>
+                            <li><a href="{% url 'admin_panel:transaction_xls_list' %}">Выгрузить в Excel</a></li>
                         </ul>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                                     <th>Владелец</th>
                                     <th>Лицевой счет</th>
                                     <th>Приход/Расход</th>
-                                    <th>Сумма (грн)</th>
+                                    <th></th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -146,8 +146,13 @@
                                             {% endif %}
                                         </td>
                                         <td data-filter="{{ object.transaction_type.name }}|||">{{ object.transaction_type.name }}</td>
-                                        <td data-filter="{{ object.account.account_flat.owner }}|||">{{ object.account.account_flat.owner }}</td>
-                                        <td data-filter="{{ object.account.number }}|||">{{ object.account.number }}</td>
+                                        <td data-filter="
+                                                {% if object.account.account_flat.owner %}{{ object.account.account_flat.owner }}|||{% endif %}">
+                                            {% if object.account.account_flat.owner %}
+                                                {{ object.account.account_flat.owner }}{% else %}-{% endif %}</td>
+                                        <td data-filter="{{ object.account.number }}|||">
+                                            {% if object.account %}{{ object.account.number }}{% else %}
+                                                -{% endif %}</td>
                                         <td data-filter="{% if object.transaction_type.type == 'INCOME' %}Приход{% elif object.transaction_type.type == 'EXPENSE' %}Расход{% endif %}|||">
                                             {% if object.transaction_type.type == 'INCOME' %}
                                                 <span class="text text-green">Приход</span>
@@ -157,11 +162,19 @@
                                                 ERROR
                                             {% endif %}
                                         </td>
-                                        <td data-filter="|||">cумма</td>
+                                        <td data-filter="|||">
+                                            {% if object.transaction_type.type == 'INCOME' %}
+                                                <span class="text text-green">{{ object.amount|decimalFormat }}</span>
+                                            {% elif object.transaction_type.type == 'EXPENSE' %}
+                                                <span class="text text-red">-{{ object.amount|decimalFormat }}</span>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </td>
 
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                                                 href="{% url 'admin_panel:transaction_delete' object.pk %}"
+                                                                                 href="{% url 'admin_panel:transaction_update' object.pk %}"
                                                                                  title="Редактировать"
                                                                                  data-toggle="tooltip">
                                                 <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
@@ -215,6 +228,7 @@
 
         function make_datatable() {
             let table = $('#datatable').DataTable({
+                order: [[1, 'asc']],
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',
