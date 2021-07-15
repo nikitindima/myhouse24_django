@@ -128,7 +128,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'cashbox_access' == True %}
-                    <li><a href="/admin_panel/account-transaction/index"><i class="fa fa-dollar"></i> <span>Касса</span></a>
+                    <li class="{% block nav_item_transaction_list %}{% endblock %}"><a href="{% url 'admin_panel:transaction_list' %}"><i class="fa fa-dollar"></i> <span>Касса</span></a>
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'receipt_access' == True %}

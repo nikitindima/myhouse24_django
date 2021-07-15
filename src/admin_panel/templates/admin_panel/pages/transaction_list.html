@@ -4,9 +4,9 @@
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
-{% block nav_item_user_list %}active{% endblock %}
+{% block nav_item_transaction_list %}active{% endblock %}
 
-{% block title %}Дома{% endblock %}
+{% block title %}Касса{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -20,11 +20,11 @@
 
     <div class="content-wrapper" style="min-height: 345px;">
         <section class="content-header">
-            <h1>Владельцы квартир </h1>
+            <h1>Касса</h1>
 
             <ul class="breadcrumb">
-                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
-                <li class="active">Владельцы квартир</li>
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
+                <li class="active">Лицевые счета</li>
             </ul>
         </section>
 
@@ -32,19 +32,60 @@
 
             <div class="row">
                 <!--<div class="col-xs-12 col-sm-6">-->
-                <!--<h2 class="page-header">Владельцы квартир</h2>-->
+                <!--<h2 class="page-header">Квартиры</h2>-->
                 <!--</div>-->
-                <div class="col-xs-12">
+                <div class="col-xs-12 col-lg-9">
+
+                    <div class="row">
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-green overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Состояние кассы</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-blue overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Баланс по счетам</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-4">
+                            <div class="small-box bg-red overflow-hidden">
+                                <div class="inner">
+                                    <h3>000 000.00 грн</h3>
+                                    <p>Задолженность по счетам</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fa fa-dollar"></i>
+                                </div>
+                                <!--<span class="small-box-footer">&nbsp;</span>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 col-lg-3">
                     <div class="btn-group pull-right margin-bottom">
                         <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false">
                             Выберите действие <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url 'admin_panel:user_create' %}">Добавить владельца квартиры</a></li>
-                            <li><a href="/admin/message/create?MessageAddress%5Buser_has_debt%5D=1">Отправить сообщение
-                                должникам</a></li>
-                            <li><a href="/admin/user/invite">Отправить приглашение</a></li>
+                            <li><a href="{% url 'admin_panel:transaction_income_create' %}">Создать приход</a></li>
+                            <li><a href="/admin/account-transaction/create?type=out">Создать расход</a></li>
+                            <li><a href="/admin/account-transaction/export">Выгрузить в Excel</a></li>
                         </ul>
                     </div>
                 </div>
@@ -56,7 +97,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"></h3>
                             <div class="box-tools">
-                                <a href="{% url 'admin_panel:user_list' %}" class="btn btn-default btn-sm">
+                                <a href="{% url 'admin_panel:account_list' %}" class="btn btn-default btn-sm">
                                     <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
                                                                               aria-hidden="true"></i>
                                 </a>
@@ -67,68 +108,64 @@
                             <table id="datatable" class="display" style="width:100%">
                                 <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>ФИО</th>
-                                    <th>Телефон</th>
-                                    <th>Email</th>
-                                    <th>Дом</th>
-                                    <th>Квартира</th>
-                                    <th>Добавлен</th>
+                                    <th>№</th>
+                                    <th>Дата</th>
                                     <th>Статус</th>
-                                    <th>Есть долг</th>
+                                    <th>Тип платежа</th>
+                                    <th>Владелец</th>
+                                    <th>Лицевой счет</th>
+                                    <th>Приход/Расход</th>
+                                    <th>Сумма (грн)</th>
                                     <th></th>
                                 </tr>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>ФИО</th>
-                                    <th>Телефон</th>
-                                    <th>Email</th>
-                                    <th>Дом</th>
-                                    <th>Квартира</th>
-                                    <th>Добавлен</th>
+                                    <th>№</th>
+                                    <th>Дата</th>
                                     <th>Статус</th>
-                                    <th>Есть долг</th>
+                                    <th>Тип платежа</th>
+                                    <th>Владелец</th>
+                                    <th>Лицевой счет</th>
+                                    <th>Приход/Расход</th>
+                                    <th>Сумма (грн)</th>
                                     <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for user in user_list %}
-                                    <tr data-href="{% url 'admin_panel:user_detail' user.pk %}"
+                                {% for object in object_list %}
+                                    <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
                                         style="cursor: pointer;">
-                                        <td data-filter="{{ user.user_id }}">{{ user.user_id }}</td>
-                                        <td data-filter="{{ user.full_name }}">{{ user.full_name }}</td>
-                                        <td data-filter="{{ user.phone }}">{{ user.phone }}</td>
-                                        <td data-filter="{{ user.email }}">{{ user.email }}</td>
-                                        <td class="houses" data-filter="{% for flat in user.flats.all %}{{ flat.house.name }}|||{% endfor %}">
-                                            {% for flat in user.flats.all %}
-                                                <a href="{% url 'admin_panel:house_detail' flat.house.id %}"><p>
-                                                    {{ flat.house.name }}</p></a>
-                                            {% endfor %}
-                                        </td>
-                                        <td data-filter="{% for flat in user.flats.all %}{{ flat.house.name }}|||{{ flat.number }}|||{% endfor %}">
-                                            {% for flat in user.flats.all %}
-                                                <a href="{% url 'admin_panel:flat_detail' flat.id %}"><p>
-                                                    № {{ flat.number }}, {{ flat.house.name }}</p></a>
-                                            {% endfor %}
-                                        </td>
-                                        <td data-filter="{{ user.date_joined }}">{{ user.date_joined }}</td>
-                                        <td data-filter="{% if user.status == 'ACTIVE' %}Активен{% elif user.status == 'NEW' %}Новый{% elif user.status == 'DEACTIVATED' %}Отключен{% endif %}|||">
-                                            {% if user.status == 'ACTIVE' %}
-                                                <small class="label label-success">Активен</small>
-                                            {% elif user.status == 'NEW' %}
-                                                <small class="label label-primary">Новый</small>
-                                            {% elif user.status == 'DEACTIVATED' %}
-                                                <small class="label label-error">Отключен</small>
+                                        <td data-filter="{{ object.number }}">{{ object.number }}</td>
+                                        <td data-filter="{{ object.created }}">{{ object.created }}</td>
+                                        <td data-filter="{% if object.is_passed == True %}Проведен{% elif object.is_passed == False %}Не проведен{% endif %}|||">
+                                            {% if object.is_passed == True %}
+                                                Проведен
+                                            {% elif object.is_passed == False %}
+                                                Не проведен
+                                            {% else %}
+                                                ERROR
                                             {% endif %}
                                         </td>
-                                        <td data-filter=""></td>
+                                        <td data-filter="{{ object.transaction_type.name }}|||">{{ object.transaction_type.name }}</td>
+                                        <td data-filter="{{ object.account.account_flat.owner }}|||">{{ object.account.account_flat.owner }}</td>
+                                        <td data-filter="{{ object.account.number }}|||">{{ object.account.number }}</td>
+                                        <td data-filter="{% if object.transaction_type.type == 'INCOME' %}Приход{% elif object.transaction_type.type == 'EXPENSE' %}Расход{% endif %}|||">
+                                            {% if object.transaction_type.type == 'INCOME' %}
+                                                <span class="text text-green">Приход</span>
+                                            {% elif object.transaction_type.type == 'EXPENSE' %}
+                                                <span class="text text-red">Расход</span>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </td>
+                                        <td data-filter="|||">cумма</td>
+
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                                                 href="{% url 'admin_panel:user_update' user.pk %}"
+                                                                                 href="{% url 'admin_panel:transaction_delete' object.pk %}"
                                                                                  title="Редактировать"
                                                                                  data-toggle="tooltip">
                                                 <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                                                    href="{% url 'admin_panel:user_delete' user.pk %}"
+                                                                                    href="{% url 'admin_panel:transaction_delete' object.pk %}"
                                                                                     title="Удалить"
                                                                                     onClick="delete_object(event)">
                                                 <i class="fa fa-trash"></i></a></div>
@@ -160,27 +197,12 @@
 
     <script>
         $(document).ready(function () {
-            // Setup - add a text input to each footer cell
-            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
             let table = make_datatable()
             const filters_row = $('#datatable thead tr:eq(1) th')
-            filters_row.slice(0, 4).each(function (i) {
-                let title = $(this).text();
-                $(this).html('<input type="text" placeholder="Поиск - ' + title + '" />');
-
-                $('input', this).on('keyup change', function () {
-                    if (table.column(i).search() !== this.value) {
-                        table
-                            .column(i)
-                            .search(this.value)
-                            .draw();
-                    }
-                });
-            });
-            delete_duplicate_houses()
-            make_search(filters_row, 5, 7, table)
-            make_select(filters_row, 4, 5, table)
-            make_select(filters_row, 7, 9, table)
+            make_search(filters_row, 0, 2, table)
+            make_select(filters_row, 2, 5, table)
+            make_search(filters_row, 5, 6, table)
+            make_select(filters_row, 6, 7, table)
 
             $('#datatable thead tr:eq(1) th select').select2({
                 theme: 'bootstrap',
@@ -201,7 +223,8 @@
                 pageLength: 10,
                 drawCallback: add_links_to_rows,
                 columns: [
-                    {"width": 20, "className": "dt-center"},
+                    {"width": "10%", "className": "dt-center"},
+                    {"className": "dt-center"},
                     null,
                     null,
                     null,
@@ -209,24 +232,9 @@
                     null,
                     null,
                     {"width": "8%", "className": "dt-center"},
-                    null,
-                    null,
                 ],
             });
             return table;
-        }
-
-        function delete_duplicate_houses() {
-            $('.houses').each(function () {
-                let seen = {};
-                $(this).children('a').each(function () {
-                    let txt = $(this).text();
-                    if (seen[txt])
-                        $(this).remove()
-                    else
-                        seen[txt] = true;
-                })
-            })
         }
 
         function add_links_to_rows() {

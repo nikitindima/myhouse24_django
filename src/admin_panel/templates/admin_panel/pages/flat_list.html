@@ -10,6 +10,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -59,7 +61,7 @@
                                     <th>Остаток</th>
                                     <th></th>
                                 </tr>
-                                <tr style="">
+                                <tr>
                                     <th class="dt-center">№ квартиры</th>
                                     <th>Дом</th>
                                     <th>Секция</th>
@@ -75,11 +77,11 @@
                                     <tr data-href="{% url 'admin_panel:flat_detail' flat.pk %}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ flat.number }}">{{ flat.number }}</td>
-                                        <td data-filter="{{ flat.house.name }}">{{ flat.house.name }}</td>
-                                        <td data-filter="{{ flat.section.name }}">{{ flat.section.name }}</td>
-                                        <td data-filter="Этаж {{ flat.floor }}">Этаж {{ flat.floor }}</td>
-                                        <td data-filter="{{ flat.owner }}">{{ flat.owner }}</td>
-                                        <td>0</td>
+                                        <td data-filter="{{ flat.house.name }}|||">{{ flat.house.name }}</td>
+                                        <td data-filter="{{ flat.section.name }}|||">{{ flat.section.name }}</td>
+                                        <td data-filter="Этаж {{ flat.floor }}|||">Этаж {{ flat.floor }}</td>
+                                        <td data-filter="{{ flat.owner }}|||">{{ flat.owner }}</td>
+                                        <td data-filter="0|||">0</td>
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
                                                                                  href="{% url 'admin_panel:flat_update' flat.pk %}"
@@ -114,12 +116,26 @@
             src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" charset="utf8"
             src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            // Setup - add a text input to each footer cell
-            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
-            const table = $('#datatable').DataTable({
+            const table = make_datatable()
+            const filters_row = $('#datatable thead tr:eq(1) th')
+            make_search(filters_row, 0, 1, table)
+            make_select(filters_row, 1, 6, table)
+
+            $('#datatable thead tr:eq(1) th select').select2({
+                theme: 'bootstrap',
+                width: 900,
+            })
+            $('#datatable thead tr:eq(1) th input')
+                .attr('class', 'form-control')
+                .attr('style', 'width: 100%; display: inline-block;');
+        });
+
+        function make_datatable() {
+            let table = $('#datatable').DataTable({
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',
@@ -128,46 +144,17 @@
                 pageLength: 10,
                 drawCallback: add_links_to_rows,
                 columns: [
-                    {"width": "8%", "className": "dt-center"},
-                    null,
+                    {"width": "10%", "className": "dt-center"},
+                    {"className": "dt-center"},
                     null,
                     null,
                     null,
                     null,
                     {"width": "8%", "className": "dt-center"},
                 ],
-
             });
-
-            $('#datatable thead tr:eq(1) th').slice(0, 5).each(function (i) {
-                let title = $(this).text();
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo($(this).empty())
-                    .on('change', function () {
-                        var val = $.fn.dataTable.util.escapeRegex(
-                            $(this).val()
-                        );
-
-                        table.column(i)
-                            .search(val ? '^' + $(this).val() + '$' : val, true, false)
-                            .draw();
-                    });
-
-                var statusItems = [];
-
-                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
-                table.column(i).nodes().to$().each(function (d, j) {
-                    var thisStatus = $(j).attr("data-filter");
-                    if ($.inArray(thisStatus, statusItems) === -1) statusItems.push(thisStatus);
-                });
-
-                statusItems.sort();
-
-                $.each(statusItems, function (i, item) {
-                    select.append('<option value="' + item + '">' + item + '</option>');
-                });
-            });
-        });
+            return table;
+        }
 
         function delete_object(event) {
             if (window.confirm("Вы действительно хотете удалить данные?")) {
@@ -179,6 +166,57 @@
         function add_links_to_rows() {
             $('tr[data-href]').on("click", function () {
                 document.location = $(this).data('href');
+            });
+        }
+
+        function make_select(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value="">-----------</option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        table.column(i + slice1)
+                            .search(val ? $(this).val() : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i + slice1).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    var data = thisStatus.split('|||')
+                    for (let k = 0; k < data.length - 1; k++) {
+                        let new_status = data[k]
+                        if ($.inArray(new_status, statusItems) === -1) statusItems.push(new_status);
+                    }
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+
+        }
+
+        function make_search(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                $(this).html('<input class="form-control" type="text" placeholder="Поиск - ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i + slice1).search() !== this.value) {
+                        table
+                            .column(i + slice1)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
             });
         }
     </script>

@@ -27,7 +27,7 @@ from .forms import (
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
     StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
-    AccountUpdateForm,
+    AccountUpdateForm, TransactionIncomeCreateForm,
 )
 from .models import (
     SiteHomePage,
@@ -39,7 +39,7 @@ from .models import (
     SiteContactsPage,
     House,
     Section,
-    Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt,
+    Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt, Transaction,
 )
 from .services.forms_services import (
     validate_forms,
@@ -510,6 +510,17 @@ def api_users(request):
     return JsonResponse({"results": results})
 
 
+def api_staff(request):
+    users = User.objects.filter(is_staff=True, is_superuser=False)
+    results = []
+
+    for user in users:
+        data = user.serialize(pattern="select2-staff")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
 def api_flats(request):
     section_id = request.GET.get('section_id', None)
     floor = request.GET.get('floor', None)
@@ -548,6 +559,30 @@ def api_new_users(request):
 
     return JsonResponse({"results": results})
 
+
+def api_accounts(request):
+    user_id = request.GET.get('user_id', None)
+    user = get_object_or_404(User, pk=user_id)
+    accounts = Account.objects.select_related('account_flat__owner').filter(account_flat__owner=user)
+    results = []
+
+    for account in accounts:
+        data = account.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
+def api_transaction_types(request):
+    trans_type = request.GET.get('trans_type', None)
+    trans_type_qs = TransactionType.objects.filter(type=trans_type)
+    results = []
+
+    for trans_type in trans_type_qs:
+        data = trans_type.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
 
 # endregion API
 
@@ -1158,7 +1193,8 @@ def account_xls_list(request):
     cell_format = workbook.add_format()
     cell_format.set_text_wrap()
 
-    queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section', 'account_flat__owner')
+    queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section',
+                                              'account_flat__owner')
     row = 1
     for obj in queryset.iterator():
         worksheet.write(row, 0, obj.number, cell_format)
@@ -1182,6 +1218,43 @@ def account_xls_list(request):
 
 
 @method_decorator(user_passes_test(cashbox_access), name='dispatch')
-class ReceiptListView(ListView):
-    queryset = Receipt.objects.select_related('account', 'tariff')
-    template_name = "admin_panel/pages/account_list.html"
+class TransactionListView(ListView):
+    queryset = Transaction.objects.select_related('account__account_flat__owner', 'receipt', 'transaction_type',
+                                                  'created_by').order_by('-created')
+    template_name = "admin_panel/pages/transaction_list.html"
+
+
+@user_passes_test(cashbox_access)
+def transaction_income_create_view(request):
+    form1 = TransactionIncomeCreateForm(request.POST or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:transaction_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/transaction_income_create.html", context=context)
+
+
+@method_decorator(user_passes_test(cashbox_access), name='dispatch')
+class TransactionDeleteView(DeleteView):
+    model = Transaction
+    success_url = reverse_lazy("admin_panel:transaction_list")
+    success_message = "Ведомость успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)

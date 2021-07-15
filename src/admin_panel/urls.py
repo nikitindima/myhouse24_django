@@ -4,7 +4,9 @@ from . import views
 
 app_name = "admin_panel"
 urlpatterns = [
-    path("cashbox/receipts/", views.ReceiptListView.as_view(), name="receipt_list"),
+    path("cashbox/transactions/", views.TransactionListView.as_view(), name="transaction_list"),
+    path("cashbox/transactions/create/income/", views.transaction_income_create_view, name="transaction_income_create"),
+    path("cashbox/transactions/delete/<int:pk>/", views.TransactionDeleteView.as_view(), name="transaction_delete"),
 
     path("accounts/", views.AccountListView.as_view(), name="account_list"),
     path("accounts/create/", views.account_create_view, name="account_create"),
@@ -44,6 +46,9 @@ urlpatterns = [
     path("api/measure/", views.api_measure_name, name="api_measure_name"),
     path("api/flats/", views.api_flats, name="api_flats"),
     path("api/messages/delete/", views.api_delete_messages, name="api_delete_messages"),
+    path("api/accounts/", views.api_accounts, name="api_accounts"),
+    path("api/transaction-types/", views.api_transaction_types, name="api_transaction_types"),
+    path("api/staff/", views.api_staff, name="api_staff"),
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),

@@ -6,7 +6,7 @@
 {% load static %}
 {% block nav_item_account_list %}active{% endblock %}
 
-{% block title %}Дома{% endblock %}
+{% block title %}Лицевые счета{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -242,7 +242,7 @@
         function make_select(filters_row, slice1, slice2, table) {
             filters_row.slice(slice1, slice2).each(function (i) {
                 let title = $(this).text();
-                var select = $('<select><option value=""></option></select>')
+                var select = $('<select><option value="">-----------</option></select>')
                     .appendTo($(this).empty())
                     .on('change', function () {
                         var val = $.fn.dataTable.util.escapeRegex(
