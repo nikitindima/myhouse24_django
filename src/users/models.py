@@ -80,6 +80,9 @@ class User(AbstractUser):
         if pattern == "select2":
             data = {"id": self.id, "text": self.full_name}
             return data
+        if pattern == "select2-staff":
+            data = {"id": self.id, "text": f'{self.full_name} - {self.role.name}'}
+            return data
         if pattern == "api_new_users":
             data = {"id": self.id, "full_name": self.full_name}
             return data

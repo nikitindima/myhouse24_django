@@ -236,6 +236,13 @@ class Account(models.Model):
     number = models.CharField(max_length=40, unique=True, blank=True)
     is_active = models.CharField(max_length=10, choices=AccountStatus.choices)
 
+    def serialize(self, pattern):
+        if pattern == "select2":
+            return {"id": self.id, "text": self.number}
+
+    def __str__(self):
+        return self.number
+
 
 # endregion PROPERTY
 class ReceiptTemplate(models.Model):
@@ -285,17 +292,26 @@ class TransactionType(models.Model):
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=7, choices=Type.choices)
 
+    def serialize(self, pattern):
+        if pattern == "select2":
+            return {"id": self.id, "text": self.name}
+
+    def __str__(self):
+        return self.name or ""
+
 
 class Transaction(models.Model):
-    name = models.CharField(max_length=100)
+    number = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     is_passed = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateField()
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
 
     account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True)
     transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_created_by')
+    manager = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_manager')
 
 
 class Message(models.Model):

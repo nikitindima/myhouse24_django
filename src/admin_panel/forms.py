@@ -28,7 +28,7 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account,
+    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account, Transaction,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -1113,3 +1113,51 @@ class AccountUpdateForm(AccountForm):
                     raise forms.ValidationError('К этой квартире уже привязан счёт')
 
         return flat_pk
+
+
+class TransactionIncomeCreateForm(ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['created_by', 'account', 'transaction_type', 'amount', 'manager', 'is_passed', 'number', 'created', 'description']
+        widgets = {
+            "created_by": Select(),
+            "account": Select(),
+            "transaction_type": Select(),
+            "amount": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите сумму",
+                }
+            ),
+            "manager": Select(),
+            "is_passed": CheckboxInput(),
+            "created": DateInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер ведомости",
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите комментарий",
+                    "rows": 6
+                }
+            )
+        }
+        labels = {
+            "created_by": "Владелец квартиры",
+            "account": "Лицевой счет",
+            "transaction_type": "Статья",
+            "amount": "Сумма",
+            "manager": "Менеджер",
+            "is_passed": "Проведен",
+            "number": "Номер",
+            "created": "Создано",
+            "description": "Комментарий"
+        }
