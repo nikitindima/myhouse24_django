@@ -1,0 +1,926 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_receipt_list %}active{% endblock %}
+
+{% block title %}Новая квитанция{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Новая квитанция</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="/admin/"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="/admin/invoice/index">Квитанции</a></li>
+                <li class="active">Новая квитанция</li>
+            </ul>
+        </section>
+
+        <section class="content">
+            <div class="invoice-create">
+
+
+                <form id="invoice-form" action="/admin/invoice/create" method="post">
+                    <input type="hidden" name="_csrf-backend"
+                           value="iMGFYQbPDoQI1Hg8gq9mSpMOVZclSkfjU9VjWtYl8sDYp_cucKZW9Wy4QUzWlwt-3mc58XF9FLYqlDYrsmi2kw==">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-7 col-lg-6">
+                            <div class="page-header-spec">
+                                <div class="form-group field-invoice-uid required">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            №
+                                        </div>
+                                        <input type="text" id="invoice-uid" class="form-control" name="Invoice[uid]"
+                                               value="17072100094" aria-required="true">
+                                    </div>
+                                </div>
+                                <span class="label-mid">от</span>
+                                <div class="form-group field-invoice-uid_date">
+                                    <div id="invoice-uid_date-kvdate" class="input-group  date"><span
+                                            class="input-group-addon kv-date-calendar" title="Выбрать дату"><i
+                                            class="glyphicon glyphicon-calendar"></i></span><input type="text"
+                                                                                                   id="invoice-uid_date"
+                                                                                                   class="form-control krajee-datepicker"
+                                                                                                   name="Invoice[uid_date]"
+                                                                                                   value="17.07.2021"
+                                                                                                   data-datepicker-source="invoice-uid_date-kvdate"
+                                                                                                   data-datepicker-type="2"
+                                                                                                   data-krajee-kvdatepicker="kvDatepicker_1643d6f1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-5 col-lg-6">
+                            <div class="btn-group pull-right margin-bottom">
+                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    Выберите действие <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#!" class="set-tariff-services">Выставить все услуги согласно
+                                        тарифу</a></li>
+                                    <li><a href="#!" class="add-counters">Добавить показания счетчиков</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-body">
+                            <input type="hidden" id="invoice-id" name="Invoice[id]">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="house_id">Дом</label>
+                                        <select id="house_id" class="form-control" name="house_id" onchange="
+                                        $.get(&quot;/admin/flat/get-lists-by-house?house_id=&quot;+$(this).val(), function( data ) {
+                                            $(&quot;select#section_id&quot;).html(data.sections);
+                                            $(&quot;select#invoice-flat_id&quot;).html(data.flats);
+                                            console.log(data);
+                                        });
+                                    ">
+                                            <option value="">Выберите...</option>
+                                            <option value="1" selected="selected">ЖК "Башня Чкалов"</option>
+                                            <option value="2">ЖК "Морская Симфония"</option>
+                                            <option value="3">ЖК "Дом Каркашадзе"</option>
+                                            <option value="4">ЖК "Королевские сады"</option>
+                                            <option value="5">ЖК "Люксембург"</option>
+                                            <option value="6">ЖК "Балковский"</option>
+                                            <option value="11">ЖК "Адмирал" Дом №11</option>
+                                            <option value="12">ЖК "Адмирал" Дом №12</option>
+                                            <option value="13">ЖК "Адмирал" Дом №13</option>
+                                            <option value="14">ЖК "Новые Черемушки"</option>
+                                            <option value="18">ЖК "Manhattan"</option>
+                                            <option value="19">ЖК "Скай Сити"</option>
+                                            <option value="20">ЖК "Альтаир 3"</option>
+                                            <option value="23">ОСМД 1002 ЖК "Альтаир 2"</option>
+                                            <option value="24">ОСМД 1001 ЖК "Альтаир"</option>
+                                            <option value="25"></option>
+                                            <option value="26"></option>
+                                            <option value="48">111</option>
+                                            <option value="51">cbdcbdf</option>
+                                            <option value="52">safsfsaf</option>
+                                            <option value="53">13525235</option>
+                                            <option value="54">235523</option>
+                                        </select></div>
+                                    <div class="form-group">
+                                        <label for="section_id">Секция</label>
+                                        <select id="section_id" class="form-control" name="section_id" onchange="
+                                        $.get(&quot;/admin/flat/get-lists-by-house?section_id=&quot;+$(this).val(), function( data ) {
+                                            $(&quot;select#invoice-flat_id&quot;).html(data.flats);
+                                            console.log(data);
+                                        });
+                                    ">
+                                            <option value="">Выберите...</option>
+                                            <option value="82" selected="selected">Секция 1</option>
+                                            <option value="83">Секция 2</option>
+                                            <option value="84">Секция 3</option>
+                                        </select></div>
+                                    <div class="form-group field-invoice-flat_id required has-success">
+                                        <label class="control-label" for="invoice-flat_id">Квартира</label>
+                                        <select id="invoice-flat_id" class="form-control" name="Invoice[flat_id]"
+                                                onchange="
+                                var thisVal = $(this).val();
+                                $.get(&quot;/admin/flat/get-flat?flat_id=&quot;+$(this).val(), function( data ) {
+                                    $(&quot;input#account_uid&quot;).val(data.account ? data.account.uid : &quot;&quot;);
+                                    $(&quot;select#invoice-tariff_id&quot;).html(data.tariffs);
+                                    $(&quot;#user-fullname&quot;).html(data.user ? data.user.fullnameHtml : &quot;&quot;);
+                                    $(&quot;#user-phone&quot;).html(data.user ? data.user.phoneHtml : &quot;&quot;);
+
+                                    $(&quot;#filterFlatId&quot;).val(thisVal).trigger(&quot;change&quot;);
+
+                                    console.log(data);
+                                });
+                            " aria-required="true" aria-invalid="false">
+                                            <option value="">Выберите...</option>
+                                            <option value="50" selected="selected">999</option>
+                                            <option value="51">1000</option>
+                                        </select>
+
+                                        <div class="help-block"></div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group field-invoice-is_checked">
+
+                                        <input type="hidden" name="Invoice[is_checked]" value="0"><label><input
+                                            type="checkbox" id="invoice-is_checked" name="Invoice[is_checked]" value="1"
+                                            checked=""> Проведена</label>
+
+                                        <div class="help-block"></div>
+                                    </div>
+                                    <div class="form-group field-invoice-status required has-success">
+                                        <label class="control-label" for="invoice-status">Статус</label>
+                                        <select id="invoice-status" class="form-control" name="Invoice[status]"
+                                                aria-required="true" aria-invalid="false">
+                                            <option value="">Выберите...</option>
+                                            <option value="10">Оплачена</option>
+                                            <option value="6">Частично оплачена</option>
+                                            <option value="5" selected="">Неоплачена</option>
+                                        </select>
+
+                                        <div class="help-block"></div>
+                                    </div>
+                                    <div class="form-group field-invoice-tariff_id required has-error">
+                                        <label class="control-label" for="invoice-tariff_id">Тариф</label>
+                                        <select id="invoice-tariff_id" class="form-control" name="Invoice[tariff_id]"
+                                                onchange="tariffId = $(this).val()" aria-required="true"
+                                                aria-invalid="true">
+                                            <option value="">Выберите...</option>
+                                            <option value="2">Пенсионный тариф</option>
+                                            <option value="3">Дополнительный тариф</option>
+                                            <option value="14">Основной тариф 2</option>
+                                        </select>
+
+                                        <div class="help-block">Необходимо заполнить «Тариф».</div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <div class="form-group field-invoice-period_start">
+                                                <label class="control-label" for="invoice-period_start">Период с</label>
+                                                <div id="invoice-period_start-kvdate" class="input-group  date"><span
+                                                        class="input-group-addon kv-date-calendar" title="Выбрать дату"><i
+                                                        class="glyphicon glyphicon-calendar"></i></span><input
+                                                        type="text" id="invoice-period_start"
+                                                        class="form-control krajee-datepicker"
+                                                        name="Invoice[period_start]" value="17.07.2021"
+                                                        data-datepicker-source="invoice-period_start-kvdate"
+                                                        data-datepicker-type="2"
+                                                        data-krajee-kvdatepicker="kvDatepicker_1643d6f1"></div>
+
+                                                <div class="help-block"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <div class="form-group field-invoice-period_end">
+                                                <label class="control-label" for="invoice-period_end">Период по</label>
+                                                <div id="invoice-period_end-kvdate" class="input-group  date"><span
+                                                        class="input-group-addon kv-date-calendar" title="Выбрать дату"><i
+                                                        class="glyphicon glyphicon-calendar"></i></span><input
+                                                        type="text" id="invoice-period_end"
+                                                        class="form-control krajee-datepicker"
+                                                        name="Invoice[period_end]" value="17.07.2021"
+                                                        data-datepicker-source="invoice-period_end-kvdate"
+                                                        data-datepicker-type="2"
+                                                        data-krajee-kvdatepicker="kvDatepicker_1643d6f1"></div>
+
+                                                <div class="help-block"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-6">
+                                    <div class="form-group">
+                                        <label for="account_uid">Лицевой счет</label>
+                                        <input type="text" id="account_uid" class="form-control" name="account_uid"
+                                               onblur="
+                                    $.get(&quot;/admin/flat/get-flat?account_uid=&quot;+$(this).val(), function( data ) {
+                                        $(&quot;select#house_id&quot;).html(data.houses);
+                                        $(&quot;select#section_id&quot;).html(data.sections);
+                                        $(&quot;select#invoice-flat_id&quot;).html(data.flats);
+                                        $(&quot;select#invoice-tariff_id&quot;).html(data.tariffs);
+                                        $(&quot;#user-fullname&quot;).html(data.user ? data.user.fullnameHtml : &quot;&quot;);
+                                        $(&quot;#user-phone&quot;).html(data.user ? data.user.phoneHtml : &quot;&quot;);
+                                        console.log(data);
+                                    });
+                                "></div>
+
+                                    <p><b>Владелец:</b> <span id="user-fullname"><a href="/admin/user/1">Пушкин Александр Сергеевич</a></span>
+                                    </p>
+                                    <p><b>Телефон:</b> <span id="user-phone"><a
+                                            href="tel:+380931234567">+380931234567</a></span></p>
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="table-responsive no-padding">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th style="min-width: 200px;">Услуга</th>
+                                                <!--<th style="min-width: 180px;">Показания</th>-->
+                                                <th style="min-width: 180px;">Расход</th>
+                                                <th style="min-width: 120px;">Ед. изм.</th>
+                                                <th style="min-width: 180px;">Цена за ед., грн.</th>
+                                                <th style="min-width: 180px;">Стоимость, грн.</th>
+                                                <th style="width: 40px; min-width: 40px;"></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="form-invoiceservice-rows">
+
+
+                                            <tr id="form-invoiceservice-0" class="form-invoiceservice">
+                                                <td>
+                                                    <input type="hidden" id="invoiceservice-0-id"
+                                                           name="InvoiceService[0][id]"> <input type="hidden"
+                                                                                                id="invoiceservice-0-invoice_id"
+                                                                                                name="InvoiceService[0][invoice_id]"
+                                                                                                value="0"> <input
+                                                        type="hidden" id="invoiceservice-0-counter_data_id"
+                                                        class="data-counter_data_id"
+                                                        name="InvoiceService[0][counter_data_id]">
+                                                    <select id="invoiceservice-0-service_id"
+                                                            class="form-control service-select"
+                                                            name="InvoiceService[0][service_id]">
+                                                        <option value="">Выберите...</option>
+                                                        <option value="1">Электроэнергия</option>
+                                                        <option value="2">Холодная вода</option>
+                                                        <option value="3">Отопление</option>
+                                                        <option value="4">Горячая вода</option>
+                                                        <option value="5">Уборка территории</option>
+                                                        <option value="6">Полив</option>
+                                                        <option value="7">Охрана</option>
+                                                    </select></td>
+                                                <td>
+                                                    <input type="text" id="invoiceservice-0-amount"
+                                                           class="form-control data-amount"
+                                                           name="InvoiceService[0][amount]"></td>
+                                                <td>
+                                                    <select id="0-unit" class="form-control data-unit" name="[0]unit">
+                                                        <option value="">Выберите...</option>
+                                                        <option value="2">м3</option>
+                                                        <option value="3">кв.м.кКал</option>
+                                                        <option value="4">кв.м</option>
+                                                        <option value="5">ед.</option>
+                                                        <option value="6">мес.</option>
+                                                        <option value="8">кВт.ч</option>
+                                                        <option value="9">грн/м2</option>
+                                                    </select></td>
+                                                <td>
+                                                    <input type="text" id="invoiceservice-0-price_unit"
+                                                           class="form-control data-price_unit"
+                                                           name="InvoiceService[0][price_unit]"></td>
+                                                <td>
+                                                    <input type="text" id="invoiceservice-0-price"
+                                                           class="form-control data-price"
+                                                           name="InvoiceService[0][price]"></td>
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-default btn-sm form-row-remove-btn"
+                                                            title="Удалить услугу"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <td colspan="4" valing="middle">
+                                                    <button type="button"
+                                                            class="btn btn-default btn-hover-change form-row-add-invoiceservice-btn">
+                                                        Добавить услугу
+                                                    </button>
+                                                    <button type="button" class="btn btn-default set-tariff-services">
+                                                        Установить все услуги согласно тарифу
+                                                    </button>
+                                                    <button type="button" class="btn btn-default add-counters">
+                                                        Добавить показания счетчиков
+                                                    </button>
+                                                </td>
+                                                <td style="min-width: 180px;">
+                                                    <div class="h4">
+                                                        Итого: <b><span id="price-total">0.00</span></b> грн
+                                                    </div>
+                                                </td>
+                                                <td style="width: 40px; min-width: 40px;"></td>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-12 text-right">
+                                    <div class="form-group">
+                                        <a href="/admin/invoice/index" class="btn btn-default">Отменить</a>
+                                        <button type="submit" class="btn btn-success">Сохранить</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Показания счетчиков</h3>
+                            </div>
+
+                            <div id="counters" data-pjax-container="" data-pjax-push-state="" data-pjax-timeout="1000">
+                                <div id="w0" class="grid-view">
+                                    <div class="box-body table-responsive no-padding">
+                                        <table class="table table-bordered table-hover table-striped table-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 125px; min-width: 125px">№</th>
+                                                <th>Статус</th>
+                                                <th style="width: 125px; min-width: 125px">Дата</th>
+                                                <th style="width: 125px; min-width: 125px">Месяц</th>
+                                                <th style="min-width: 200px">Дом</th>
+                                                <th style="min-width: 160px">Секция</th>
+                                                <th style="width: 110px; min-width: 110px">№ квартиры</th>
+                                                <th>Счетчик</th>
+                                                <th style="width: 90px; min-width: 90px">Показания</th>
+                                                <th style="width: 90px; min-width: 90px">Ед. изм.</th>
+                                            </tr>
+                                            <tr id="w0-filters" class="filter-hidden">
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td><input type="hidden" id="filterMonthYear"
+                                                           name="CounterDataSearch[searchUidMonthYear]" value=""><input
+                                                        type="hidden" id="filterFlatId"
+                                                        name="CounterDataSearch[flat_id]" value=""></td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr data-key="58">
+                                                <td>16072100058</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>16.07.2021</td>
+                                                <td>Июль 2021</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 2</td>
+                                                <td>3019</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">2425.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="57">
+                                                <td>25062100056</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>25.06.2021</td>
+                                                <td>Июнь 2021</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td><span class="not-set">(не задано)</span></td>
+                                                <td style="background-color: #DFD5; font-weight: normal">235532.2</td>
+                                                <td style="background-color: #DFD5; font-weight: normal"><span
+                                                        class="not-set">(не задано)</span></td>
+                                            </tr>
+                                            <tr data-key="55">
+                                                <td>11062100055</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>11.06.2021</td>
+                                                <td>Июнь 2021</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 1</td>
+                                                <td>3001</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">1000.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="54">
+                                                <td>26052100054</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>26.05.2021</td>
+                                                <td>Май 2021</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 1</td>
+                                                <td>3001</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">300.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="53">
+                                                <td>23052100053</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>23.05.2021</td>
+                                                <td>Май 2021</td>
+                                                <td>ЖК "Дом Каркашадзе"</td>
+                                                <td>Секция 2</td>
+                                                <td>6001</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">360.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="52">
+                                                <td>30042100052</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>30.04.2021</td>
+                                                <td>Апрель 2021</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>999</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">300.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="51">
+                                                <td>30042100051</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>30.04.2021</td>
+                                                <td>Апрель 2021</td>
+                                                <td>ЖК "Дом Каркашадзе"</td>
+                                                <td>Секция 2</td>
+                                                <td>6001</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">300.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="50">
+                                                <td>30042100050</td>
+                                                <td><small class="label label-success">Учтено и оплачено</small></td>
+                                                <td>30.04.2021</td>
+                                                <td>Апрель 2021</td>
+                                                <td>ЖК "Дом Каркашадзе"</td>
+                                                <td>Секция 2</td>
+                                                <td>6001</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">300.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="49">
+                                                <td>30042100049</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>30.04.2021</td>
+                                                <td>Апрель 2021</td>
+                                                <td>ЖК "Дом Каркашадзе"</td>
+                                                <td>Секция 2</td>
+                                                <td>6001</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">250.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="48">
+                                                <td>23032100048</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>23.03.2021</td>
+                                                <td>Март 2021</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>1000</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">21256.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="47">
+                                                <td>23032100047</td>
+                                                <td><small class="label label-success">Учтено и оплачено</small></td>
+                                                <td>23.03.2021</td>
+                                                <td>Март 2021</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>999</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal"><span
+                                                        class="not-set">(не задано)</span></td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="46">
+                                                <td>21022000046</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>21.02.2020</td>
+                                                <td>Февраль 2020</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>1000</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">4120.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="45">
+                                                <td>21022000045</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>21.02.2020</td>
+                                                <td>Февраль 2020</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>999</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">4560.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="44">
+                                                <td>06031900044</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.03.2019</td>
+                                                <td>Март 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">326.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="43">
+                                                <td>06031900043</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.03.2019</td>
+                                                <td>Март 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">23.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="42">
+                                                <td>06031900042</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.03.2019</td>
+                                                <td>Март 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">150.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="41">
+                                                <td>06031900041</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.02.2019</td>
+                                                <td>Февраль 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">50.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="40">
+                                                <td>06031900040</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.02.2019</td>
+                                                <td>Февраль 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">12.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="39">
+                                                <td>06031900039</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>06.02.2019</td>
+                                                <td>Февраль 2019</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 2</td>
+                                                <td>5008</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">218.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="38">
+                                                <td>07121800038</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>07.12.2018</td>
+                                                <td>Декабрь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4001</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">2000.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="37">
+                                                <td>31101800037</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>999</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">20000.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="36">
+                                                <td>31101800036</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4001</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">895.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="35">
+                                                <td>31101800035</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4001</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">1500.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="34">
+                                                <td>31101800034</td>
+                                                <td><small class="label label-primary">Нулевое</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>999</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">19000.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="33">
+                                                <td>31101800031</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Башня Чкалов"</td>
+                                                <td>Секция 1</td>
+                                                <td>1000</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">1200.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="30">
+                                                <td>31101800026</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>31.10.2018</td>
+                                                <td>Октябрь 2018</td>
+                                                <td>ЖК "Скай Сити"</td>
+                                                <td>Секция 3</td>
+                                                <td>4001</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">450.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="25">
+                                                <td>13091800025</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>13.09.2018</td>
+                                                <td>Сентябрь 2018</td>
+                                                <td>ЖК "Королевские сады"</td>
+                                                <td>Секция 1</td>
+                                                <td>4006</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">100.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="24">
+                                                <td>11111111</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>22.08.2018</td>
+                                                <td>Август 2018</td>
+                                                <td>ЖК "Скай Сити"</td>
+                                                <td>Секция 3</td>
+                                                <td>4001</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">200.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="19">
+                                                <td>888888</td>
+                                                <td><small class="label label-warning">Новое</small></td>
+                                                <td>03.07.2018</td>
+                                                <td>Июль 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">220.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            <tr data-key="16">
+                                                <td>C0016</td>
+                                                <td><small class="label label-primary">Нулевое</small></td>
+                                                <td>04.06.2018</td>
+                                                <td>Июнь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td>Горячая вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">40.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="15">
+                                                <td>C0015</td>
+                                                <td><small class="label label-primary">Нулевое</small></td>
+                                                <td>03.06.2018</td>
+                                                <td>Июнь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td>Отопление</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">20.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кв.м.кКал</td>
+                                            </tr>
+                                            <tr data-key="14">
+                                                <td>C0014</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>02.06.2018</td>
+                                                <td>Июнь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td>Холодная вода</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">130.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">м3</td>
+                                            </tr>
+                                            <tr data-key="13">
+                                                <td>C0013</td>
+                                                <td><small class="label label-success">Учтено</small></td>
+                                                <td>01.06.2018</td>
+                                                <td>Июнь 2018</td>
+                                                <td>ЖК "Морская Симфония"</td>
+                                                <td>Секция 3</td>
+                                                <td>4006</td>
+                                                <td>Электроэнергия</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">80.0</td>
+                                                <td style="background-color: #DFD5; font-weight: normal">кВт.ч</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="box-footer clearfix"></div>
+                                </div>
+
+
+                                <script>jQuery('#w0').yiiGridView({
+                                    "filterUrl": "\/admin\/invoice\/create?CounterDataSearch%5BsearchUidMonthYear%5D=\u0026CounterDataSearch%5Bflat_id%5D=\u0026_pjax=%23counters",
+                                    "filterSelector": "#w0-filters input, #w0-filters select"
+                                });</script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const select_house = $('select[name=form1-house]')
+            const select_section = $('select[name=form1-section]')
+            const select_flat = $('select[name=form1-flat]')
+            const select_service = $('select[name=form1-service]')
+            const select_status = $('select[name=form1-status]')
+
+            select_status.select2({
+                theme: 'bootstrap',
+            })
+            select_service.select2({
+                theme: 'bootstrap',
+            })
+            select_house.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/houses/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_section.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/sections/' + select_house.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            });
+            select_flat.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '/admin_panel/api/flats/';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            section_id: select_section.val(),
+                        };
+                    }
+                }
+            });
+
+            select_house.on("select2:select", function () {
+                select_section.select2("val", "0")
+                select_flat.select2("val", 0)
+            });
+            select_section.on("select2:select", function () {
+                select_flat.select2("val", 0)
+            });
+
+            !function (a) {
+                a.fn.datepicker.dates.ru = {
+                    days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                    daysShort: ["Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб"],
+                    daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                    months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                    monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+                    today: "Сегодня",
+                    clear: "Очистить",
+                    format: "dd.mm.yyyy",
+                    weekStart: 1,
+                    monthsTitle: "Месяцы"
+                }
+            }(jQuery);
+
+            $('#id_form1-created').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: '-100y',
+                endDate: '+0d',
+                language: 'ru'
+            });
+
+            const form1_house_id = '{{ form1_initial.house.id }}'
+            const form1_house_text = '{{ form1_initial.house.text }}'
+            const form1_section_id = '{{ form1_initial.section.id }}'
+            const form1_section_name = '{{ form1_initial.section.text }}'
+            if (form1_house_id !== '' && form1_section_id !== '') {
+                let newOptionHouse = new Option(form1_house_text, form1_house_id, false, false);
+                select_house.append(newOptionHouse).val(form1_house_id).trigger('change')
+                let newOptionSection = new Option(form1_section_name, form1_section_id, false, false);
+                select_section.append(newOptionSection).val(form1_section_id).trigger('change')
+            }
+        });
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

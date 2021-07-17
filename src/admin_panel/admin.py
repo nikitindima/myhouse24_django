@@ -12,7 +12,7 @@ from .models import (
     Section,
     Flat,
     Tariff,
-    User, Service, ServicePrice, Message, Account,
+    User, Service, ServicePrice, Message, Account, MeterData,
 )
 
 admin.site.register(Account)
@@ -31,3 +31,4 @@ admin.site.register(User)
 admin.site.register(Service)
 admin.site.register(ServicePrice)
 admin.site.register(Message)
+admin.site.register(MeterData)

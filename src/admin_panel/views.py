@@ -1,5 +1,8 @@
 import io
+import os
+import random
 from ast import literal_eval
+from binascii import hexlify
 from datetime import timedelta
 
 from django.contrib import messages
@@ -27,7 +30,7 @@ from .forms import (
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
     StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
-    AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm,
+    AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm, MeterDataForm,
 )
 from .models import (
     SiteHomePage,
@@ -40,12 +43,13 @@ from .models import (
     House,
     Section,
     Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt, Transaction,
+    MeterData,
 )
 from .services.forms_services import (
     validate_forms,
     save_forms,
     create_formset,
-    save_extra_forms,
+    save_extra_forms, send_form_errors_to_messages_framework, generate_random_number_for_model_field,
 )
 from .services.site_pages_services import (
     get_or_create_page_object,
@@ -55,7 +59,7 @@ from .services.site_pages_services import (
 )
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
     tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access, account_access, \
-    cashbox_access
+    cashbox_access, receipt_access, meter_data_access
 from .services.xls_services import make_in_memory_worksheet
 from ..users.models import UserRole
 
@@ -76,7 +80,7 @@ def site_home_view(request):
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1, seo_data_form, formset=formset)
-        print(forms_valid_status, seo_data_form.errors, formset.errors)
+
         if forms_valid_status:
             save_forms(form1, seo_data_form, formset)
             messages.success(request, "Данные успешно обновлены.")
@@ -254,7 +258,7 @@ class DocumentDeleteView(DeleteView):
 @method_decorator(user_passes_test(house_access), name='dispatch')
 class HouseListView(ListView):
     template_name = "admin_panel/pages/house_list.html"
-    model = House
+    queryset = House.objects.all().order_by('-id')
 
 
 @user_passes_test(house_access)
@@ -372,7 +376,7 @@ def section_delete_view(request):
 @method_decorator(user_passes_test(flat_access), name='dispatch')
 class FlatListView(ListView):
     template_name = "admin_panel/pages/flat_list.html"
-    queryset = Flat.objects.select_related("section", "house", "owner")
+    queryset = Flat.objects.select_related("section", "house", "owner").order_by('-id')
 
 
 @user_passes_test(flat_access)
@@ -460,7 +464,12 @@ class FlatDeleteView(DeleteView):
 # region API
 
 def api_houses(request):
+    search = request.GET.get('search', None)
     houses = House.objects.all()
+
+    if search is not None:
+        houses = houses.filter(name__icontains=search)
+
     results = []
 
     for house_inst in houses:
@@ -471,8 +480,13 @@ def api_houses(request):
 
 
 def api_sections(request, pk):
-    sections = Section.objects.filter(house=pk)
+    search = request.GET.get('search', None)
+    sections = Section.objects.\
+        prefetch_related('section_flats').filter(house=pk, section_flats__isnull=False).distinct().order_by('id')
     results = []
+
+    if search is not None:
+        sections = sections.filter(name__icontains=search)
 
     for section in sections:
         data = section.serialize(pattern="select2")
@@ -523,12 +537,20 @@ def api_staff(request):
 
 
 def api_flats(request):
-    section_id = request.GET.get('section_id', None)
+    search = request.GET.get('search', None)
     floor = request.GET.get('floor', None)
+    section_id = request.GET.get('section_id', None)
 
     flats = Flat.objects.filter(section__id=section_id)
+
+    if search is not None:
+        flats = flats.filter(number__icontains=search)
+
     if floor is not None:
         flats.filter(floor=floor)
+
+    if search is not None:
+        flats.filter(number__icontains=search)
 
     results = []
 
@@ -597,7 +619,7 @@ class UserListView(ListView):
 
     queryset = User.objects.filter(is_staff=False, is_superuser=False).prefetch_related(
         Prefetch("flats", queryset=Flat.objects.select_related("house"))
-    ).prefetch_related("flats__house")
+    ).prefetch_related("flats__house").order_by('-date_joined')
 
 
 @user_passes_test(house_user_access)
@@ -766,7 +788,7 @@ def system_services(request):
 @method_decorator(user_passes_test(tariff_access), name='dispatch')
 class SystemTariffsListView(ListView):
     template_name = "admin_panel/pages/system_tariffs_list.html"
-    model = Tariff
+    queryset = Tariff.objects.all().order_by('-id')
 
 
 @user_passes_test(tariff_access)
@@ -890,7 +912,7 @@ def system_user_role_view(request):
 
 @method_decorator(user_passes_test(staff_access), name='dispatch')
 class StaffListView(ListView):
-    queryset = User.objects.filter(is_staff=True, is_superuser=False)
+    queryset = User.objects.filter(is_staff=True, is_superuser=False).order_by('-date_joined')
     template_name = "admin_panel/pages/system_staff_list.html"
 
 
@@ -1327,3 +1349,153 @@ def transaction_xls_list(request):
     output.close()
 
     return response
+
+
+@method_decorator(user_passes_test(meter_data_access), name='dispatch')
+class MeterDataListView(ListView):
+    queryset = MeterData.objects.select_related('service', 'flat__house', 'flat__section',
+                                                'service__measure').order_by('-id')
+    template_name = "admin_panel/pages/meter_data_list.html"
+
+
+@method_decorator(user_passes_test(meter_data_access), name='dispatch')
+class MeterDataByFlatListView(ListView):
+    template_name = "admin_panel/pages/meter_data_list_by_flat.html"
+
+    def get_queryset(self):
+        flat_id = self.request.GET.get('flat_id', None)
+        queryset = MeterData.objects.select_related('service', 'flat__house', 'flat__section',
+                                                    'service__measure').order_by('-id')
+        if flat_id is not None:
+            flat = get_object_or_404(Flat, pk=flat_id)
+            queryset = queryset.filter(flat=flat)
+            self.extra_context = {'flat': flat}
+        return queryset
+
+
+@user_passes_test(meter_data_access)
+def meter_data_create_view(request):
+    meter_data_id = request.GET.get('meter_data_id', None)
+    form1_initial = None
+
+    if request.method == "POST":
+        form1 = MeterDataForm(request.POST or None, prefix="form1")
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:meter_data_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+        send_form_errors_to_messages_framework(form1, request)
+
+    number = generate_random_number_for_model_field(model=MeterData, field='number', length=8)
+    form1 = MeterDataForm(initial={'number': number}, prefix="form1")
+
+    if meter_data_id is not None:
+        obj = MeterData.objects.filter(id=meter_data_id).select_related('service', 'flat__house', 'flat__section',
+                                                                        'service__measure')[0]
+
+        form1.initial = {'flat': obj.flat, 'status': obj.status, 'service': obj.service,
+                         'created': today(), 'number': number}
+        form1_initial = {
+            'house': {'id': obj.flat.house.id, 'text': obj.flat.house.name},
+            'section': {'id': obj.flat.section.id, 'text': obj.flat.section.name},
+        }
+
+    context = {
+        "form1": form1,
+        "form1_initial": form1_initial
+    }
+    return render(request, "admin_panel/pages/meter_data_create.html", context=context)
+
+
+@method_decorator(user_passes_test(meter_data_access), name='dispatch')
+class MeterDataDeleteView(DeleteView):
+    model = MeterData
+    success_url = reverse_lazy("admin_panel:meter_data_list")
+    success_message = "Показание счетчика успешно удалены"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+@user_passes_test(meter_data_access)
+def meter_data_update_view(request, pk):
+    obj = MeterData.objects.filter(pk=pk).select_related('service', 'flat__house', 'flat__section',
+                                                                    'service__measure')[0]
+    form1 = MeterDataForm(request.POST or None, prefix="form1", instance=obj)
+
+    if request.method == "POST":
+
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:meter_data_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+        send_form_errors_to_messages_framework(form1, request)
+
+    form1_initial = {
+        'house': {'id': obj.flat.house.id, 'text': obj.flat.house.name},
+        'section': {'id': obj.flat.section.id, 'text': obj.flat.section.name},
+    }
+
+    context = {
+        "form1": form1,
+        "form1_initial": form1_initial
+    }
+    return render(request, "admin_panel/pages/meter_data_create.html", context=context)
+
+
+@method_decorator(user_passes_test(receipt_access), name='dispatch')
+class ReceiptListView(ListView):
+    queryset = Receipt.objects.select_related('account').order_by('-created')
+    template_name = "admin_panel/pages/receipt_list.html"
+
+
+@user_passes_test(receipt_access)
+def receipt_create_view(request):
+    form1 = ReceiptCreateForm(request.POST or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:transaction_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/transaction_expense_create.html", context=context)
+
+
+@method_decorator(user_passes_test(receipt_access), name='dispatch')
+class ReceiptDeleteView(DeleteView):
+    model = Receipt
+    success_url = reverse_lazy("admin_panel:receipt_list")
+    success_message = "Квитанции успешно удалены"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)

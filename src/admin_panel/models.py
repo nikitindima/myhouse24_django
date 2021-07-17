@@ -30,7 +30,7 @@ class Service(models.Model):
     measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
 
 class ServicePrice(models.Model):
@@ -207,7 +207,7 @@ class Flat(models.Model):
 
     floor = models.CharField(max_length=100, null=True)
     section = models.ForeignKey(
-        Section, on_delete=models.CASCADE, null=True, blank=True
+        Section, on_delete=models.CASCADE, null=True, blank=True, related_name="section_flats"
     )
     house = models.ForeignKey(
         House, on_delete=models.CASCADE, null=True, related_name="houses"
@@ -223,7 +223,7 @@ class Flat(models.Model):
             return data
 
     def __str__(self):
-        return f'{self.house.name}, кв. {self.number}'
+        return f'{self.number}'
 
 
 class Account(models.Model):
@@ -254,11 +254,17 @@ class ReceiptTemplate(models.Model):
 
 
 class Receipt(models.Model):
+    class ReceiptStatus(models.TextChoices):
+        PAID = "PAID", _("Оплачена")
+        PARTLY_PAID = "PARTLY_PAID", _("Частично оплачена")
+        NOT_PAID = "NOT_PAID", _("Неоплачена")
+
+    number = models.CharField(max_length=40, unique=True)
     is_passed = models.BooleanField()
-    is_paid = models.BooleanField()
     period = DateRangeField()
     created = models.DateTimeField()
 
+    status = models.CharField(max_length=11, choices=ReceiptStatus.choices)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
     services = models.ManyToManyField(Service, through='Bill')
@@ -273,10 +279,19 @@ class Bill(models.Model):
 
 
 class MeterData(models.Model):
-    number = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20)
+    class MeterStatus(models.TextChoices):
+        NEW = "NEW", _("Новое")
+        ACCOUNTED = "ACCOUNTED", _("Учтено")
+        ACCOUNTED_AND_PAID = "ACCOUNTED_AND_PAID", _("Учтено и оплачено")
+        NULL = "NULL", _("Нулевое")
+
+    status = models.CharField(max_length=20, choices=MeterStatus.choices)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    created = models.DateField()
+    number = models.CharField(max_length=40, unique=True)
 
 
 class CompanyCredentials(models.Model):

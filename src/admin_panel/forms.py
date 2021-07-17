@@ -5,6 +5,7 @@ import unicodedata
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.postgres.forms import RangeWidget
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput, CharField
 from django.forms.widgets import (
@@ -29,6 +30,7 @@ from .models import (
     Section,
     Floor,
     Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account, Transaction,
+    MeterData, Receipt,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -1026,11 +1028,11 @@ class MessageForm(ModelForm):
 
 
 class AccountForm(ModelForm):
-    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
+    house = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Дом',
                       required=True)
-    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
+    section = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Секция',
                         required=True)
-    flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
+    flat = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Квартира',
                      required=True)
 
     class Meta:
@@ -1205,3 +1207,89 @@ class TransactionExpenseCreateForm(ModelForm):
             "created": "Создано",
             "description": "Комментарий",
         }
+
+
+class MeterDataForm(ModelForm):
+    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
+                      required=True)
+    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
+                        required=True)
+    # flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
+    #                  required=True)
+
+    class Meta:
+        model = MeterData
+        fields = ['status', 'service', 'flat', 'amount', 'created', 'number']
+
+        widgets = {
+            "flat": Select(),
+            "service": Select(),
+            "status": Select(),
+            "created": DateInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер ведомости",
+                }
+            ),
+            "amount": NumberInput()
+        }
+        labels = {
+            "house": "Дом",
+            "section": "Секция",
+
+            "flat": "Квартира",
+            "service": "Счетчик",
+            "status": "Статус",
+            "amount": "Показания счетчика",
+            "created": "Проведен",
+            "number": "Номер",
+        }
+
+
+class ReceiptCreateForm(ModelForm):
+    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
+                      required=True)
+    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
+                        required=True)
+    flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
+                     required=True)
+
+    class Meta:
+        model = Receipt
+        fields = ['is_passed', 'period', 'created']
+
+        widgets = {
+            "number": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите номер ведомости",
+                }
+            ),
+            "account": Select(),
+            "tariff": Select(),
+            "status": Select(),
+            "created": DateInput(
+                attrs={
+                    "class": "form-control",
+                }
+            ),
+            "period": RangeWidget(base_widget=(DateInput, DateInput)),
+            "is_passed": CheckboxInput()
+        }
+        labels = {
+            "house": "Дом",
+            "section": "Секция",
+
+            "flat": "Квартира",
+            "service": "Счетчик",
+            "status": "Статус",
+            "amount": "Показания счетчика",
+            "created": "Проведен",
+            "number": "Номер",
+        }
+

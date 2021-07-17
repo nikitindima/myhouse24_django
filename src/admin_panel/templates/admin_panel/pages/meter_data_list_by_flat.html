@@ -4,9 +4,9 @@
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
-{% block nav_item_account_list %}active{% endblock %}
+{% block nav_item_meter_data_list %}active{% endblock %}
 
-{% block title %}Лицевые счета{% endblock %}
+{% block title %}Показания счетчиков{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -20,72 +20,22 @@
 
     <div class="content-wrapper" style="min-height: 345px;">
         <section class="content-header">
-            <h1>Лицевые счета</h1>
+            <h1>Показания счетчиков, кв. {{ flat.number }}</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
-                <li class="active">Лицевые счета</li>
+                <li><a href="{% url 'admin_panel:meter_data_list' %}"><i class="fa fa-home"></i>Счетчики</a></li>
+                <li class="active">Показания счетчиков, кв. {{ flat.number }}</li>
             </ul>
         </section>
 
         <section class="content">
 
             <div class="row">
-                <!--<div class="col-xs-12 col-sm-6">-->
-                <!--<h2 class="page-header">Квартиры</h2>-->
-                <!--</div>-->
-                <div class="col-xs-12 col-lg-9">
-
-                    <div class="row">
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-green overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Состояние кассы</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-blue overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Баланс по счетам</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-red overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Задолженность по счетам</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xs-12 col-lg-3">
-                    <div class="btn-group pull-right margin-bottom">
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            Выберите действие <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="{% url 'admin_panel:account_create' %}">Добавить лицевой счет</a></li>
-                            <li><a href="{% url 'admin_panel:account_list_xls' %}">Выгрузить в Excel</a></li>
-                        </ul>
+                <div class="col-xs-12">
+                    <div class="pull-right margin-bottom">
+                        <a class="btn btn-success" href="{% url 'admin_panel:meter_data_create' %}">Добавить
+                            показание</a>
                     </div>
                 </div>
             </div>
@@ -96,7 +46,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"></h3>
                             <div class="box-tools">
-                                <a href="{% url 'admin_panel:account_list' %}" class="btn btn-default btn-sm">
+                                <a href="{% url 'admin_panel:meter_data_list' %}" class="btn btn-default btn-sm">
                                     <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
                                                                               aria-hidden="true"></i>
                                 </a>
@@ -109,54 +59,74 @@
                                 <tr>
                                     <th>№</th>
                                     <th>Статус</th>
-                                    <th>Квартира</th>
+                                    <th>Дата</th>
+                                    <th>Месяц</th>
                                     <th>Дом</th>
                                     <th>Секция</th>
-                                    <th>Владелец</th>
-                                    <th>Остаток</th>
+                                    <th>№ квартиры</th>
+                                    <th>Счетчик</th>
+                                    <th>Показания</th>
+                                    <th>Ед. изм.</th>
                                     <th></th>
                                 </tr>
                                 <tr>
                                     <th>№</th>
                                     <th>Статус</th>
-                                    <th>Квартира</th>
+                                    <th>Дата</th>
+                                    <th></th>
                                     <th>Дом</th>
                                     <th>Секция</th>
-                                    <th>Владелец</th>
-                                    <th>Остаток</th>
+                                    <th>№ квартиры</th>
+                                    <th>Счетчик</th>
+                                    <th></th>
+                                    <th></th>
                                     <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for object in object_list %}
-                                    <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
+                                    <tr data-href="{% url 'admin_panel:meter_data_list' %}?flat_id={{ object.flat.pk }}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ object.number }}">{{ object.number }}</td>
-                                        <td data-filter="{% if object.is_active == 'Active' %}Активный{% elif object.is_active == 'Inactive' %}Неактивный{% endif %}|||">
-                                            {% if object.is_active == 'Active' %}
-                                                <small class="label label-success">Активный</small>
-                                            {% elif object.is_active == 'Inactive' %}
-                                                <small class="label label-danger">Неактивный</small>
+                                        <td data-filter="{% if object.status == 'NEW' %}Новое{% elif object.status == 'ACCOUNTED' %}Учтено{% elif object.status == 'ACCOUNTED_AND_PAID' %}Учтено и оплачено{% elif object.status == 'NULL' %}Нулевое{% endif %}|||">
+
+                                            {% if object.status == 'NEW' %}
+                                                <small class="label label-warning">Новое</small>
+                                            {% elif object.status == 'ACCOUNTED' %}
+                                                <small class="label label-primary">Учтено</small>
+                                            {% elif object.status == 'ACCOUNTED_AND_PAID' %}
+                                                <small class="label label-success">Учтено и оплачено</small>
+                                            {% elif object.status == 'NULL' %}
+                                                <small class="label label-danger">Нулевое</small>
                                             {% else %}
                                                 ERROR
                                             {% endif %}
                                         </td>
-                                        <td data-filter="{{ object.account_flat.number }}">{{ object.account_flat.number }}</td>
-                                        <td data-filter="{{ object.account_flat.house }}|||">{{ object.account_flat.house }}</td>
-                                        <td data-filter="{{ object.account_flat.section }}|||">{{ object.account_flat.section }}</td>
-                                        <td data-filter="{{ object.account_flat.owner }}|||">{{ object.account_flat.owner }}</td>
-                                        <td data-filter="|||"></td>
+                                        <td data-filter="{{ object.created }}">{{ object.created }}</td>
+                                        <td data-filter="{{ object.created|date:'F Y' }}">{{ object.created|date:'F Y' }}</td>
+                                        <td data-filter="{{ object.flat.house }}|||">{{ object.flat.house }}</td>
+                                        <td data-filter="{{ object.flat.section }}|||">{{ object.flat.section }}</td>
+                                        <td data-filter="{{ object.flat }}">{{ object.flat }}</td>
+                                        <td data-filter="{{ object.service }}|||">{{ object.service }}</td>
 
+                                        <td style="background-color: #DFD5; font-weight: normal"
+                                            data-filter="{{ object.amount }}">{{ object.amount }}</td>
+                                        <td style="background-color: #DFD5; font-weight: normal"
+                                            data-filter="{{ object.service.measure.name }}">{{ object.service.measure.name }}</td>
                                         <td>
-                                            <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                                                 href="{% url 'admin_panel:account_update' object.pk %}"
-                                                                                 title="Редактировать"
-                                                                                 data-toggle="tooltip">
-                                                <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                                                    href="{% url 'admin_panel:account_delete' object.pk %}"
-                                                                                    title="Удалить"
-                                                                                    onClick="delete_object(event)">
-                                                <i class="fa fa-trash"></i></a></div>
+                                            <a class="btn btn-default btn-sm"
+                                               href="{% url 'admin_panel:meter_data_update' object.pk %}"
+                                               title="Изменить показания счетчика">
+                                                <i class="fa fa-pencil"></i></a>
+
+                                            <div class="btn-group pull-right">
+                                                <a class="btn btn-default btn-sm"
+                                                   href="{% url 'admin_panel:meter_data_delete' object.pk %}"
+                                                   title="Удалить показание"
+                                                   data-toggle="tooltip"
+                                                   onclick="delete_object(event)">
+                                                    <i class="fa fa-trash"></i></a>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -185,14 +155,14 @@
 
     <script>
         $(document).ready(function () {
-            // Setup - add a text input to each footer cell
-            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
             let table = make_datatable()
             const filters_row = $('#datatable thead tr:eq(1) th')
             make_search(filters_row, 0, 1, table)
-            make_search(filters_row, 2, 3, table)
             make_select(filters_row, 1, 2, table)
-            make_select(filters_row, 3, 7, table)
+            make_search(filters_row, 2, 3, table)
+            make_select(filters_row, 4, 6, table)
+            make_search(filters_row, 6, 7, table)
+            make_select(filters_row, 7, 8, table)
 
             $('#datatable thead tr:eq(1) th select').select2({
                 theme: 'bootstrap',
@@ -205,6 +175,7 @@
 
         function make_datatable() {
             let table = $('#datatable').DataTable({
+                order: [[1, 'asc']],
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',
@@ -213,14 +184,17 @@
                 pageLength: 10,
                 drawCallback: add_links_to_rows,
                 columns: [
-                    {"width": "10%", "className": "dt-center"},
+                    null,
                     {"className": "dt-center"},
                     null,
                     null,
                     null,
                     null,
                     null,
-                    {"width": "8%", "className": "dt-center"},
+                    null,
+                    {"width": "6%", "className": "dt-center"},
+                    {"width": "6%", "className": "dt-center"},
+                    {"width": "6%", "className": "dt-center"},
                 ],
             });
             return table;
