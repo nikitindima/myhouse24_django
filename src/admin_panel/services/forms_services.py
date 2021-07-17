@@ -1,4 +1,7 @@
+import random
+
 from django import forms
+from django.contrib import messages
 from django.forms import modelformset_factory
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
@@ -116,3 +119,36 @@ def save_extra_forms(formset, model, **kwargs):
 
             new_object.full_clean()
             new_object.save()
+
+
+def send_form_errors_to_messages_framework(form, request, formset=False):
+    if formset is True:
+        form_errors = form.errors[0]
+    else:
+        form_errors = form.errors
+
+    if form.errors:
+        [
+            messages.error(request, f"{field}, {error.as_text()}")
+            for field, error in form_errors.items()
+        ]
+
+
+def generate_random_number_for_model_field(model=None, field=None, length=10):
+    while True:
+        range_start = 10**(length-1)
+        range_end = (10**length)-1
+
+        number = random.randint(range_start, range_end)
+
+        if model is not None and field is not None:
+            qs_filter = field + '__' + 'contains'
+            qs = model.objects.filter(**{qs_filter: number})
+            if qs.exists():
+                continue
+            else:
+                break
+        else:
+            break
+
+    return number

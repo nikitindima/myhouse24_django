@@ -3,46 +3,40 @@
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
-{% block nav_item_transaction_list %}active{% endblock %}
+{% block nav_item_meter_data_list %}active{% endblock %}
 
-{% block title %}Новая расходная ведомость{% endblock %}
+{% block title %}Новое показание{% endblock %}
 
 {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
-          integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 {% endblock %}
 
 {% block content %}
 
-    <div class="content-wrapper" style="min-height: 839px;">
+
+    <div class="content-wrapper" style="min-height: 867px;">
         <section class="content-header">
-            <h1>Новая расходная ведомость</h1>
+            <h1>Новое показание</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
-                <li><a href="{% url 'admin_panel:transaction_list' %}">Платежи</a></li>
-                <li class="active">Новая приходная ведомость</li>
+                <li><a href="{% url 'admin_panel:meter_data_list' %}">Счетчики</a></li>
+                <li class="active">Новое показание</li>
             </ul>
         </section>
 
         <section class="content">
 
 
-            <form method="post">
+            <form method="post" novalidate>
                 {% csrf_token %}
-
                 <div class="row">
                     <div class="col-xs-12 col-md-7 col-lg-6">
                         <div class="page-header-spec">
-                            <div class="form-group field-accounttransaction-uid required">
+                            <div class="form-group">
                                 <div class="input-group">
-                                    <div class="input-group-addon">
-                                        №
-                                    </div>
+                                    <div class="input-group-addon">№</div>
                                     {{ form1.number }}
                                 </div>
                             </div>
@@ -61,51 +55,48 @@
                 </div>
                 <div class="box">
                     <div class="box-body">
-
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6 col-sm-offset-6">
-                                {{ form1.is_passed|as_crispy_field }}
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-6">
-
-                                <div class="form-group">
-                                    {{ form1.transaction_type|as_crispy_field }}
-                                </div>
-
-                                <div class="form-group">
-                                    {{ form1.amount|as_crispy_field }}
-                                </div>
-
-                            </div>
-                            <div class="col-xs-12 col-sm-6">
-
-                                <div class="form-group">
-                                    {{ form1.manager|as_crispy_field }}
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12 text-right">
-                                <div class="form-group">
-                                    <a href="{% url 'admin_panel:transaction_expense_create' %}"
-                                       class="btn btn-default margin-bottom-15">Отменить</a>
-                                    <input type="submit" class="btn btn-success margin-bottom-15" name="action_save"
-                                           value="Сохранить"></div>
-                            </div>
-                        </div>
-
                         <div class="row">
                             <div class="col-xs-12">
-                                <div class="form-group">
-                                    {{ form1.description|as_crispy_field }}
+                                <div class="col-xs-12 col-sm-6">
+
+                                    <div class="form-group">
+                                        {{ form1.house|as_crispy_field }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form1.section|as_crispy_field }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form1.flat|as_crispy_field }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form1.service|as_crispy_field }}
+                                    </div>
+
+                                </div>
+                                <div class="col-xs-12 col-sm-6">
+
+                                    <div class="form-group">
+                                        {{ form1.status|as_crispy_field }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ form1.amount|as_crispy_field }}
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-right">
+                            <div class="form-group">
+                                <a href="{% url 'admin_panel:meter_data_create' %}" class="btn btn-default">Отменить</a>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -116,69 +107,73 @@
 
 {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
-            integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         $(document).ready(function () {
-            const select_created_by = $('select[name=form1-created_by]')
-            const select_account = $('select[name=form1-account]')
-            const select_transaction_type = $('select[name=form1-transaction_type]')
-            const select_manager = $('select[name=form1-manager]')
+            const select_house = $('select[name=form1-house]')
+            const select_section = $('select[name=form1-section]')
+            const select_flat = $('select[name=form1-flat]')
+            const select_service = $('select[name=form1-service]')
+            const select_status = $('select[name=form1-status]')
 
-            select_created_by.select2({
+            select_status.select2({
                 theme: 'bootstrap',
             })
-            select_account.select2({
+            select_service.select2({
+                theme: 'bootstrap',
+            })
+            select_house.select2({
                 theme: 'bootstrap',
                 ajax: {
                     url: function (params) {
-                        return '{% url 'admin_panel:api_accounts' %}';
+                        return '/admin_panel/api/houses/';
                     },
                     data: function (params) {
                         // Query parameters will be ?search=[term]&type=public
                         return {
                             search: params.term,
-                            type: 'public',
-                            user_id: select_created_by.val()
+                            type: 'public'
                         };
                     }
                 }
             });
-            select_transaction_type.select2({
+            select_section.select2({
                 theme: 'bootstrap',
                 ajax: {
                     url: function (params) {
-                        return '{% url 'admin_panel:api_transaction_types' %}';
+                        return '/admin_panel/api/sections/' + select_house.val();
                     },
                     data: function (params) {
                         // Query parameters will be ?search=[term]&type=public
                         return {
                             search: params.term,
-                            type: 'public',
-                            trans_type: 'EXPENSE'
+                            type: 'public'
                         };
                     }
                 }
             });
-            select_manager.select2({
+            select_flat.select2({
                 theme: 'bootstrap',
                 ajax: {
                     url: function (params) {
-                        return '{% url 'admin_panel:api_staff' %}';
+                        return '/admin_panel/api/flats/';
                     },
                     data: function (params) {
                         // Query parameters will be ?search=[term]&type=public
                         return {
                             search: params.term,
+                            section_id: select_section.val(),
                         };
                     }
                 }
             });
 
-            select_created_by.on("select2:select", function () {
-                select_account.select2("val", 0)
+            select_house.on("select2:select", function () {
+                select_section.select2("val", "0")
+                select_flat.select2("val", 0)
+            });
+            select_section.on("select2:select", function () {
+                select_flat.select2("val", 0)
             });
 
             !function (a) {
@@ -202,6 +197,17 @@
                 endDate: '+0d',
                 language: 'ru'
             });
+
+            const form1_house_id = '{{ form1_initial.house.id }}'
+            const form1_house_text = '{{ form1_initial.house.text }}'
+            const form1_section_id = '{{ form1_initial.section.id }}'
+            const form1_section_name = '{{ form1_initial.section.text }}'
+            if (form1_house_id !== '' && form1_section_id !== '') {
+                let newOptionHouse = new Option(form1_house_text, form1_house_id, false, false);
+                select_house.append(newOptionHouse).val(form1_house_id).trigger('change')
+                let newOptionSection = new Option(form1_section_name, form1_section_id, false, false);
+                select_section.append(newOptionSection).val(form1_section_id).trigger('change')
+            }
         });
     </script>
     {% include 'admin_panel/elements/messages.html' %}>

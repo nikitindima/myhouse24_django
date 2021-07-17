@@ -132,7 +132,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'receipt_access' == True %}
-                    <li><a href="/admin_panel/invoice/index"><i class="fa fa-files-o"></i>
+                    <li class="{% block nav_item_receipt_list %}{% endblock %}"><a href="{% url 'admin_panel:receipt_list' %}"><i class="fa fa-files-o"></i>
                         <span>Квитанции на оплату</span></a>
                     </li>
                 {% endif %}
@@ -168,7 +168,7 @@
                         <span>Заявки вызова мастера</span></a></li>
                 {% endif %}
                 {% if request.user|check_access:'meter_data_access' == True %}
-                    <li><a href="/admin_panel/counter-data/counters"><i class="fa fa-dashboard"></i>
+                    <li class="{% block nav_item_meter_data_list %}{% endblock %}"><a href="{% url 'admin_panel:meter_data_list' %}"><i class="fa fa-dashboard"></i>
                         <span>Показания счетчиков</span></a></li>
                 {% endif %}
                 {% if request.user|check_access:'site_access' == True %}

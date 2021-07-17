@@ -97,7 +97,6 @@ function requestWithoutReload(url, data){
          url: url,
          data: data,
          success: function() {
-
           }
      });
 }

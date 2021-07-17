@@ -11,6 +11,10 @@ urlpatterns = [
     path("cashbox/transactions/delete/<int:pk>/", views.TransactionDeleteView.as_view(), name="transaction_delete"),
     path("cashbox/transactions/xls/", views.transaction_xls_list, name="transaction_xls_list"),
 
+    path("receipts/", views.ReceiptListView.as_view(), name="receipt_list"),
+    path("receipts/create/", views.receipt_create_view, name="receipt_create"),
+    path("receipts/delete/<int:pk>/", views.ReceiptDeleteView.as_view(), name="receipt_delete"),
+
     path("accounts/", views.AccountListView.as_view(), name="account_list"),
     path("accounts/create/", views.account_create_view, name="account_create"),
     path("accounts/detail/<int:pk>/", views.AccountDetailView.as_view(), name="account_detail"),
@@ -31,6 +35,12 @@ urlpatterns = [
     path("flats/detail/<int:pk>/", views.FlatDetailView.as_view(), name="flat_detail"),
     path("flats/update/<int:pk>/", views.flat_update_view, name="flat_update"),
     path("flats/delete/<int:pk>/", views.FlatDeleteView.as_view(), name="flat_delete"),
+
+    path("meters-data/", views.MeterDataListView.as_view(), name="meter_data_list"),
+    path("meters-data/by-flat/", views.MeterDataByFlatListView.as_view(), name="meter_data_list_by_flat"),
+    path("meters-data/create/", views.meter_data_create_view, name="meter_data_create"),
+    path("meters-data/delete/<int:pk>/", views.MeterDataDeleteView.as_view(), name='meter_data_delete'),
+    path("meters-data/update/<int:pk>/", views.meter_data_update_view, name='meter_data_update'),
 
     path("website/home/", views.site_home_view, name="site_home"),
     path("website/about/", views.site_about_view, name="site_about"),

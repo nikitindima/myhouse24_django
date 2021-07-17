@@ -4,9 +4,9 @@
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
-{% block nav_item_account_list %}active{% endblock %}
+{% block nav_item_receipt_list %}active{% endblock %}
 
-{% block title %}Лицевые счета{% endblock %}
+{% block title %}Касса{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -20,7 +20,7 @@
 
     <div class="content-wrapper" style="min-height: 345px;">
         <section class="content-header">
-            <h1>Лицевые счета</h1>
+            <h1>Касса</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
@@ -83,8 +83,10 @@
                             Выберите действие <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="{% url 'admin_panel:account_create' %}">Добавить лицевой счет</a></li>
-                            <li><a href="{% url 'admin_panel:account_list_xls' %}">Выгрузить в Excel</a></li>
+                            <li><a href="/admin/invoice/create">Создать общую квитанцию</a></li>
+                            <!--                <li><a href="#!">Создать квитанцию на оплату за ЭЭ</a></li>
+                                            <li><a href="#!">Создать квитанцию на оплату за ГАЗ</a></li>-->
+                            <li><a href="#!" class="delete-many">Удалить</a></li>
                         </ul>
                     </div>
                 </div>
@@ -107,24 +109,26 @@
                             <table id="datatable" class="display" style="width:100%">
                                 <thead>
                                 <tr>
-                                    <th>№</th>
-                                    <th>Статус</th>
-                                    <th>Квартира</th>
-                                    <th>Дом</th>
-                                    <th>Секция</th>
-                                    <th>Владелец</th>
-                                    <th>Остаток</th>
                                     <th></th>
+                                    <th>№ квитанции</th>
+                                    <th>Статус</th>
+                                    <th>Дата</th>
+                                    <th>Месяц</th>
+                                    <th>Квартира</th>
+                                    <th>Владелец</th>
+                                    <th>Проведена</th>
+                                    <th>Сумма (грн)</th>
                                 </tr>
                                 <tr>
-                                    <th>№</th>
-                                    <th>Статус</th>
-                                    <th>Квартира</th>
-                                    <th>Дом</th>
-                                    <th>Секция</th>
-                                    <th>Владелец</th>
-                                    <th>Остаток</th>
                                     <th></th>
+                                    <th>№ квитанции</th>
+                                    <th>Статус</th>
+                                    <th>Дата</th>
+                                    <th>Месяц</th>
+                                    <th>Квартира</th>
+                                    <th>Владелец</th>
+                                    <th>Проведена</th>
+                                    <th>Сумма (грн)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -132,28 +136,51 @@
                                     <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ object.number }}">{{ object.number }}</td>
-                                        <td data-filter="{% if object.is_active == 'Active' %}Активный{% elif object.is_active == 'Inactive' %}Неактивный{% endif %}|||">
-                                            {% if object.is_active == 'Active' %}
-                                                <small class="label label-success">Активный</small>
-                                            {% elif object.is_active == 'Inactive' %}
-                                                <small class="label label-danger">Неактивный</small>
+                                        <td data-filter="{{ object.created }}">{{ object.created }}</td>
+                                        <td data-filter="{% if object.is_passed == True %}Проведен{% elif object.is_passed == False %}Не проведен{% endif %}|||">
+                                            {% if object.is_passed == True %}
+                                                Проведен
+                                            {% elif object.is_passed == False %}
+                                                Не проведен
                                             {% else %}
                                                 ERROR
                                             {% endif %}
                                         </td>
-                                        <td data-filter="{{ object.account_flat.number }}">{{ object.account_flat.number }}</td>
-                                        <td data-filter="{{ object.account_flat.house }}|||">{{ object.account_flat.house }}</td>
-                                        <td data-filter="{{ object.account_flat.section }}|||">{{ object.account_flat.section }}</td>
-                                        <td data-filter="{{ object.account_flat.owner }}|||">{{ object.account_flat.owner }}</td>
-                                        <td data-filter="|||"></td>
+                                        <td data-filter="{{ object.transaction_type.name }}|||">{{ object.transaction_type.name }}</td>
+                                        <td data-filter="
+
+                                                {% if object.account.account_flat.owner %}{{ object.account.account_flat.owner }}|||{% endif %}">
+                                            {% if object.account.account_flat.owner %}
+                                                {{ object.account.account_flat.owner }}{% else %}-{% endif %}</td>
+                                        <td data-filter="{{ object.account.number }}|||">
+                                            {% if object.account %}{{ object.account.number }}{% else %}
+                                                -{% endif %}</td>
+                                        <td data-filter="{% if object.transaction_type.type == 'INCOME' %}Приход{% elif object.transaction_type.type == 'EXPENSE' %}Расход{% endif %}|||">
+                                            {% if object.transaction_type.type == 'INCOME' %}
+                                                <span class="text text-green">Приход</span>
+                                            {% elif object.transaction_type.type == 'EXPENSE' %}
+                                                <span class="text text-red">Расход</span>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </td>
+                                        <td data-filter="|||">
+                                            {% if object.transaction_type.type == 'INCOME' %}
+                                                <span class="text text-green">{{ object.amount|decimalFormat }}</span>
+                                            {% elif object.transaction_type.type == 'EXPENSE' %}
+                                                <span class="text text-red">-{{ object.amount|decimalFormat }}</span>
+                                            {% else %}
+                                                ERROR
+                                            {% endif %}
+                                        </td>
 
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
-                                                                                 href="{% url 'admin_panel:account_update' object.pk %}"
+                                                                                 href="{% url 'admin_panel:transaction_update' object.pk %}"
                                                                                  title="Редактировать"
                                                                                  data-toggle="tooltip">
                                                 <i class="fa fa-pencil"></i></a> <a class="btn btn-default btn-sm"
-                                                                                    href="{% url 'admin_panel:account_delete' object.pk %}"
+                                                                                    href="{% url 'admin_panel:transaction_delete' object.pk %}"
                                                                                     title="Удалить"
                                                                                     onClick="delete_object(event)">
                                                 <i class="fa fa-trash"></i></a></div>
@@ -185,14 +212,12 @@
 
     <script>
         $(document).ready(function () {
-            // Setup - add a text input to each footer cell
-            {#$('#datatable thead tr').clone(true).appendTo('#datatable thead');#}
             let table = make_datatable()
             const filters_row = $('#datatable thead tr:eq(1) th')
-            make_search(filters_row, 0, 1, table)
-            make_search(filters_row, 2, 3, table)
-            make_select(filters_row, 1, 2, table)
-            make_select(filters_row, 3, 7, table)
+            make_search(filters_row, 0, 2, table)
+            make_select(filters_row, 2, 5, table)
+            make_search(filters_row, 5, 6, table)
+            make_select(filters_row, 6, 7, table)
 
             $('#datatable thead tr:eq(1) th select').select2({
                 theme: 'bootstrap',
@@ -205,6 +230,7 @@
 
         function make_datatable() {
             let table = $('#datatable').DataTable({
+                order: [[1, 'asc']],
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',
@@ -215,6 +241,7 @@
                 columns: [
                     {"width": "10%", "className": "dt-center"},
                     {"className": "dt-center"},
+                    null,
                     null,
                     null,
                     null,
