@@ -14,7 +14,7 @@ from django.forms.widgets import (
     NumberInput,
     Select,
     PasswordInput,
-    DateInput,
+    DateInput, SelectMultiple,
 )
 from django.shortcuts import get_object_or_404
 
@@ -30,7 +30,7 @@ from .models import (
     Section,
     Floor,
     Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account, Transaction,
-    MeterData, Receipt,
+    MeterData, Receipt, Bill, HouseStaff,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -470,10 +470,34 @@ class HouseCreateForm(HouseForm):
         model = House
 
 
+# class HouseStaffForm(forms.Form):
+#     house_staff = forms.CharField(widget=forms.Select(attrs={"class": "form-control"}), label="ФИО")
+
+    # class Meta:
+    #     model = User
+    #     fields = ['id']
+    #     widgets = {
+    #         'id': Select()
+    #     }
+
+class HouseStaffForm(ModelForm):
+    class Meta:
+        model = HouseStaff
+        fields = ['house_staff']
+        widgets = {
+            "house_staff": Select(
+                attrs={
+                    "class": "form-control",
+                }
+            )
+        }
+        labels = {
+            "house_staff": "ФИО"
+        }
+
+
 # region FLAT
 class FlatForm(ModelForm):
-    # floor = forms.ChoiceField(widget=forms.Select, choices=[(x, str(x)) for x in range(10)])
-
     class Meta:
         model = Flat
         fields = [
@@ -1120,7 +1144,8 @@ class AccountUpdateForm(AccountForm):
 class TransactionIncomeCreateForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ['created_by', 'account', 'transaction_type', 'amount', 'manager', 'is_passed', 'number', 'created', 'description']
+        fields = ['created_by', 'account', 'transaction_type', 'amount', 'manager', 'is_passed', 'number', 'created',
+                  'description']
         widgets = {
             "created_by": Select(),
             "account": Select(),
@@ -1214,6 +1239,7 @@ class MeterDataForm(ModelForm):
                       required=True)
     section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
                         required=True)
+
     # flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
     #                  required=True)
 
@@ -1261,35 +1287,89 @@ class ReceiptCreateForm(ModelForm):
 
     class Meta:
         model = Receipt
-        fields = ['is_passed', 'period', 'created']
+        fields = ['is_passed', 'created', 'number', 'account', 'tariff', 'status', 'period_start', 'period_end']
 
         widgets = {
             "number": TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Введите номер ведомости",
+                    "placeholder": "Введите номер квитанции",
                 }
             ),
-            "account": Select(),
+            "account": Select(
+                attrs={
+                    "disabled": "disabled",
+                }
+            ),
             "tariff": Select(),
             "status": Select(),
             "created": DateInput(
                 attrs={
                     "class": "form-control",
+                    "placeholder": "Выберите дату создания",
                 }
             ),
-            "period": RangeWidget(base_widget=(DateInput, DateInput)),
+            "period_start": DateInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите дату начала периода",
+                }),
+            "period_end": DateInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите дату окончания периода",
+                }),
             "is_passed": CheckboxInput()
         }
         labels = {
             "house": "Дом",
             "section": "Секция",
-
             "flat": "Квартира",
-            "service": "Счетчик",
             "status": "Статус",
-            "amount": "Показания счетчика",
+            "tariff": "Тариф",
             "created": "Проведен",
             "number": "Номер",
+            "is_passed": "Проведена",
+            "period_start": "Период с",
+            "period_end": "Период до",
+            "account": "Счет"
         }
 
+
+class BillForm(ModelForm):
+    class Meta:
+        model = Bill
+        fields = ['consumption', 'price', 'cost', 'service']
+        widgets = {
+            "consumption": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите расход",
+                }
+            ),
+            "price": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите расход",
+                }
+            ),
+            "cost": NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите расход",
+                }
+            ),
+            "service": Select(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите расход",
+                },
+                choices=[(0, "Выбирите...")]
+            ),
+        }
+
+
+class BillUpdateForm(BillForm):
+    class Meta(BillForm.Meta):
+        model = Bill
+        fields = BillForm.Meta.fields + ['receipt']

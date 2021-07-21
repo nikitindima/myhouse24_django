@@ -1,3 +1,5 @@
+import datetime
+
 from django import template
 
 from src.admin_panel.services.user_passes_test import check_access
@@ -19,12 +21,15 @@ def cool_phone_number(value):
 
 @register.filter(name="get_id")
 def get_id(value):
-    return str(value).split("-")[1]
+    try:
+        result = str(value).split("-")[1]
+    except IndexError:
+        result = value
+    return result
 
 
 @register.filter(name="get_unique_houses")
 def get_unique_houses(value):
-    print(value)
     return value.distinct("house")
 
 

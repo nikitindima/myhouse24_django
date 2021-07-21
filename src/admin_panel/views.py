@@ -1,6 +1,8 @@
 import io
+import json
 import os
 import random
+from django.db.models import Value
 from ast import literal_eval
 from binascii import hexlify
 from datetime import timedelta
@@ -9,7 +11,12 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sitemaps import ping_google
+from django.core.mail import send_mail
+from django.core.serializers import serialize
+from django.db import models
 from django.db.models import Max, Prefetch
+from django.db.models.functions import Concat
+from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -30,7 +37,8 @@ from .forms import (
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
     StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
-    AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm, MeterDataForm,
+    AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm, MeterDataForm, ReceiptCreateForm,
+    BillForm, BillUpdateForm, HouseStaffForm,
 )
 from .models import (
     SiteHomePage,
@@ -43,7 +51,7 @@ from .models import (
     House,
     Section,
     Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt, Transaction,
-    MeterData,
+    MeterData, Bill, HouseStaff,
 )
 from .services.forms_services import (
     validate_forms,
@@ -53,7 +61,7 @@ from .services.forms_services import (
 )
 from .services.site_pages_services import (
     get_or_create_page_object,
-    create_forms,
+    create_form_with_seo,
     create_formset_and_save_to_m2m_field,
     save_new_objects_to_many_to_many_field,
 )
@@ -75,7 +83,7 @@ def home_view(request):
 @user_passes_test(site_access)
 def site_home_view(request):
     obj = get_or_create_page_object(SiteHomePage)
-    form1, seo_data_form = create_forms(request, obj, SiteHomeForm)
+    form1, seo_data_form = create_form_with_seo(request, obj, SiteHomeForm)
     formset = create_formset_and_save_to_m2m_field(request, obj.around_us, Article)
 
     if request.method == "POST":
@@ -101,7 +109,7 @@ def site_home_view(request):
 @user_passes_test(site_access)
 def site_about_view(request):
     obj = get_or_create_page_object(SiteAboutPage)
-    form1, seo_data_form = create_forms(request, obj, SiteAboutForm)
+    form1, seo_data_form = create_form_with_seo(request, obj, SiteAboutForm)
     formset = create_formset_and_save_to_m2m_field(request, obj.docs, Document)
 
     if request.method == "POST":
@@ -142,7 +150,7 @@ def site_about_view(request):
 @user_passes_test(site_access)
 def site_services_view(request):
     obj = get_or_create_page_object(SiteServicesPage)
-    seo_data_form = create_forms(request, obj, only_seo=True)
+    seo_data_form = create_form_with_seo(request, obj, only_seo=True)
     formset = create_formset_and_save_to_m2m_field(request, obj.services, Article)
 
     if request.method == "POST":
@@ -180,7 +188,7 @@ def site_services_view(request):
 @user_passes_test(site_access)
 def site_contacts_view(request):
     obj = get_or_create_page_object(SiteContactsPage)
-    form1, seo_data_form = create_forms(request, obj, SiteContactsForm)
+    form1, seo_data_form = create_form_with_seo(request, obj, SiteContactsForm)
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1, seo_data_form)
@@ -265,14 +273,20 @@ class HouseListView(ListView):
 def house_create_view(request):
     errors = []
     form1 = HouseCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+    formset2_factory = formset_factory(HouseStaffForm, extra=0)
 
     if request.method == "POST":
         formset = create_formset(SectionForm, request, post=True)
+        formset2 = formset2_factory(request.POST or None, prefix='house-staff')
         errors = formset.errors
-        forms_valid_status = validate_forms(form1, formset)
+        forms_valid_status = validate_forms(form1, formset, formset2)
 
         if forms_valid_status:
             house = form1.save(commit=True)
+
+            for form in formset2:
+                user = form.cleaned_data.get('house_staff')
+                house.house_staff.add(user)
 
             save_extra_forms(formset, Section, house=house)
 
@@ -288,10 +302,11 @@ def house_create_view(request):
             ]
 
     formset = create_formset(SectionForm, request)
-
+    formset2 = formset2_factory(prefix='house-staff')
     context = {
         "form1": form1,
         "formset": formset,
+        "formset2": formset2,
     }
     return render(request, "admin_panel/pages/house_create.html", context=context)
 
@@ -321,14 +336,21 @@ def house_update_view(request, pk):
     )
 
     if request.method == "POST":
-        forms_valid_status = validate_forms(form1, formset)
+        formset2 = create_formset(HouseStaffForm, request, post=True, qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'),
+                                  prefix="house-staff")
+        forms_valid_status = validate_forms(form1, formset, formset2)
 
         if forms_valid_status:
             save_forms(form1)
+
             for form in formset:
                 if form.cleaned_data.get("id") is not None:
                     if form.cleaned_data.get("name"):
                         form.save()
+
+            for form in formset2.extra_forms:
+                user = form.cleaned_data.get('house_staff')
+                house.house_staff.add(user)
 
             save_extra_forms(formset, Section, house=house)
 
@@ -338,10 +360,13 @@ def house_update_view(request, pk):
 
         messages.error(request, f"Ошибка при сохранении формы.")
 
+    formset2 = create_formset(HouseStaffForm, request, qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'), prefix="house-staff")
+
     context = {
         "object": house,
         "form1": form1,
         "formset": formset,
+        "formset2": formset2
     }
     return render(request, "admin_panel/pages/house_update.html", context=context)
 
@@ -462,6 +487,15 @@ class FlatDeleteView(DeleteView):
 # endregion PROPERTY
 
 # region API
+def api_house_staff_delete(request):
+    staff_id = request.GET.get('staff', None)
+
+    if staff_id is not None:
+        staff = HouseStaff.objects.filter(id=staff_id)
+        staff.delete()
+
+    return JsonResponse({"results": 'ok'})
+
 
 def api_houses(request):
     search = request.GET.get('search', None)
@@ -481,7 +515,7 @@ def api_houses(request):
 
 def api_sections(request, pk):
     search = request.GET.get('search', None)
-    sections = Section.objects.\
+    sections = Section.objects. \
         prefetch_related('section_flats').filter(house=pk, section_flats__isnull=False).distinct().order_by('id')
     results = []
 
@@ -526,14 +560,31 @@ def api_users(request):
 
 
 def api_staff(request):
-    users = User.objects.filter(is_staff=True, is_superuser=False)
+    users = User.objects.filter(is_staff=True, is_superuser=False).annotate(
+        user_full_name=Concat('last_name', Value(' '), 'first_name', Value(' '), 'patronymic'))
     results = []
 
+    search = request.GET.get('search', None)
+    if search is not None:
+        users = users.filter(user_full_name__icontains=search)
+
     for user in users:
-        data = user.serialize(pattern="select2-staff")
+        data = user.serialize(pattern="select2")
         results.append(data)
 
     return JsonResponse({"results": results})
+
+
+def api_get_staff_role(request):
+    user_id = request.GET.get('user_id', None)
+
+    if user_id is not None:
+        user = User.objects.filter(is_staff=True, is_superuser=False, id=user_id).select_related('role').last()
+        role = user.role.name
+    else:
+        role = 'none'
+
+    return JsonResponse({"results": role})
 
 
 def api_flats(request):
@@ -567,6 +618,44 @@ def api_delete_messages(request):
     return JsonResponse({"results": "Success"})
 
 
+def api_delete_receipts(request):
+    id_list = literal_eval(request.GET.get('id_list', None))
+    Receipt.objects.filter(pk__in=id_list).delete()
+    return JsonResponse({"results": "Success"})
+
+
+def api_get_services_from_tariff(request):
+    tariff_id = request.GET.get('tariff_id', None)
+
+    if tariff_id not in ['', None]:
+        tariff = get_object_or_404(Tariff, pk=tariff_id)
+        services = tariff.service_price.select_related("service__measure")
+        data = serialize('json', services)
+        results = json.loads(data)
+    else:
+        results = 'none'
+
+    return JsonResponse({"results": results})
+
+
+def api_get_meter_data(request):
+    service_id = request.GET.get('service_id', None)
+    flat_id = request.GET.get('flat_id', None)
+
+    if service_id not in ['', None] and flat_id not in ['', None]:
+        service = get_object_or_404(Service, pk=service_id)
+        flat = get_object_or_404(Flat, pk=flat_id)
+        meter_data = MeterData.objects.filter(service=service, flat=flat, status='NEW')
+        if meter_data.exists():
+            results = meter_data.last().amount
+        else:
+            results = 'none'
+    else:
+        results = 'none'
+
+    return JsonResponse({"results": results})
+
+
 def api_new_users(request):
     day_today = today(tzinfo=utc)
     day_week_ago = today(tzinfo=utc) - timedelta(days=7)
@@ -583,11 +672,40 @@ def api_new_users(request):
     return JsonResponse({"results": results})
 
 
+def api_get_owner(request):
+    flat_id = request.GET.get('flat_id', None)
+
+    if flat_id is not None:
+        flat = get_object_or_404(Flat, pk=flat_id)
+        owner = flat.owner
+
+    else:
+        raise Exception('Function api_accounts does not get user_id or flat_id')
+
+    results = {
+        'id': str(owner.id),
+        'name': owner.full_name,
+        'phone': str(owner.phone)
+    }
+    print(results)
+    return JsonResponse({"results": results})
+
+
 def api_accounts(request):
     user_id = request.GET.get('user_id', None)
-    user = get_object_or_404(User, pk=user_id)
-    accounts = Account.objects.select_related('account_flat__owner').filter(account_flat__owner=user)
+    flat_id = request.GET.get('flat_id', None)
     results = []
+
+    if user_id is not None:
+        user = get_object_or_404(User, pk=user_id)
+        accounts = Account.objects.select_related('account_flat__owner').filter(account_flat__owner=user)
+
+    elif flat_id is not None:
+        flat = get_object_or_404(Flat, pk=flat_id)
+        accounts = Account.objects.select_related('account_flat__owner').filter(account_flat=flat)
+
+    else:
+        raise Exception('Function api_accounts does not get user_id or flat_id')
 
     for account in accounts:
         data = account.serialize(pattern="select2")
@@ -607,6 +725,23 @@ def api_transaction_types(request):
 
     return JsonResponse({"results": results})
 
+
+# def api_meter_data_by_flat(request):
+#     flat_id = request.GET.get('flat_id', None)
+#     results = []
+#     queryset = MeterData.objects.select_related('service', 'flat__house', 'flat__section',
+#                                                 'service__measure').order_by('-id')
+#
+#     if flat_id is not None:
+#         flat = get_object_or_404(Flat, pk=flat_id)
+#         queryset = queryset.filter(flat=flat)
+
+# for object in queryset:
+#     data = {
+#         'number': object.number
+#     }
+
+# return JsonResponse({"results": queryset})
 # endregion API
 
 # region USERS
@@ -1430,7 +1565,7 @@ class MeterDataDeleteView(DeleteView):
 @user_passes_test(meter_data_access)
 def meter_data_update_view(request, pk):
     obj = MeterData.objects.filter(pk=pk).select_related('service', 'flat__house', 'flat__section',
-                                                                    'service__measure')[0]
+                                                         'service__measure')[0]
     form1 = MeterDataForm(request.POST or None, prefix="form1", instance=obj)
 
     if request.method == "POST":
@@ -1461,30 +1596,112 @@ def meter_data_update_view(request, pk):
 
 @method_decorator(user_passes_test(receipt_access), name='dispatch')
 class ReceiptListView(ListView):
-    queryset = Receipt.objects.select_related('account').order_by('-created')
+    queryset = Receipt.objects.select_related('account__account_flat__owner').prefetch_related('bill_receipt') \
+        .annotate(total_price=models.Sum('services__bill_service__cost')).order_by('-created')
     template_name = "admin_panel/pages/receipt_list.html"
 
 
 @user_passes_test(receipt_access)
 def receipt_create_view(request):
-    form1 = ReceiptCreateForm(request.POST or None, prefix="form1")
+    receipt_id = request.GET.get('receipt_id', None)
+    receipt, owner = None, None
+
+    number = generate_random_number_for_model_field(model=Receipt, field='number', length=8)
+    form1_initial = {"number": number}
+
+    formset = create_formset(BillForm, request, post=True, prefix='formset', can_delete=True)
+    meter_data_qs = MeterData.objects.select_related('service', 'flat__house', 'flat__section',
+                                                     'service__measure').order_by('-id')
+
+    if receipt_id is not None:
+        receipt = get_object_or_404(Receipt, pk=receipt_id)
+        flat = receipt.account.account_flat
+        bills = Bill.objects.filter(receipt=receipt)
+        formset.queryset = bills
+        form1_initial.update({
+            "is_passed": receipt.is_passed,
+            "created": today(),
+            "account": receipt.account,
+            "tariff": receipt.tariff,
+            "status": receipt.status,
+            "period_start": receipt.period_start,
+            "period_end": receipt.period_end,
+        })
+        owner = receipt.account.account_flat.owner
+        meter_data_qs = meter_data_qs.filter(flat=flat)
 
     if request.method == "POST":
-        forms_valid_status = validate_forms(form1)
+        form1 = ReceiptCreateForm(request.POST, prefix="form1")
+        forms_valid_status = validate_forms(form1, formset)
 
         if forms_valid_status:
-            save_forms(form1)
+            receipt = form1.save()
+
+            for form in formset:
+                consumption = form.cleaned_data.get('consumption')
+                price = form.cleaned_data.get('price')
+                cost = form.cleaned_data.get('cost')
+                service = form.cleaned_data.get('service')
+
+                if all([consumption is not None, price is not None, service is not None, cost is not None]):
+                    bill = Bill(consumption=consumption, price=price, cost=cost, service=service, receipt=receipt)
+                    bill.save()
 
             messages.success(request, "Данные успешно cохранены.")
 
-            return redirect("admin_panel:transaction_list")
+            return redirect("admin_panel:receipt_list")
 
         messages.error(request, f"Ошибка при сохранении формы.")
 
+    form1 = ReceiptCreateForm(initial=form1_initial, prefix="form1")
+
     context = {
         "form1": form1,
+        "formset": formset,
+        "meter_data_qs": meter_data_qs,
+        "receipt": receipt,
+        "owner": owner
     }
-    return render(request, "admin_panel/pages/transaction_expense_create.html", context=context)
+
+    return render(request, "admin_panel/pages/receipt_create.html", context=context)
+
+
+@user_passes_test(receipt_access)
+def receipt_update_view(request, pk):
+    receipt = Receipt.objects.filter(pk=pk).select_related('account__account_flat__house',
+                                                           'account__account_flat__section',
+                                                           'account__account_flat__owner').last()
+    flat = receipt.account.account_flat
+    owner = flat.owner
+    bills = Bill.objects.filter(receipt=receipt)
+
+    formset = create_formset(BillUpdateForm, request, post=True, prefix='formset', qs=bills, can_delete=True)
+    meter_data_qs = MeterData.objects.filter(flat=flat).select_related('service', 'flat__house', 'flat__section',
+                                                                       'service__measure').order_by('-id')
+
+    if request.method == "POST":
+        form1 = ReceiptCreateForm(request.POST, prefix="form1", instance=receipt)
+        forms_valid_status = validate_forms(form1, formset)
+
+        if forms_valid_status:
+            save_forms(form1, formset)
+
+            messages.success(request, "Данные успешно cохранены.")
+
+            return redirect("admin_panel:receipt_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    form1 = ReceiptCreateForm(prefix="form1", instance=receipt)
+
+    context = {
+        "form1": form1,
+        "formset": formset,
+        "meter_data_qs": meter_data_qs,
+        "receipt": receipt,
+        "owner": owner
+    }
+    return render(request, "admin_panel/pages/receipt_update.html", context=context)
 
 
 @method_decorator(user_passes_test(receipt_access), name='dispatch')

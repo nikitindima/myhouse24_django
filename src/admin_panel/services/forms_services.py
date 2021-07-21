@@ -79,9 +79,9 @@ def validate_image(form, name, max_size=None):
             raise forms.ValidationError("Вы можете загружать только изображения")
 
 
-def create_formset(form, request, post=False, qs=None, can_delete=False, prefix='formset_sections', files=False):
+def create_formset(form, request, post=False, qs=None, can_delete=False, prefix='formset_sections', files=False, extra=0):
     formset_factory = modelformset_factory(
-        model=form.Meta.model, form=form, extra=0, can_delete=can_delete
+        model=form.Meta.model, form=form, can_delete=can_delete, extra=extra
     )
     formset = formset_factory(
         request.POST or None,

@@ -21,12 +21,12 @@
 
     <div class="content-wrapper" style="min-height: 867px;">
         <section class="content-header">
-            <h1>Новая квитанция</h1>
+            <h1>Квитанция {{ receipt.number }}</h1>
 
             <ul class="breadcrumb">
                 <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
                 <li><a href="{% url 'admin_panel:receipt_list' %}">Квитанции</a></li>
-                <li class="active">Новая квитанция</li>
+                <li class="active">Квитанция {{ receipt.number }}</li>
             </ul>
         </section>
 
@@ -62,9 +62,8 @@
                                     Выберите действие <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#!" class="set-tariff-services">Выставить все услуги согласно
-                                        тарифу</a></li>
-                                    <li><a href="#!" class="add-counters">Добавить показания счетчиков</a></li>
+                                    <li><a href="{% url 'admin_panel:receipt_create' %}?receipt_id={{ receipt.id }}" class="add-counters">Копировать</a></li>
+                                    <li><a href="#!" class="add-counters">Удалить</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -159,12 +158,17 @@
 
                                             {{ formset.management_form }}
                                             <div id="can-delete-list"></div>
+
                                             {% for form in formset %}
                                                 {% for hidden in form.hidden_fields %}
                                                     {{ hidden }}
                                                 {% endfor %}
-                                                <tr id="{{ form.consumption.auto_id|get_id }}" class="">
+
+                                                <tr id="{{ form.receipt.auto_id|get_id }}" class="">
                                                     <td>
+                                                        <input type="hidden" id="{{ form.receipt.auto_id }}"
+                                                               name="{{ form.receipt.html_name }}"
+                                                               value="{{ receipt.id }}">
                                                         {{ form.service }}
                                                     <td>
                                                         {{ form.consumption }}
@@ -215,8 +219,11 @@
 
                                         <table style="display:none">
                                             <tbody id="formset-empty-form">
-                                            <tr id="{{ formset.empty_form.consumption.auto_id|get_id }}">
+                                            <tr id="{{ formset.empty_form.receipt.auto_id|get_id }}">
                                                 <td>
+                                                    <input type="hidden" id="{{ formset.empty_form.receipt.auto_id }}"
+                                                           name="{{ formset.empty_form.receipt.html_name }}"
+                                                           value="{{ receipt.id }}">
                                                     {{ formset.empty_form.service }}
                                                 </td>
                                                 <td>
@@ -254,7 +261,8 @@
                             <div class="row">
                                 <div class="col-xs-12 text-right">
                                     <div class="form-group">
-                                        <a href="{% url 'admin_panel:receipt_create' %}" class="btn btn-default">Отменить</a>
+                                        <a href="{% url 'admin_panel:receipt_update' receipt.pk %}"
+                                           class="btn btn-default">Отменить</a>
                                         <button type="submit" id="submit-button" class="btn btn-success">Сохранить
                                         </button>
                                     </div>
@@ -517,6 +525,7 @@
                 })
                 {#add_formset_form(counter, form_counters);#}
             })
+
             {% if receipt != None %}
                 let data_house = {
                     id: {{ receipt.account.account_flat.house.id }},
@@ -682,7 +691,6 @@
             })
         }
 
-
         function add_formset_form(data = null) {
             form_counters++
             $('#formset-rows').append($('#formset-empty-form').html().replace(/__prefix__/g, (form_counters - 1)));
@@ -692,7 +700,6 @@
             let form_price = $('#id_formset-' + (form_counters - 1) + '-price')
             let form_consumption = $('#id_formset-' + (form_counters - 1) + '-consumption')
             let form_cost = $('#id_formset-' + (form_counters - 1) + '-cost')
-            let measure = $('#measure-' + (form_counters - 1) + ' > option:nth-child(1)')
 
             form_service.select2({
                 theme: 'bootstrap',
@@ -703,7 +710,6 @@
                 form_service.val(data.service).trigger('change')
                 form_price.val(data.price)
             }
-
             add_event_listeners_to_formset_forms(form_consumption, form_price, form_cost);
         }
 

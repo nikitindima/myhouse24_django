@@ -82,7 +82,7 @@ def create_gallery_formset(obj_field, request):
     return formset
 
 
-def create_forms(request, obj, form=None, only_seo=False):
+def create_form_with_seo(request, obj, form=None, only_seo=False):
     seo_data_form = SeoDataForm(
         request.POST or None,
         request.FILES or None,

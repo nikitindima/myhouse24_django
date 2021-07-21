@@ -8,6 +8,8 @@
 {% block title %}Новый дом{% endblock %}
 
 {% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -122,8 +124,7 @@
                                     <ul class="nav nav-tabs">
                                         <li class="active"><a href="#tab-sections" data-toggle="tab"
                                                               aria-expanded="true">Секции</a></li>
-                                        {#                                        <li><a href="#tab-floors" data-toggle="tab" aria-expanded="false">Этажи</a></li>#}
-                                        <li><a href="#tab-houseuseradmins" data-toggle="tab" aria-expanded="false">Пользователи</a>
+                                        <li><a href="#tab-house-staff" data-toggle="tab" aria-expanded="false">Пользователи</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content">
@@ -161,54 +162,118 @@
                                                     </div>
                                                 {% endfor %}
                                             </div>
-
-                                            <div id="form-section-empty-form" style="display: none;">
-
-                                                <div class="row form-section"
-                                                     id="section-{{ formset.empty_form.name.auto_id|get_id }}">
-                                                    <div class="col-xs-12">
-                                                        <div class="form-group">
-                                                            <div class="input-group">
-                                                                <div class="col-xs-8 cols-sm-12">
-                                                                    {{ formset.empty_form.name.label_tag }}
-                                                                    {{ formset.empty_form.name }}
-                                                                </div>
-                                                                <div class="col-xs-4 cols-sm-12">
-                                                                    {{ formset.empty_form.floors.label_tag }}
-                                                                    {{ formset.empty_form.floors }}
-                                                                </div>
-                                                                <div class="input-group-btn">
-                                                                    <button type="button" style="bottom: -11px;"
-                                                                            onclick="delete_parent(this, 4)"
-                                                                            class="btn btn-danger form-row-remove-btn">
-                                                                        <i class="fa fa-trash"></i></button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
                                             <button class="btn btn-success pull-right form-row-add-section-btn"
                                                     type="button">Добавить
                                             </button>
                                         </div>
 
-                                        {#                                        <div class="tab-pane clearfix" id="tab-floors">#}
-                                        {#                                            <div id="form-floor-rows">#}
-                                        {#                                            </div>#}
-                                        {#                                            <button class="btn btn-success pull-right form-row-add-floor-btn"#}
-                                        {#                                                    type="button">Добавить#}
-                                        {#                                            </button>#}
-                                        {#                                        </div>#}
+                                        <div class="tab-pane clearfix" id="tab-house-staff">
+                                            {{ formset2.management_form }}
+                                            <div id="form-house-staff-rows" class="form-group">
+                                                {% for form in formset2 %}
+                                                    {% for hidden in form.hidden_fields %}
+                                                        {{ hidden }}
+                                                    {% endfor %}
+                                                    <div class="row form-section"
+                                                         id="house-staff-{{ form.house_staff.auto_id|get_id }}">
+                                                <div class="col-xs-12">
+                                                    <div id="form-houseuseradmin-1"
+                                                         class="row form-houseuseradmin">
 
-                                        <div class="tab-pane clearfix" id="tab-houseuseradmins">
-                                            <div id="form-houseuseradmin-rows">
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <div class="form-group">
+                                                                {{ form.house_staff|as_crispy_field }}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-xs-12 col-sm-5">
+                                                            <div class="form-group">
+                                                                <label for="{{ form.house_staff.auto_id }}-role">Роль</label>
+                                                                <div class="input-group">
+                                                                    <input type="text"
+                                                                           class="form-control useradmin-role"
+                                                                           id="{{ form.house_staff.auto_id }}-role"
+                                                                           value=""
+                                                                           readonly="">
+                                                                    <span class="input-group-btn">
+                                                                        <button type="button"
+                                                                                onclick="delete_parent(this, 4)"
+                                                                                class="btn btn-danger form-row-remove-btn">
+                                                                            <i class="fa fa-trash"></i></button>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                    </div>
+                                                {% endfor %}
                                             </div>
-                                            <button class="btn btn-success pull-right form-row-add-houseuseradmin-btn"
+                                            <button class="btn btn-success pull-right form-row-add-house-staff-btn"
                                                     type="button">Добавить
                                             </button>
+                                        </div>
+
+                                        <div id="form-section-empty-form" style="display: none;">
+                                            <div class="row form-section"
+                                                 id="section-{{ formset.empty_form.name.auto_id|get_id }}">
+                                                <div class="col-xs-12">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <div class="col-xs-8 cols-sm-12">
+                                                                {{ formset.empty_form.name.label_tag }}
+                                                                {{ formset.empty_form.name }}
+                                                            </div>
+                                                            <div class="col-xs-4 cols-sm-12">
+                                                                {{ formset.empty_form.floors.label_tag }}
+                                                                {{ formset.empty_form.floors }}
+                                                            </div>
+                                                            <div class="input-group-btn">
+                                                                <button type="button" style="bottom: -11px;"
+                                                                        onclick="delete_parent(this, 4)"
+                                                                        class="btn btn-danger form-row-remove-btn">
+                                                                    <i class="fa fa-trash"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="form-staff-empty-form" style="display: none;">
+                                            <div class="row form-section">
+                                                <div class="col-xs-12">
+                                                    <div id="form-houseuseradmin-1"
+                                                         class="row form-houseuseradmin">
+
+                                                        <div class="col-xs-12 col-sm-7">
+                                                            <div class="form-group">
+                                                                {{ formset2.empty_form.house_staff|as_crispy_field }}
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-xs-12 col-sm-5">
+                                                            <div class="form-group">
+                                                                <label for="{{ formset2.empty_form.house_staff.auto_id }}-role">Роль</label>
+                                                                <div class="input-group">
+                                                                    <input type="text"
+                                                                           class="form-control useradmin-role"
+                                                                           id="{{ formset2.empty_form.house_staff.auto_id }}-role"
+                                                                           value=""
+                                                                           readonly="">
+                                                                    <span class="input-group-btn">
+                                                                        <button type="button"
+                                                                                onclick="delete_parent(this, 4)"
+                                                                                class="btn btn-danger form-row-remove-btn">
+                                                                            <i class="fa fa-trash"></i></button>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
 
                                     </div>
@@ -232,11 +297,16 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         let section_empty_field = document.getElementById('id_formset_sections-__prefix__-floors')
         section_empty_field.setAttribute('min', '1')
         let sections_form_counters = $('#id_formset_sections-TOTAL_FORMS').val()
         let sections_form_initial = $('#id_formset_sections-INITIAL_FORMS').val()
+
+        let house_staff_counters = $('#id_house-staff-TOTAL_FORMS').val()
+        let house_staff_initial = $('#id_house-staff-INITIAL_FORMS').val()
 
         $('.form-row-add-section-btn').click(function () {
             sections_form_counters++
@@ -252,6 +322,46 @@
 
             let new_section_name_field = document.getElementById('id_formset_sections-' + (sections_form_counters - 1) + '-name')
             new_section_name_field.value = 'Секция ' + sections_form_counters
+        })
+        $('.form-row-add-house-staff-btn').click(function () {
+            house_staff_counters++
+            $('#form-house-staff-rows').append($('#form-staff-empty-form').html().replace(/__prefix__/g, (house_staff_counters - 1)));
+            $('#id_house-staff-TOTAL_FORMS').val(house_staff_counters);
+
+            let select_house_staff = $('#id_house-staff-' + (house_staff_counters - 1) + '-house_staff')
+
+            select_house_staff.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '{% url 'admin_panel:api_staff' %}';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            })
+
+            let newOptionStaff = new Option('Выберите...', '0', false, false);
+            select_house_staff.append(newOptionStaff).val(0).trigger('change')
+            let select_house_staff_role = $('#id_house-staff-' + (house_staff_counters - 1) + '-house_staff-role')
+
+            select_house_staff.on("select2:select", function () {
+                $.ajax({
+                    url: '{% url 'admin_panel:api_get_staff_role' %}',
+                    data: {
+                        'user_id': select_house_staff.val(),
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        select_house_staff_role.val(data.results)
+                    }
+                });
+            });
         })
 
         function delete_parent(elem, level) {

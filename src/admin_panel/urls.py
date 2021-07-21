@@ -13,6 +13,7 @@ urlpatterns = [
 
     path("receipts/", views.ReceiptListView.as_view(), name="receipt_list"),
     path("receipts/create/", views.receipt_create_view, name="receipt_create"),
+    path("receipts/update/<int:pk>/", views.receipt_update_view, name="receipt_update"),
     path("receipts/delete/<int:pk>/", views.ReceiptDeleteView.as_view(), name="receipt_delete"),
 
     path("accounts/", views.AccountListView.as_view(), name="account_list"),
@@ -49,7 +50,7 @@ urlpatterns = [
     path("website/update-sitemap/", views.update_sitemap_view, name="update_sitemap"),
     path("website/delete-gallery-image/<int:pk>/", views.GalleryImageDeleteView.as_view(), name="delete_gallery_image"),
     path("website/delete-document/<int:pk>/", views.DocumentDeleteView.as_view(), name="delete_document"),
-    path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article", ),
+    path("website/delete-article/<int:pk>/", views.ArticleDeleteView.as_view(), name="delete_article"),
 
     path("api/houses/", views.api_houses, name="api_houses"),
     path("api/sections/<int:pk>/", views.api_sections, name="api_sections"),
@@ -58,10 +59,16 @@ urlpatterns = [
     path("api/users/new/", views.api_new_users, name="api_new_users"),
     path("api/measure/", views.api_measure_name, name="api_measure_name"),
     path("api/flats/", views.api_flats, name="api_flats"),
-    path("api/messages/delete/", views.api_delete_messages, name="api_delete_messages"),
     path("api/accounts/", views.api_accounts, name="api_accounts"),
     path("api/transaction-types/", views.api_transaction_types, name="api_transaction_types"),
     path("api/staff/", views.api_staff, name="api_staff"),
+    path("api/get_owner/", views.api_get_owner, name="api_get_owner"),
+    path("api/messages/delete/", views.api_delete_messages, name="api_delete_messages"),
+    path("api/receipts/delete/", views.api_delete_receipts, name="api_delete_receipts"),
+    path("api/services/", views.api_get_services_from_tariff, name="api_get_services_from_tariff"),
+    path("api/meter_data/", views.api_get_meter_data, name="api_get_meter_data"),
+    path("api/get_staff_role/", views.api_get_staff_role, name="api_get_staff_role"),
+    path("api/api_house_staff_delete/", views.api_house_staff_delete, name="api_house_staff_delete"),
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),

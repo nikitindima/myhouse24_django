@@ -154,15 +154,6 @@
                 }
             });
 
-            {#let data = {#}
-            {#    id: 0,#}
-            {#    text: 'Всем...'#}
-            {#let newOption = new Option(data.text, data.id, false, false);#}
-            {#select_house.append(newOption).val(data.id).trigger('change')#}
-            {#select_section.append(newOption).val(data.id).trigger('change')#}
-            {#select_floor.append(newOption).val(data.id).trigger('change')#}
-            {#select_flat.append(newOption).val(data.id).trigger('change')#}
-
             select_house.on("select2:select", function () {
                 select_section.select2("val", 0)
                 select_floor.select2("val", '0')

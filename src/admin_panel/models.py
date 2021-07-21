@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import DateRangeField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import ManyToManyField
+from django.db.models import ManyToManyField, DateField
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
 
@@ -149,12 +149,13 @@ class SiteContactsPage(models.Model):
 # endregion SITE_CONTROL
 
 # region PROPERTY
+
 class House(models.Model):
     upload_path = os.path.join(MEDIA_ROOT, "images", "houses")
 
     name = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=300, null=True, blank=True)
-    house_staff = models.ManyToManyField(User)
+    house_staff = models.ManyToManyField(User, null=True, blank=True, through="HouseStaff")
     image1 = models.ImageField(
         upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
     )
@@ -177,6 +178,11 @@ class House(models.Model):
 
     def __str__(self):
         return self.name or ""
+
+
+class HouseStaff(models.Model):
+    house = models.ForeignKey(House, on_delete=models.CASCADE)
+    house_staff = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Section(models.Model):
@@ -261,8 +267,10 @@ class Receipt(models.Model):
 
     number = models.CharField(max_length=40, unique=True)
     is_passed = models.BooleanField()
-    period = DateRangeField()
-    created = models.DateTimeField()
+
+    period_start = models.DateField()
+    period_end = models.DateField()
+    created = models.DateField()
 
     status = models.CharField(max_length=11, choices=ReceiptStatus.choices)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -274,8 +282,8 @@ class Bill(models.Model):
     consumption = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
-    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, related_name='bill_receipt')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bill_service')
 
 
 class MeterData(models.Model):
