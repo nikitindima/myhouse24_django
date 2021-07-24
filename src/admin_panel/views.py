@@ -1,20 +1,17 @@
-import io
 import json
-import os
-import random
-from django.db.models import Value
 from ast import literal_eval
-from binascii import hexlify
 from datetime import timedelta
 
+from dateutil.utils import today
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sitemaps import ping_google
-from django.core.mail import send_mail
 from django.core.serializers import serialize
 from django.db import models
 from django.db.models import Max, Prefetch
+from django.db.models import Value, Sum
 from django.db.models.functions import Concat
 from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponse
@@ -22,9 +19,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.timezone import utc
-from django.views.generic import DeleteView, ListView, DetailView, CreateView
-from dateutil.utils import today
-from xlsxwriter.workbook import Workbook
+from django.views.generic import DeleteView, ListView, DetailView
 
 from .forms import (
     SiteHomeForm,
@@ -36,9 +31,9 @@ from .forms import (
     FlatUpdateForm,
     UserCreateForm,
     UserUpdateForm, MeasureForm, ServiceForm, TariffForm, ServicePriceForm, UserRoleForm, StaffCreateForm,
-    StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountForm, AccountCreateForm,
+    StaffUpdateForm, CredentialsForm, TransactionTypeForm, MessageForm, AccountCreateForm,
     AccountUpdateForm, TransactionIncomeCreateForm, TransactionExpenseCreateForm, MeterDataForm, ReceiptCreateForm,
-    BillForm, BillUpdateForm, HouseStaffForm,
+    BillForm, BillUpdateForm, HouseStaffForm, CallRequestForm,
 )
 from .models import (
     SiteHomePage,
@@ -51,7 +46,7 @@ from .models import (
     House,
     Section,
     Flat, Measure, Service, Tariff, CompanyCredentials, TransactionType, Message, Account, Receipt, Transaction,
-    MeterData, Bill, HouseStaff,
+    MeterData, Bill, HouseStaff, CallRequest,
 )
 from .services.forms_services import (
     validate_forms,
@@ -67,16 +62,36 @@ from .services.site_pages_services import (
 )
 from .services.user_passes_test import site_access, house_user_access, statistics_access, flat_access, service_access, \
     tariff_access, role_access, staff_access, house_access, payments_detail_access, message_access, account_access, \
-    cashbox_access, receipt_access, meter_data_access
+    cashbox_access, receipt_access, meter_data_access, call_request_access
 from .services.xls_services import make_in_memory_worksheet
 from ..users.models import UserRole
 
 User = get_user_model()
 
 
+@staff_member_required(login_url='account_login')
+def welcome_view(request):
+    return render(request, "admin_panel/pages/welcome.html")
+
+
 @user_passes_test(statistics_access)
-def home_view(request):
-    return render(request, "admin_panel/pages/home.html")
+def statistics_view(request):
+    houses_count = House.objects.count()
+    active_owners_count = User.objects.filter(status="ACTIVE", is_superuser=False, is_staff=False).count()
+    call_requests = CallRequest.objects.all()
+    call_requests_new_count = call_requests.filter(status="NEW").count()
+    call_requests_in_work_count = call_requests.filter(status="IN_WORK").count()
+    flats_count = Flat.objects.count()
+    accounts_count = Account.objects.filter(is_active="Active").count()
+    context = {
+        "houses_count": houses_count,
+        "active_owners_count": active_owners_count,
+        "call_requests_new_count": call_requests_new_count,
+        "call_requests_in_work_count": call_requests_in_work_count,
+        "flats_count": flats_count,
+        "accounts_count": accounts_count,
+    }
+    return render(request, "admin_panel/pages/statistics.html", context=context)
 
 
 # region SITE_CONTROL
@@ -336,7 +351,8 @@ def house_update_view(request, pk):
     )
 
     if request.method == "POST":
-        formset2 = create_formset(HouseStaffForm, request, post=True, qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'),
+        formset2 = create_formset(HouseStaffForm, request, post=True,
+                                  qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'),
                                   prefix="house-staff")
         forms_valid_status = validate_forms(form1, formset, formset2)
 
@@ -360,7 +376,9 @@ def house_update_view(request, pk):
 
         messages.error(request, f"Ошибка при сохранении формы.")
 
-    formset2 = create_formset(HouseStaffForm, request, qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'), prefix="house-staff")
+    formset2 = create_formset(HouseStaffForm, request,
+                              qs=HouseStaff.objects.filter(house=house).select_related('house_staff__role'),
+                              prefix="house-staff")
 
     context = {
         "object": house,
@@ -497,6 +515,25 @@ def api_house_staff_delete(request):
     return JsonResponse({"results": 'ok'})
 
 
+def api_statistics(request):
+    cash_box = Transaction.objects.select_related('transaction_type')
+    cash_box_income = cash_box.filter(transaction_type__type="INCOME").aggregate(Sum('amount'))
+    cash_box_expense = cash_box.filter(transaction_type__type="EXPENSE").aggregate(Sum('amount'))
+    cash_box_balance = "{:,}".format(cash_box_income['amount__sum'] - cash_box_expense['amount__sum'])
+
+    account_debt = "{:,}".format(0.00)
+
+    account_balance = Account.objects.all()
+    account_balance = "{:,}".format(0.00)
+
+    results = {
+        "cash_box_balance": cash_box_balance,
+        "account_debt": account_debt,
+        "account_balance": account_balance
+    }
+    return JsonResponse({"results": results})
+
+
 def api_houses(request):
     search = request.GET.get('search', None)
     houses = House.objects.all()
@@ -591,22 +628,69 @@ def api_flats(request):
     search = request.GET.get('search', None)
     floor = request.GET.get('floor', None)
     section_id = request.GET.get('section_id', None)
+    owner_id = request.GET.get('owner_id', None)
 
-    flats = Flat.objects.filter(section__id=section_id)
+    flats = Flat.objects.all()
 
-    if search is not None:
+    if search not in [None, '']:
         flats = flats.filter(number__icontains=search)
 
-    if floor is not None:
-        flats.filter(floor=floor)
+    if section_id not in [None, '']:
+        flats = flats.filter(section__id=section_id)
 
-    if search is not None:
-        flats.filter(number__icontains=search)
+    if floor not in [None, '']:
+        flats = flats.filter(floor=floor)
+
+    if owner_id not in [None, '']:
+        flats = flats.filter(owner__id=owner_id)
 
     results = []
 
     for flat in flats:
         data = flat.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
+def api_master(request):
+    search = request.GET.get('search', None)
+    master_type_id = request.GET.get('master_type_id', None)
+    flat_id = request.GET.get('flat_id', None)
+
+    masters = User.objects.filter(is_staff=True, is_superuser=False).select_related('role').exclude(
+        role__name__in=['Директор', 'Бухгалтер', 'Управляющий'])
+
+    if flat_id not in [None, '']:
+        masters = get_object_or_404(Flat, pk=flat_id).house.house_staff.all()
+
+    if search not in [None, '']:
+        masters = masters.filter(role__name__icontains=search)
+
+    if master_type_id not in [None, '']:
+        masters = masters.filter(role__id=master_type_id)
+
+    results = []
+
+    for master in masters:
+        data = master.serialize(pattern="select2")
+        results.append(data)
+
+    return JsonResponse({"results": results})
+
+
+def api_master_types(request):
+    search = request.GET.get('search', None)
+
+    roles = UserRole.objects.exclude(name__in=['Директор', 'Бухгалтер', 'Управляющий'])
+
+    if search not in [None, '']:
+        roles = roles.filter(name__icontains=search)
+
+    results = []
+
+    for role in roles:
+        data = role.serialize(pattern="select2")
         results.append(data)
 
     return JsonResponse({"results": results})
@@ -1248,7 +1332,8 @@ def message_create_view(request):
 @method_decorator(user_passes_test(account_access), name='dispatch')
 class AccountListView(ListView):
     queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__owner',
-                                              'account_flat__section')
+                                              'account_flat__section')\
+        .prefetch_related('receipt_account')
     template_name = "admin_panel/pages/account_list.html"
 
 
@@ -1328,7 +1413,6 @@ def account_update_view(request, pk):
 @method_decorator(user_passes_test(account_access), name='dispatch')
 class AccountDetailView(DetailView):
     template_name = "admin_panel/pages/account_detail.html"
-    # queryset = Account.objects.all()
     queryset = Account.objects.select_related('account_flat', 'account_flat__house', 'account_flat__section')
 
 
@@ -1597,7 +1681,7 @@ def meter_data_update_view(request, pk):
 @method_decorator(user_passes_test(receipt_access), name='dispatch')
 class ReceiptListView(ListView):
     queryset = Receipt.objects.select_related('account__account_flat__owner').prefetch_related('bill_receipt') \
-        .annotate(total_price=models.Sum('services__bill_service__cost')).order_by('-created')
+        .annotate(total_price=models.Sum('bill_receipt__cost')).order_by('-created')
     template_name = "admin_panel/pages/receipt_list.html"
 
 
@@ -1716,3 +1800,74 @@ class ReceiptDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+
+@method_decorator(user_passes_test(call_request_access), name='dispatch')
+class CallRequestListView(ListView):
+    model = CallRequest
+    template_name = "admin_panel/pages/call_request_list.html"
+
+
+@user_passes_test(call_request_access)
+def call_request_create_view(request):
+    form1 = CallRequestForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:call_request_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/call_request_create.html", context=context)
+
+
+@user_passes_test(call_request_access)
+def call_request_update_view(request, pk):
+    call_request = get_object_or_404(CallRequest, pk=pk)
+    form1 = CallRequestForm(request.POST or None, request.FILES or None, prefix="form1", instance=call_request)
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("admin_panel:call_request_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(request, "admin_panel/pages/call_request_update.html", context=context)
+
+
+@method_decorator(user_passes_test(call_request_access), name='dispatch')
+class CallRequestDeleteView(DeleteView):
+    model = CallRequest
+    success_url = reverse_lazy("admin_panel:call_request_list")
+    success_message = "Заявка успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
+@method_decorator(user_passes_test(account_access), name='dispatch')
+class CallRequestDetailView(DetailView):
+    queryset = CallRequest.objects.all()
+    template_name = "admin_panel/pages/call_request_detail.html"

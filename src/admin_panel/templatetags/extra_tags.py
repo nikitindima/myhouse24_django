@@ -2,6 +2,7 @@ import datetime
 
 from django import template
 
+from src.admin_panel.models import Flat
 from src.admin_panel.services.user_passes_test import check_access
 
 register = template.Library()
@@ -46,3 +47,9 @@ def check_user_access(user, variable):
 @register.filter(name="decimalFormat")
 def decimal_format(value):
     return "{:,}".format(value)
+
+
+@register.filter(name="get_flats")
+def get_flats(user):
+    flats = Flat.objects.filter(owner=user).select_related('house').order_by('id')
+    return flats

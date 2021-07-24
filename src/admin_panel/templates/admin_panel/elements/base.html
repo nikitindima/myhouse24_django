@@ -103,7 +103,7 @@
                                        href="{% url 'admin_panel:user_detail' user.pk %}">Профиль</a>
                                 </div>
                                 <div class="pull-right">
-                                    <a class="btn btn-default btn-flat" href="/admin_panel/site/logout"
+                                    <a class="btn btn-default btn-flat" href="{% url 'account_logout' %}"
                                        data-method="post">Выход</a>
                                 </div>
                             </li>
@@ -123,7 +123,7 @@
             <ul class="sidebar-menu" data-widget="tree">
                 {% if request.user|check_access:'statistics_access' == True %}
                     {#                {% if request.user.role.statistics_access == 'True' or request.user.is_superuser or request.user.role.name == 'Директор' %}#}
-                    <li class="{% block nav_item_home %}{% endblock %}"><a href="/admin_panel"><i
+                    <li class="{% block nav_item_statistics %}{% endblock %}"><a href="{% url 'admin_panel:home' %}"><i
                             class="fa fa-line-chart"></i> <span>Статистика</span></a>
                     </li>
                 {% endif %}
@@ -164,7 +164,7 @@
                     </li>
                 {% endif %}
                 {% if request.user|check_access:'call_request_access' == True %}
-                    <li><a href="/admin_panel/master-request/index"><i class="fa fa-wrench"></i>
+                    <li class="{% block nav_item_call_request_list %}{% endblock %}"><a href="{% url 'admin_panel:call_request_list' %}"><i class="fa fa-wrench"></i>
                         <span>Заявки вызова мастера</span></a></li>
                 {% endif %}
                 {% if request.user|check_access:'meter_data_access' == True %}

@@ -1,47 +1,132 @@
-{% extends "account/base.html" %}
-
+{% load extra_tags %}
+{% load static %}
 {% load i18n %}
 {% load account socialaccount %}
 {% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="ru-RU" style="height: auto; min-height: 100%;">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="icon" type="image/png" href="http://myhouse24.avada-media.ua/favicon.png">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="{% static 'admin_panel/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css' %}"
+          rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/Ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/css/AdminLTE.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/iCheck/flat/blue.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/css/all-skins.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/alertifyjs/css/alertify.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin_panel/plugins/alertifyjs/css/themes/default.min.css' %}" rel="stylesheet">
+    }
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"
+          rel="stylesheet">
+    <title>Вход</title>
+    <style type="text/css">.jqstooltip {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        visibility: hidden;
+        background: rgb(0, 0, 0) transparent;
+        background-color: rgba(0, 0, 0, 0.6);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+        color: white;
+        font: 10px arial, san serif;
+        text-align: left;
+        white-space: nowrap;
+        padding: 5px;
+        border: 1px solid white;
+        box-sizing: content-box;
+        z-index: 10000;
+    }
 
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
+    .jqsfield {
+        color: white;
+        font: 10px arial, san serif;
+        text-align: left;
+    }</style>
+</head>
+<body class="login-page" style="height: auto; min-height: 100%;">
+<div class="login-box">
+    <div class="login-logo">
+        <a href="{% url 'site:home' %}">
+            <img src="http://myhouse24.avada-media.ua/logo.svg" alt="logo">
+        </a>
+    </div>
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Для жильца</a></li>
+            <li><a href="#tab_2" data-toggle="tab" aria-expanded="true">Для администрации</a></li>
+        </ul>
+        <div class="tab-content">
 
-{% block inner %}
+            <div class="tab-pane active" id="tab_1">
+                <div class="login-box-body">
 
-<h1>{% trans "Sign In" %}</h1>
+                    <p class="login-box-msg">Вход в личный кабинет</p>
 
-{% get_providers as socialaccount_providers %}
+                    <form id="login-form login" action="{% url 'account_login' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{% url 'cabinet:home' %}"/>
+                        {{ form|crispy }}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <button type="submit" class="btn btn-primary btn-block" name="login-button">Вход
+                                </button>
+                            </div>
+                        </div>
 
-{% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one
-of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for a {{ site_name }} account and sign in below:{% endblocktrans %}</p>
+                    </form>
 
-<div class="socialaccount_ballot">
+                </div>
+            </div>
+            <div class="tab-pane" id="tab_2">
+                <div class="login-box-body">
 
-  <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  </ul>
+                    <p class="login-box-msg">Вход в личный кабинет</p>
 
-  <div class="login-or">{% trans 'or' %}</div>
+                    <form id="login-form login" action="{% url 'account_login' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{% url 'admin_panel:welcome' %}"/>
+                        {{ form|crispy }}
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <button type="submit" class="btn btn-primary btn-block" name="login-button">Вход
+                                </button>
+                            </div>
+                        </div>
 
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
-{% include "socialaccount/snippets/login_extra.html" %}
 
-{% else %}
-<p>{% blocktrans %}If you have not created an account yet, then please
-<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
-{% endif %}
+<script src="{% static 'admin_panel/js/jquery.js' %}"></script>
+{#<script src="https://code.jquery.com/jquery-3.5.1.js"></script>#}
+<script src="{% static 'admin_panel/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/fastclick/fastclick.js' %}"></script>
+<script src="{% static 'admin_panel/js/adminlte.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/iCheck/icheck.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.ru-RU.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/jquery-sparkline/jquery.sparkline.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
+<script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
 
-<form class="login" method="POST" action="{% url 'account_login' %}">
-  {% csrf_token %}
-  {{ form|crispy }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
-  <a class="button secondaryAction" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-  <button class="primaryAction btn btn-primary" type="submit">{% trans "Sign In" %}</button>
-</form>
-
-{% endblock %}
+</body>
+</html>

@@ -14,7 +14,7 @@ from django.forms.widgets import (
     NumberInput,
     Select,
     PasswordInput,
-    DateInput, SelectMultiple,
+    DateInput, SelectMultiple, TimeInput,
 )
 from django.shortcuts import get_object_or_404
 
@@ -30,7 +30,7 @@ from .models import (
     Section,
     Floor,
     Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account, Transaction,
-    MeterData, Receipt, Bill, HouseStaff,
+    MeterData, Receipt, Bill, HouseStaff, CallRequest,
 )
 # 2.5MB - 2621440
 # 5MB - 5242880
@@ -469,16 +469,6 @@ class HouseCreateForm(HouseForm):
     class Meta(HouseForm.Meta):
         model = House
 
-
-# class HouseStaffForm(forms.Form):
-#     house_staff = forms.CharField(widget=forms.Select(attrs={"class": "form-control"}), label="ФИО")
-
-    # class Meta:
-    #     model = User
-    #     fields = ['id']
-    #     widgets = {
-    #         'id': Select()
-    #     }
 
 class HouseStaffForm(ModelForm):
     class Meta:
@@ -1373,3 +1363,73 @@ class BillUpdateForm(BillForm):
     class Meta(BillForm.Meta):
         model = Bill
         fields = BillForm.Meta.fields + ['receipt']
+
+
+class CallRequestForm(ModelForm):
+    class Meta:
+        model = CallRequest
+        fields = ['request_date', 'request_time', 'flat_owner',
+                  'description', 'comment', 'flat', 'master_type',
+                  'status', 'master']
+        widgets = {
+            "request_date": DateInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Выберите день заявки",
+                },
+            ),
+            "request_time": TimeInput(
+                attrs={
+                    "id": "kt_timepicker_1",
+                    "class": "form-control",
+                    "placeholder": "Выберите время заявки",
+
+                },
+            ),
+            "flat_owner": Select(
+                attrs={
+                    "class": "form-control",
+                },
+            ),
+            "description": Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите описание"
+                },
+            ),
+            "comment": Textarea(
+                attrs={
+                    "class": "form-control summernote",
+                    "placeholder": "Введите комментарий"
+                },
+            ),
+            "flat": Select(
+                attrs={
+                    "class": "form-control",
+                },
+            ),
+            "master_type": Select(
+                attrs={
+                    "class": "form-control",
+                },
+            ),
+            "status": Select(
+                attrs={
+                    "class": "form-control",
+                },
+            ),
+            "master": Select(
+                attrs={
+                    "class": "form-control",
+                },
+            ),
+        }
+        labels = {
+            'flat_owner': "Владелец квартиры",
+            'description': "Описание",
+            'comment': "Комментарий",
+            'flat': "Квартира",
+            'master_type': "Тип мастера",
+            'status': "Статус",
+            'master': "Мастер"
+        }

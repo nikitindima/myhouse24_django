@@ -1,10 +1,10 @@
-{% extends 'admin_panel/elements/base.html' %}
+{% extends 'cabinet/elements/base.html' %}
 {% load i18n %}
 {% load extra_tags %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
-{% block nav_item_receipt_list %}active{% endblock %}
+{% block nav_item_receipt_list %}active menu-open{% endblock %}
 
 {% block title %}Квитанции на оплату{% endblock %}
 
@@ -35,74 +35,12 @@
         <section class="content">
 
             <div class="row">
-                <!--<div class="col-xs-12 col-sm-6">-->
-                <!--<h2 class="page-header">Квартиры</h2>-->
-                <!--</div>-->
-                <div class="col-xs-12 col-lg-9">
-
-                    <div class="row">
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-green overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Состояние кассы</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-blue overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Баланс по счетам</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-md-4">
-                            <div class="small-box bg-red overflow-hidden">
-                                <div class="inner">
-                                    <h3>000 000.00 грн</h3>
-                                    <p>Задолженность по счетам</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fa fa-dollar"></i>
-                                </div>
-                                <!--<span class="small-box-footer">&nbsp;</span>-->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xs-12 col-lg-3">
-                    <div class="btn-group pull-right margin-bottom">
-                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
-                            Выберите действие <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="{% url 'admin_panel:receipt_create' %}">Создать общую квитанцию</a></li>
-                            <!--                <li><a href="#!">Создать квитанцию на оплату за ЭЭ</a></li>
-                                            <li><a href="#!">Создать квитанцию на оплату за ГАЗ</a></li>-->
-                            <li><a href="#!" id="delete-many" class="delete-many">Удалить</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
                 <div class="col-xs-12">
                     <div class="box">
                         <div class="box-header with-border">
                             <h3 class="box-title"></h3>
                             <div class="box-tools">
-                                <a href="{% url 'admin_panel:receipt_list' %}" class="btn btn-default btn-sm">
+                                <a href="" class="btn btn-default btn-sm">
                                     <span class="hidden-xs">Очистить</span><i class="fa fa-eraser visible-xs"
                                                                               aria-hidden="true"></i>
                                 </a>
@@ -113,35 +51,22 @@
                             <table id="datatable" class="display" style="width:100%">
                                 <thead>
                                 <tr>
-                                    <th></th>
                                     <th>№ квитанции</th>
                                     <th>Статус</th>
                                     <th>Дата</th>
-                                    <th>Месяц</th>
-                                    <th>Квартира</th>
-                                    <th>Владелец</th>
-                                    <th>Проведена</th>
                                     <th>Сумма (грн)</th>
-                                    <th></th>
                                 </tr>
                                 <tr>
                                     <th></th>
-                                    <th>№ квитанции</th>
                                     <th>Статус</th>
                                     <th>Дата</th>
-                                    <th>Месяц</th>
-                                    <th>Квартира</th>
-                                    <th>Владелец</th>
-                                    <th>Проведена</th>
-                                    <th></th>
                                     <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for object in object_list %}
-                                    <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
+                                    <tr data-href="{% url 'cabinet:receipt_detail' object.pk %}" style="cursor: pointer;"
                                         id="{{ object.id }}">
-                                        <td></td>
                                         <td data-filter="{{ object.number }}">{{ object.number }}</td>
                                         <td data-filter="{% if object.status == "PAID" %}Оплачена{% elif object.status == "PARTLY_PAID" %}Частично оплачена{% elif object.status == "NOT_PAID" %}Неоплачена{% else %}ERROR{% endif %}|||">
                                             {% if object.status == "PAID" %}
@@ -156,45 +81,12 @@
                                         </td>
                                         <td data-sort="{{ object.created|date:"U" }}"
                                             data-filter="{{ object.created }}">{{ object.created }}</td>
-                                        <td data-filter="{{ object.created|date:"M" }}">{{ object.created|date:"F" }}</td>
-                                        <td data-filter="{{ object.account.account_flat }}|||">{{ object.account.account_flat }}</td>
-                                        <td data-filter="{{ object.account.account_flat.owner }}|||">{{ object.account.account_flat.owner }}</td>
-                                        <td data-filter="{% if object.is_passed == True %}Проведена{% elif object.is_passed == False %}Не проведена{% endif %}|||">
-                                            {% if object.is_passed == True %}
-                                                Проведена
-                                            {% elif object.is_passed == False %}
-                                                Не проведена
-                                            {% else %}
-                                                ERROR
-                                            {% endif %}
-                                        </td>
                                         <td data-filter="{% if object.total_price != None %}{{ object.total_price|decimalFormat }}|||{% else %}{% endif %}">
                                             {% if object.total_price != None %}
                                                 {{ object.total_price|decimalFormat }}
                                             {% else %}
                                                 -
                                             {% endif %}
-                                        </td>
-                                        <td>
-                                            <div class="btn-group pull-right">
-                                                <a class="btn btn-default btn-sm"
-                                                   href="{% url 'admin_panel:receipt_create' %}?receipt_id={{ object.pk }}"
-                                                   title="Копировать"
-                                                   data-toggle="tooltip"><i
-                                                        class="fa fa-clone"></i></a>
-                                                <a class="btn btn-default btn-sm"
-                                                   href="{% url 'admin_panel:receipt_update' object.pk %}"
-                                                   title="Редактировать"
-                                                   data-toggle="tooltip">
-                                                    <i class="fa fa-pencil"></i>
-                                                </a>
-                                                <a class="btn btn-default btn-sm"
-                                                   href="{% url 'admin_panel:receipt_delete' object.pk %}"
-                                                   title="Удалить"
-                                                   onClick="delete_object(event)">
-                                                    <i class="fa fa-trash"></i>
-                                                </a>
-                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -226,13 +118,11 @@
     <script>
         $(document).ready(function () {
             let table = make_datatable()
-            activate_delete_many_button(table)
+            add_links_to_rows()
 
             const filters_row = $('#datatable thead tr:eq(1) th')
-            make_search(filters_row, 1, 2, table)
-            make_select(filters_row, 2, 3, table)
-            make_search(filters_row, 3, 6, table)
-            make_select(filters_row, 6, 8, table)
+            make_search(filters_row, 2, 3, table)
+            make_select(filters_row, 1, 2, table)
 
             $('#datatable thead tr:eq(1) th select').select2({
                 theme: 'bootstrap',
@@ -245,16 +135,7 @@
 
         function make_datatable() {
             let table = $('#datatable').DataTable({
-                columnDefs: [{
-                    orderable: false,
-                    className: 'select-checkbox',
-                    targets: 0
-                }],
-                select: {
-                    style: 'multi',
-                    selector: 'td:first-child'
-                },
-                order: [[3, 'desc']],
+                order: [[2, 'desc']],
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',
@@ -266,14 +147,8 @@
                 columns: [
                     null,
                     null,
-                    {"width": "4%", "className": "dt-center"},
                     null,
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    {"width": "8%", "className": "dt-center"},
                 ],
             });
             $("td.select-checkbox").attr('style', 'top: auto;')
@@ -284,13 +159,6 @@
             $('tr[data-href]').on("click", function () {
                 document.location = $(this).data('href');
             });
-        }
-
-        function delete_object(event) {
-            if (window.confirm("Вы действительно хотете удалить данные?")) {
-            } else {
-                event.preventDefault();
-            }
         }
 
         function make_select(filters_row, slice1, slice2, table) {
@@ -344,35 +212,6 @@
             });
         }
 
-        function activate_delete_many_button(table) {
-            $("#delete-many").on("click", function (e) {
-                if (window.confirm("Вы действительно хотете удалить данные?")) {
-                    let id_list = get_receipts_id_list(table)
-                    send_ajax_to_delete_receipts(id_list)
-                    window.location = window.location
-                }
-            });
-        }
-
-        function get_receipts_id_list(table) {
-            let rows = table.rows({selected: true})[0];
-            let id_list = []
-            rows.forEach((index) => id_list.push($(table.rows(index).nodes()[0]).attr("id")))
-            return id_list
-        }
-
-        function send_ajax_to_delete_receipts(id_list) {
-            $.ajax({
-                url: '{% url 'admin_panel:api_delete_receipts' %}',
-                data: {
-                    'id_list': JSON.stringify(id_list)
-                },
-                dataType: 'json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
-        }
     </script>
     {% include 'admin_panel/elements/messages.html' %}>
 

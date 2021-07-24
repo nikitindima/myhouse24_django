@@ -4,6 +4,9 @@ from . import views
 
 app_name = "admin_panel"
 urlpatterns = [
+    path("", views.welcome_view, name="welcome"),
+    path("statistics/", views.statistics_view, name="home"),
+    
     path("cashbox/transactions/", views.TransactionListView.as_view(), name="transaction_list"),
     path("cashbox/transactions/create/income/", views.transaction_income_create_view, name="transaction_income_create"),
     path("cashbox/transactions/create/expense/", views.transaction_expense_create_view, name="transaction_expense_create"),
@@ -23,7 +26,6 @@ urlpatterns = [
     path("accounts/delete/<int:pk>/", views.AccountDeleteView.as_view(), name="account_delete"),
     path("accounts/xls/", views.account_xls_list, name="account_list_xls"),
 
-    path("", views.home_view, name="home"),
     path("houses/", views.HouseListView.as_view(), name="house_list"),
     path("houses/create/", views.house_create_view, name="house_create"),
     path("houses/detail/<int:pk>/", views.HouseDetailView.as_view(), name="house_detail"),
@@ -69,6 +71,10 @@ urlpatterns = [
     path("api/meter_data/", views.api_get_meter_data, name="api_get_meter_data"),
     path("api/get_staff_role/", views.api_get_staff_role, name="api_get_staff_role"),
     path("api/api_house_staff_delete/", views.api_house_staff_delete, name="api_house_staff_delete"),
+    path("api/master/", views.api_master, name="api_master"),
+    path("api/master/types/", views.api_master_types, name="api_master_types"),
+    path("api/statistics/", views.api_statistics, name="api_get_statistics"),
+
 
     path("users/", views.UserListView.as_view(), name="user_list"),
     path("users/create/", views.user_create_view, name="user_create"),
@@ -105,4 +111,10 @@ urlpatterns = [
 
     path("messages/", views.MessageListView.as_view(), name="message_list"),
     path("messages/create/", views.message_create_view, name="message_create"),
+
+    path("call-requests/", views.CallRequestListView.as_view(), name="call_request_list"),
+    path("call-requests/create/", views.call_request_create_view, name="call_request_create"),
+    path("call-requests/update/<int:pk>/", views.call_request_update_view, name="call_request_update"),
+    path("call-requests/delete/<int:pk>/", views.CallRequestDeleteView.as_view(), name="call_request_delete"),
+    path("call-requests/detail/<int:pk>/", views.CallRequestDetailView.as_view(), name="call_request_detail"),
 ]

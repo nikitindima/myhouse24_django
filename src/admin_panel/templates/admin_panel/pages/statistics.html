@@ -1,6 +1,6 @@
 {% extends 'admin_panel/elements/base.html' %}
 {% load static %}
-{% block nav_item_home %}active{% endblock %}
+{% block nav_item_statistics %}active{% endblock %}
 
 {% block title %}Cтатистика{% endblock %}
 
@@ -20,13 +20,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-primary">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ houses_count }}</h3>
                             <p>Домов</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-building"></i>
                         </div>
-                        <a href="/admin_panel/house/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:house_list' %}" class="small-box-footer">
                             Перейти в дома <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -34,13 +34,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-green">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ active_owners_count }}</h3>
                             <p>Активных владельцев</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-users"></i>
                         </div>
-                        <a href="/admin_panel/user/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:user_list' %}" class="small-box-footer">
                             Перейти к владельцам <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -48,13 +48,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-yellow">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ call_requests_in_work_count }}</h3>
                             <p>Заявок мастера в работе</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-wrench"></i>
                         </div>
-                        <a href="/admin_panel/master-request/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:call_request_list' %}" class="small-box-footer">
                             Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -62,13 +62,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-primary">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ flats_count }}</h3>
                             <p>Квартир</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-key"></i>
                         </div>
-                        <a href="/admin_panel/flat/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:flat_list' %}" class="small-box-footer">
                             Перейти в квартиры <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -76,13 +76,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-green">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ accounts_count }}</h3>
                             <p>Лицевых счетов</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-child"></i>
                         </div>
-                        <a href="/admin_panel/account/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:account_list' %}" class="small-box-footer">
                             Перейти к счетам <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -90,13 +90,13 @@
                 <div class="col-lg-4 col-sm-6 col-xs-12">
                     <div class="small-box bg-yellow">
                         <div class="inner">
-                            <h3>0</h3>
+                            <h3>{{ call_requests_new_count }}</h3>
                             <p>Новых заявок мастера</p>
                         </div>
                         <div class="icon">
                             <i class="fa fa-user-plus"></i>
                         </div>
-                        <a href="/admin_panel/master-request/index" class="small-box-footer">
+                        <a href="{% url 'admin_panel:call_request_list' %}" class="small-box-footer">
                             Перейти в заявки <i class="fa fa-arrow-circle-right"></i>
                         </a>
                     </div>
@@ -121,37 +121,23 @@
                         <span class="info-box-icon bg-red"><i class="fa fa-money"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Задолженность по счетам, грн</span>
-                            <span class="info-box-number">000 0000.00</span>
+                            <span id="account-debt" class="info-box-number">000 0000.00</span>
                         </div>
                     </div>
                     <div class="info-box">
                         <span class="info-box-icon bg-blue"><i class="fa fa-money"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Баланс по счетам, грн</span>
-                            <span class="info-box-number">000 000.00</span>
+                            <span id="account-balance" class="info-box-number">000 000.00</span>
                         </div>
                     </div>
                     <div class="info-box">
                         <span class="info-box-icon bg-green"><i class="fa fa-money"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Состояние кассы, грн</span>
-                            <span class="info-box-number">000 000.00</span>
+                            <span id="cash-box-balance" class="info-box-number">000 000.00</span>
                         </div>
                     </div>
-                    <!--        <div class="info-box">
-                                <span class="info-box-icon bg-green"><i class="fa fa-cog"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Задолженность за месяц, грн</span>
-                                    <span class="info-box-number">1 510.00</span>
-                                </div>
-                            </div>
-                            <div class="info-box">
-                                <span class="info-box-icon bg-aqua"><i class="fa fa-cog"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Задолженность за квартал, грн</span>
-                                    <span class="info-box-number">27 110.00</span>
-                                </div>
-                            </div>-->
                 </div>
             </div>
             <div class="row">
@@ -326,7 +312,22 @@
             //-----------------
         });
 
-    });</script>
+    });
+    set_statistics_data()
+
+    function set_statistics_data() {
+        $.ajax({
+            url: '{% url 'admin_panel:api_get_statistics' %}',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.results.cash_box_balance)
+                $('#account-debt').text(data.results.account_debt)
+                $('#account-balance').text(data.results.account_balance)
+                $('#cash-box-balance').text(data.results.cash_box_balance)
+            }
+        })
+    }
+    </script>
 
 {% endblock %}
 

@@ -61,7 +61,12 @@
                 <li><a href="https://avada-media.ua/moydom24/">Условия приобретения</a></li>
                 <li class="{% block nav_item_contacts %}{% endblock %}"><a href="{% url 'site:contacts' %}">Контакты</a>
                 </li>
-                <li><a href="http://myhouse24.avada-media.ua/cabinet/site/login"><i class="fas fa-sign-in-alt"></i> Вход</a>
+                <li>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'account_logout' %}"><i class="fas fa-sign-out-alt"></i> Выход</a>
+                    {% else %}
+                        <a href="{% url 'account_login' %}"><i class="fas fa-sign-in-alt"></i> Вход</a>
+                    {% endif %}
                 </li>
             </ul>
         </div>

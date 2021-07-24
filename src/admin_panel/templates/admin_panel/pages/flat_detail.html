@@ -68,7 +68,7 @@
                                     <td>Дом</td>
                                     <td>
                                         {% if object.house %}
-                                        <a href="{% url 'admin_panel:house_detail' object.house.id %}"> {{ object.house.name }} </a>
+                                            <a href="{% url 'admin_panel:house_detail' object.house.id %}"> {{ object.house.name }} </a>
                                         {% else %}
                                             -
                                         {% endif %}
@@ -97,12 +97,11 @@
                                 </tbody>
                             </table>
                             <div>
-                                <p><a href="/admin/counter-data/counter-list?CounterDataSearch%5Bflat_id%5D=64">Посмотреть
-                                    показания счетчиков</a></p>
                                 <p>
-                                    <a href="/admin/account-transaction/index?AccountTransactionSearch%5Baccount_id%5D=0&amp;AccountTransactionSearch%5Btype%5D=in">Посмотреть
-                                        приходы</a></p>
-                                <p><a href="/admin/invoice/index?InvoiceSearch%5Bflat_id%5D=64">Посмотреть квитанции</a>
+                                    <a href="{% url 'admin_panel:meter_data_list_by_flat' %}?flat_id={{ object.id }}">Посмотреть
+                                        показания счетчиков</a></p>
+                                <p><a href="#">Посмотреть приходы</a></p>
+                                <p><a href="#">Посмотреть квитанции</a>
                                 </p>
                             </div>
                         </div>

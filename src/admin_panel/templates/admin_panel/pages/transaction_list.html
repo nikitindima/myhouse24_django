@@ -135,7 +135,8 @@
                                     <tr data-href="{% url 'admin_panel:account_detail' object.pk %}"
                                         style="cursor: pointer;">
                                         <td data-filter="{{ object.number }}">{{ object.number }}</td>
-                                        <td data-filter="{{ object.created }}">{{ object.created }}</td>
+                                        <td data-sort="{{ object.created|date:"U" }}"
+                                            data-filter="{{ object.created }}">{{ object.created }}</td>
                                         <td data-filter="{% if object.is_passed == True %}Проведен{% elif object.is_passed == False %}Не проведен{% endif %}|||">
                                             {% if object.is_passed == True %}
                                                 Проведен
@@ -228,7 +229,7 @@
 
         function make_datatable() {
             let table = $('#datatable').DataTable({
-                order: [[1, 'asc']],
+                order: [[1, 'desc']],
                 orderCellsTop: true,
                 fixedHeader: true,
                 sDom: '<"top"i>rt<"bottom"lp><"clear">',

@@ -1,0 +1,249 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_call_request_list %}active{% endblock %}
+
+{% block title %}Новая заявка{% endblock %}
+
+{% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.css"
+          integrity="sha512-E4kKreeYBpruCG4YNe4A/jIj3ZoPdpWhWgj9qwrr19ui84pU5gvNafQZKyghqpFIHHE4ELK7L9bqAv7wfIXULQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link href="{% static 'admin_panel/plugins/summernote/summernote.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>Новая заявка</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:call_request_list' %}">Вызов мастера</a></li>
+                <li class="active">Новая заявка</li>
+            </ul>
+        </section>
+
+        <section class="content">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-xs-12 col-md-7 col-lg-6">
+                        <div class="page-header-spec">
+
+                            <div class="form-group">
+                                <div class="input-group date">
+                                    {{ form1.request_date }}
+                                    <span class="input-group-addon" title="Выбрать дату">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <span class="label-mid">в</span>
+
+                            <div class="form-group">
+                                <div class="input-group bootstrap-timepicker">
+                                    {{ form1.request_time }}
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-clock-o"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <div class="box-body">
+                        <div class="row">
+
+                            <div class="col-xs-12 col-md-6">
+                                <div class="form-group">
+                                    {{ form1.flat_owner|as_crispy_field }}
+                                </div>
+                            </div>
+
+
+                            <div class="col-xs-12 col-md-6"></div>
+
+                            <div class="clearfix"></div>
+
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    {{ form1.description|as_crispy_field }}
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    {{ form1.flat|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.master_type|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.status|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.master|as_crispy_field }}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="form-group">
+                                    {{ form1.comment|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12 text-right">
+                                <div class="form-group">
+                                    <a href="{% url 'admin_panel:call_request_create' %}" class="btn btn-default">Отменить</a>
+                                    <button type="submit" class="btn btn-success">Сохранить</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"
+            integrity="sha512-2xXe2z/uA+2SyT/sTSt9Uq4jDKsT0lV4evd3eoE/oxKih8DSAsOF6LUb+ncafMJPAimWAXdu9W+yMXGrCVOzQA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static 'admin_panel/plugins/summernote/summernote.js' %}"></script>
+    <script src="{% static 'site/js/make_summernote.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            const select_flat_owner = $('select[name=form1-flat_owner]')
+            const select_flat = $('select[name=form1-flat]')
+            const select_master_type = $('select[name=form1-master_type]')
+            const select_status = $('select[name=form1-status]')
+            const select_master = $('select[name=form1-master]')
+
+            select_flat_owner.select2({
+                theme: 'bootstrap',
+            })
+            select_flat.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '{% url 'admin_panel:api_flats' %}';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            owner_id: select_flat_owner.val()
+                        };
+                    }
+                }
+            });
+            select_master_type.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '{% url 'admin_panel:api_master_types' %}';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                        };
+                    }
+                }
+            });
+            select_status.select2({
+                theme: 'bootstrap',
+            })
+            select_master.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '{% url 'admin_panel:api_master' %}';
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            master_type_id: select_master_type.val(),
+                            flat_id: select_flat.val()
+                        };
+                    }
+                }
+            });
+
+            select_flat_owner.on("select2:select", function () {
+                select_flat.select2("val", 0)
+                select_master_type.select2("val", 0)
+                select_master.select2("val", 0)
+            });
+            select_flat.on("select2:select", function () {
+                select_master_type.select2("val", 0)
+                select_master.select2("val", 0)
+            });
+            select_master_type.on("select2:select", function () {
+                select_master.select2("val", 0)
+            });
+
+            {#---Activate datepicker---#}
+            !function (a) {
+                a.fn.datepicker.dates.ru = {
+                    days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
+                    daysShort: ["Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Суб"],
+                    daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                    months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                    monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"],
+                    today: "Сегодня",
+                    clear: "Очистить",
+                    format: "dd.mm.yyyy",
+                    weekStart: 1,
+                    monthsTitle: "Месяцы"
+                }
+            }(jQuery);
+            $('#id_form1-request_date').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: '-100y',
+                endDate: '+0d',
+                language: 'ru'
+            }).datepicker("setDate", 'now');
+            $('#kt_timepicker_1').timepicker({
+                minuteStep: 1,
+                defaultTime: '10AM',
+                showSeconds: false,
+                showMeridian: false,
+                snapToStep: true
+            });
+        })
+
+        function redirect_after_save() {
+            let redirect_status = $('#redirect')
+            redirect_status.val('True');
+        }
+    </script>
+
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}

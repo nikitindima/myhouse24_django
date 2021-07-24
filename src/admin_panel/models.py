@@ -155,7 +155,7 @@ class House(models.Model):
 
     name = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=300, null=True, blank=True)
-    house_staff = models.ManyToManyField(User, null=True, blank=True, through="HouseStaff")
+    house_staff = models.ManyToManyField(User, blank=True, through="HouseStaff")
     image1 = models.ImageField(
         upload_to=UploadToPathAndRename(upload_path), null=True, blank=True
     )
@@ -273,7 +273,7 @@ class Receipt(models.Model):
     created = models.DateField()
 
     status = models.CharField(max_length=11, choices=ReceiptStatus.choices)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="receipt_account")
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
     services = models.ManyToManyField(Service, through='Bill')
 
@@ -353,9 +353,20 @@ class Message(models.Model):
 
 
 class CallRequest(models.Model):
-    description = models.CharField(max_length=3000)
+    class CallRequestStatus(models.TextChoices):
+        NEW = "NEW", _("Новое")
+        IN_WORK = "IN_WORK", _("В работе")
+        DONE = "DONE", _("Выполнено")
+
+    request_date = models.DateField()
+    request_time = models.TimeField()
+
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
+    flat_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_request_created_by')
+    master = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='call_request_master')
     master_type = models.ForeignKey(UserRole, on_delete=models.SET_NULL, null=True, blank=True)
+
+    description = models.CharField(max_length=3000)
     comment = models.CharField(max_length=3000)
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=CallRequestStatus.choices)
     created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)

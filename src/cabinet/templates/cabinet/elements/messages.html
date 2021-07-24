@@ -1,0 +1,78 @@
+{#<-----Messages----->#}
+{% for message in messages %}
+    <script>
+        alertify.{{ message.tags }}('{{ message|escape }}', 10);
+    </script>
+{% endfor %}
+
+{#<-----form1.errors----->#}
+{% for error in form1.non_field_errors %}
+    <script>
+        alertify.error('{{ error|escape }}', 10);
+    </script>
+{% endfor %}
+
+{% for field in form1 %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <script>
+                alertify.error('{{ error|escape }}', 10);
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+
+{#<-----formset.errors----->#}
+{% for error in formset.non_field_errors %}
+    <script>
+        msg = alertify.error('{{ error }}', 10);
+    </script>
+{% endfor %}
+
+{% for form in formset %}
+    {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <script>
+                    alertify.error('{{ field.name }} - {{ error|escape }}', 10);
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+{#<-----formset2.errors----->#}
+{% for error in formset2.non_field_errors %}
+    <script>
+        msg = alertify.error('{{ error }}', 10);
+    </script>
+{% endfor %}
+
+{% for form in formset2 %}
+    {% for field in form %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <script>
+                    alertify.error('{{ field.name }} - {{ error|escape }}', 10);
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+{#<-----seo_data_form.errors----->#}
+{% for error in seo_data_form.non_field_errors %}
+    <script>
+        alertify.error('{{ error|escape }}', 10);
+    </script>
+{% endfor %}
+
+{% for field in seo_data_form %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <script>
+                alertify.error('{{ error|escape }}', 10);
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endfor %}

@@ -37,6 +37,11 @@ class UserRole(models.Model):
     def __str__(self):
         return self.name
 
+    def serialize(self, pattern):
+        if pattern == "select2":
+            data = {"id": self.id, "text": self.name}
+            return data
+
 
 class User(AbstractUser):
     username = models.CharField(_("username"), max_length=150)

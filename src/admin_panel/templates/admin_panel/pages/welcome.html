@@ -1,0 +1,24 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load static %}
+
+{% block title %}Админ панель{% endblock %}
+
+{% block content %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <h1>Админ панель</h1>
+        </section>
+        <section class="content">
+
+                <div class="starter-template" style="text-align: center">
+                    <h1>Приветствуем, {{ request.user.first_name }}!</h1>
+                    <p class="lead">Это страница приветствия. Используйте меню слева для навигации.</p>
+                </div>
+
+        </section>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+

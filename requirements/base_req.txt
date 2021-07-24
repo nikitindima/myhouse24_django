@@ -46,5 +46,6 @@ django-jsonview
 django-phonenumber-field[phonenumbers]
 django-birthday
 
-# XLS
-xlsxwriter
+# XLS/PDF
+xlsxwriter  # xls
+reportlab  # pdf
