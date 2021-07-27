@@ -1,27 +1,14 @@
-import io
-import os
-
-import openpyxl
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.staticfiles import finders
 from django.db import models
 from django.db.models import Q
-from django.http import HttpResponse, FileResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-# Create your views here.
-# (login_url='account_login')
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
-from openpyxl import Workbook
-from reportlab.pdfgen import canvas
-
-from config import settings
-from src.admin_panel.forms import ReceiptCreateForm, UserUpdateForm, UserProfileUpdateForm
+from src.admin_panel.forms import UserProfileUpdateForm
 from src.admin_panel.models import Flat, Receipt, Account, Bill, Tariff, ServicePrice, Message, CallRequest, \
     CompanyCredentials
 from src.admin_panel.services.forms_services import validate_forms, save_forms
-from src.admin_panel.services.xls_services import make_in_memory_worksheet
 from src.cabinet.services.pdf_factory import PdfFactory
 
 
@@ -29,9 +16,12 @@ from src.cabinet.services.pdf_factory import PdfFactory
 def home_view(request):
     flat_id = request.GET.get('flat_id', None)
     if flat_id is None:
-        first_flat_id = Flat.objects.filter(owner=request.user).order_by('id').first().id
-        return redirect(reverse('cabinet:home') + f'?flat_id={str(first_flat_id)}')
-
+        user_flats_qs = Flat.objects.filter(owner=request.user)
+        if user_flats_qs.exists():
+            first_flat_id = user_flats_qs.order_by('id').first().id
+            return redirect(reverse('cabinet:home') + f'?flat_id={str(first_flat_id)}')
+        else:
+            return redirect(reverse('cabinet:user_profile_detail'))
     context = {
         'current_flat_id': flat_id
     }

@@ -31,10 +31,17 @@
                         <div class="col-md-6 col-lg-12">
                             <div class="box">
                                 <div class="box-body box-profile">
-                                    <img style="width: 200px; height: 200px; object-fit: cover;"
-                                         class="profile-user-img img-responsive img-circle"
-                                         src="{{ request.user.avatar.url }}"
-                                         alt="Аватар">
+                                    {% if request.user.avatar %}
+                                        <img style="width: 200px; height: 200px; object-fit: cover;"
+                                             class="profile-user-img img-responsive img-circle"
+                                             src="{{ request.user.avatar.url }}"
+                                             alt="Аватар">
+                                    {% else %}
+                                        <img style="width: 200px; height: 200px; object-fit: cover;"
+                                             class="profile-user-img img-responsive img-circle"
+                                             src="{% static 'admin_panel/images/jpg/Image-not-found.jpg'%}"
+                                             alt="Аватар">
+                                    {% endif %}
 
                                     <h3 class="profile-username text-center">{{ request.user.full_name }}</h3>
 
@@ -86,30 +93,35 @@
                                 <div class="row">
                                     <div class="col-xs-12 col-md-6">
                                         <img src="
+
                                                 {% if object.house.image1 %}{{ object.house.image1.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                              class="img-responsive largeImg margin-bottom-30" alt=""
                                              style="width:522px; height: 350px; object-fit: cover;">
                                     </div>
                                     <div class="col-xs-6 col-md-3">
                                         <img src="
+
                                                 {% if object.house.image2 %}{{ object.house.image2.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                              class="img-responsive smallImg margin-bottom-30" alt=""
                                              style="width:248px; height: 160px; object-fit: cover;">
                                     </div>
                                     <div class="col-xs-6 col-md-3">
                                         <img src="
+
                                                 {% if object.house.image3 %}{{ object.house.image3.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                              class="img-responsive smallImg margin-bottom-30" alt=""
                                              style="width:248px; height: 160px; object-fit: cover;">
                                     </div>
                                     <div class="col-xs-6 col-md-3">
                                         <img src="
+
                                                 {% if object.house.image4 %}{{ object.house.image4.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                              class="img-responsive smallImg margin-bottom-30" alt=""
                                              style="width:248px; height: 160px; object-fit: cover;">
                                     </div>
                                     <div class="col-xs-6 col-md-3">
                                         <img src="
+
                                                 {% if object.house.image5 %}{{ object.house.image5.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                              class="img-responsive smallImg margin-bottom-30" alt=""
                                              style="width:248px; height: 160px; object-fit: cover;">
