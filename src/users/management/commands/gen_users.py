@@ -24,9 +24,9 @@ class Command(BaseCommand):
             is_active=True,
             is_superuser=True,
             is_staff=True,
-        ).save()
-
-        User.objects.last().set_password('admin')
+        )
+        user.set_password('admin')
+        user.save()
 
         for _ in range(5):
             try:
@@ -41,9 +41,9 @@ class Command(BaseCommand):
                     is_active=True,
                     is_superuser=False,
                     is_staff=True,
-                ).save()
-
-                User.objects.last().set_password('admin')
+                )
+                user.set_password('admin')
+                user.save()
 
             except IntegrityError:
                 pass
