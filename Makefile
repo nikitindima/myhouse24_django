@@ -50,6 +50,7 @@ gunicorn-run:
 	$(MANAGE) collectstatic --no-input
 	$(MANAGE) makemigrations --no-input
 	$(MANAGE) migrate --no-input
+	$(MANAGE) gen_users
 	#cd $(PROJECT_DIR)/scr && gunicorn -w 4 -b 0.0.0.0:$(WSGI_PORT) config.wsgi --timeout 30 --log-level debug --max-requests 10000 --reload
 	#gunicorn -w 4 -b 0.0.0.0:$(WSGI_PORT) config.config.wsgi:Application --timeout 30 --log-level debug --max-requests 10000 --reload
 	#PYTHONPATH=`pwd` gunicorn config.wsgi -b 0.0.0.0:8000 --reload
@@ -63,11 +64,8 @@ collect:
 gen-users:
 	$(MANAGE) gen_users
 
-gen-s:
-	$(MANAGE) gen_seances
-
 kill-port:
-	sudo fuser -k 8001/tcp
+	sudo fuser -k 8080/tcp
 
 diagram:
 	$(MANAGE) graph_models -a -g -o my_project_visualized.png

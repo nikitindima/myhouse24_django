@@ -793,6 +793,38 @@ class UserUpdateForm(UserForm):
         return user
 
 
+class UserProfileUpdateForm(UserUpdateForm):
+    class Meta(UserUpdateForm.Meta):
+        model = User
+        fields = [
+            "first_name",
+            "last_name",
+            "patronymic",
+            "birthday",
+            "phone",
+            "viber",
+            "telegram",
+            "email",
+            "description",
+            "user_id",
+            "avatar",
+        ]
+        widgets = UserUpdateForm.Meta.widgets
+        widgets.update({
+            "user_id": TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Введите id",
+                    "readonly": "readonly"
+                }
+            ),
+        })
+
+    def clean_user_id(self):
+        user_id = self.instance.user_id
+        return user_id
+
+
 class StaffCreateForm(UserCreateForm):
     class Meta(UserForm.Meta):
         model = User

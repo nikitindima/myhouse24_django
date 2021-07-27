@@ -48,7 +48,7 @@
                 <span class="sr-only">Toggle navigation</span>
             </a>
             <!-- Header title -->
-            <div class="header-title">Панель администратора</div>
+            <div class="header-title">Личный кабинет</div>
             <!-- Navbar Right Menu -->
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
@@ -60,7 +60,7 @@
                         <ul class="dropdown-menu">
 
                             <li class="header">Нет новых сообщений</li>
-                            <li class="footer"><a href="/cabinet/message/index">Перейти в раздел сообщений</a></li>
+                            <li class="footer"><a href="{% url 'cabinet:message_list' %}">Перейти в раздел сообщений</a></li>
 
                         </ul>
                     </li>
@@ -91,7 +91,7 @@
                             <li class="user-footer">
                                 <div class="pull-left">
                                     <a class="btn btn-default btn-flat"
-                                       href="{% url 'admin_panel:user_detail' user.pk %}">Профиль</a>
+                                       href="{% url 'cabinet:user_profile_detail' %}">Профиль</a>
                                 </div>
                                 <div class="pull-right">
                                     <a class="btn btn-default btn-flat" href="{% url 'account_logout' %}"
@@ -131,40 +131,42 @@
                                 </li>
 
                                 <li class="{% block nav_item_receipt_list %}{% endblock %} treeview">
-                                <a href="#!"><i class="fa fa-files-o"></i> <span>Квитанции</span> <span
-                                        class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                                    <a href="#!"><i class="fa fa-files-o"></i> <span>Квитанции</span> <span
+                                            class="pull-right-container"><i
+                                            class="fa fa-angle-left pull-right"></i></span></a>
+                                    <ul class="treeview-menu">
+                                        <li class="{% if current_flat_id_receipts == None %}active{% endif %}"><a
+                                                href="{% url 'cabinet:receipt_list' %}"><i class="fa fa-files-o"></i>
+                                            <span>Все квитанции</span></a></li>
+                                        {% for flat in flats %}
+                                            <li class="{% if current_flat_id_receipts|slugify == flat.id|slugify %}active{% endif %}">
+                                                <a href="{% url 'cabinet:receipt_list' %}?flat_id={{ flat.id }}"><i
+                                                        class="fa fa-file-text-o"></i>
+                                                    <span>{{ flat.house }}, кв {{ flat.number }}</span></a></li>
+                                        {% endfor %}
+
+                                    </ul>
+                                </li>
+
+                                <li class="{% block nav_item_tariff_list %}{% endblock %} treeview">
+                                <a href="/cabinet/tariff/index"><i class="fa fa-money"></i> <span>Тарифы</span>
+                                    <span class="pull-right-container"><i
+                                            class="fa fa-angle-left pull-right"></i></span></a>
                                 <ul class="treeview-menu">
-                                <li class="{% if current_flat_id_receipts == None %}active{% endif %}"><a
-                                        href="{% url 'cabinet:receipt_list' %}"><i class="fa fa-files-o"></i>
-                                    <span>Все квитанции</span></a></li>
                                 {% for flat in flats %}
-                                    <li class="{% if current_flat_id_receipts|slugify == flat.id|slugify %}active{% endif %}">
-                                        <a href="{% url 'cabinet:receipt_list' %}?flat_id={{ flat.id }}"><i
+                                    <li class="{% if current_flat_id_tariffs|slugify == flat.id|slugify %}active{% endif %}">
+                                        <a href="{% url 'cabinet:tariff_list' %}?flat_id={{ flat.id }}"><i
                                                 class="fa fa-file-text-o"></i>
                                             <span>{{ flat.house }}, кв {{ flat.number }}</span></a></li>
                                 {% endfor %}
                             {% endwith %}
                             </ul>
                             </li>
-
-                    <li class="treeview"><a href="/cabinet/tariff/index"><i class="fa fa-money"></i> <span>Тарифы</span>
-                        <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                        <ul class="treeview-menu">
-                            <li><a href="/cabinet/tariff/index?flat_id=19"><i class="fa fa-file-text-o"></i> <span>ЖК "Королевские сады", кв.5008</span></a>
-                            </li>
-                            <li><a href="/cabinet/tariff/index?flat_id=22"><i class="fa fa-file-text-o"></i> <span>ЖК "Люксембург", кв.9026</span></a>
-                            </li>
-                            <li><a href="/cabinet/tariff/index?flat_id=48"><i class="fa fa-file-text-o"></i> <span>ЖК "Королевские сады", кв.2001</span></a>
-                            </li>
-                            <li><a href="/cabinet/tariff/index?flat_id=60"><i class="fa fa-file-text-o"></i> <span>ЖК "Башня Чкалов", кв.21</span></a>
-                            </li>
-                        </ul>
+                    <li class="{% block nav_item_message_list %}{% endblock %}"><a href="{% url 'cabinet:message_list' %}"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
                     </li>
-                    <li><a href="/cabinet/message/index"><i class="fa fa-envelope-o"></i> <span>Сообщения</span></a>
+                    <li class="{% block nav_item_call_request_list %}{% endblock %}"><a href="{% url 'cabinet:call_request_list' %}"><i class="fa fa-wrench"></i> <span>Вызов мастера</span></a>
                     </li>
-                    <li><a href="/cabinet/master-request/index"><i class="fa fa-wrench"></i> <span>Вызов мастера</span></a>
-                    </li>
-                    <li><a href="/cabinet/user/view"><i class="fa fa-user-circle-o"></i> <span>Профиль</span></a></li>
+                    <li class="{% block nav_item_user_profile_detail %}{% endblock %}"><a href="{% url 'cabinet:user_profile_detail' %}"><i class="fa fa-user-circle-o"></i> <span>Профиль</span></a></li>
                 </ul>
             </section>
             <div class="slimScrollBar"

@@ -1,0 +1,80 @@
+{% load extra_tags %}
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <style>
+        html {
+            font-family: Arial;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            margin: 0.5em 0;
+        }
+
+        table {
+            font-size: 1.3em;
+        }
+
+        .pagebreak {
+            page-break-before: always;
+        }
+
+        @page {
+            margin: 0;
+        }
+
+        @media print {
+            @page {
+                margin: 0;
+            }
+
+            body {
+                margin: 1.6cm;
+            }
+        }
+    </style>
+    <title>Печать</title>
+
+</head>
+<body>
+<div class="box pagebreak">
+    <h4>Квитанция: #{{ object.number }}</h4>
+    <h4>Дата: {{ object.created }}</h4>
+    <h4>Квартира: {{ object.account.account_flat }}, {{ object.account.account_flat.house }}</h4>
+    <h4>Получатель: {{ object.account.account_flat.owner }}</h4>
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th style="width: 40px; min-width: 40px;">#</th>
+            <th>Услуга</th>
+            <th>Количество потребления (расход)</th>
+            <th style="width: 80px; min-width: 80px;">Ед. изм.</th>
+            <th>Цена за ед., грн</th>
+            <th>Стоимость, грн</th>
+        </tr>
+        </thead>
+        <tfoot>
+        <tr>
+            <td colspan="5"></td>
+            <td colspan="2"><b>Итого: {{ object.total_price|decimalFormat }}</b></td>
+        </tr>
+        </tfoot>
+        <tbody>
+        {% for bill in object.bill_receipt.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ bill.service.name }}</td>
+                <td>{{ bill.consumption|decimalFormat }}</td>
+                <td>{{ bill.service.measure.name }}</td>
+                <td>{{ bill.price|decimalFormat }}</td>
+                <td>{{ bill.cost|decimalFormat }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>window.print();</script>
+</body>
+</html>

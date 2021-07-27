@@ -29,7 +29,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title"></h3>
                     <div class="box-tools">
-                        <a href="/cabinet/invoice/print/96" class="btn btn-info btn-sm">
+                        <a href="{% url 'cabinet:receipt_print' object.pk %}" class="btn btn-info btn-sm">
                             <i class="fa fa-print" aria-hidden="true"></i> <span class="hidden-xs">Распечатать</span>
                         </a>
                     </div>
@@ -71,7 +71,7 @@
                 </div>
                 <div class="box-footer">
                     <div class="pull-right">
-                        <a href="{% url 'cabinet:index' %}" class="btn btn-sm btn-warning" download=""><i
+                        <a href="{% url 'cabinet:receipt_pdf' 18 %}" class="btn btn-sm btn-warning" download=""><i
                                 class="fa fa-file-pdf-o" aria-hidden="true"></i> Скачать в PDF</a>
                         <a href="/cabinet/invoice/pay/96" class="btn btn-sm btn-success"><i class="fa fa-credit-card"
                                                                                             aria-hidden="true"></i>

@@ -1,0 +1,175 @@
+{% extends 'cabinet/elements/base.html' %}
+{% load i18n %}
+{% load extra_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_tariff_list %}active menu-open{% endblock %}
+
+{% block title %}Квитанции на оплату{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/fixedcolumns/3.3.3/css/fixedColumns.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.3/css/select.dataTables.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <link href="{% static 'admin_panel/css/select2-bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 806px;">
+        <section class="content-header">
+            <h1>Тарифы - {{ flat.house }}, кв.{{ flat.number }}</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'cabinet:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li class="active">Тарифы - {{ flat.house }}, кв.{{ flat.number }}</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="box">
+                <div class="box-body">
+                    <div class="table-responsive no-padding">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th style="min-width:250px">Услуга</th>
+                                <th style="min-width:150px">Ед. изм.</th>
+                                <th style="min-width:150px">Цена за ед., грн</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for object in object_list %}
+                                <tr>
+                                    <td>{{ object.service.name }}</td>
+                                    <td>{{ object.service.measure.name }}</td>
+                                    <td>{{ object.price }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/3.3.3/js/dataTables.fixedColumns.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            let table = make_datatable()
+            add_links_to_rows()
+
+            const filters_row = $('#datatable thead tr:eq(1) th')
+            make_search(filters_row, 2, 3, table)
+            make_select(filters_row, 1, 2, table)
+
+            $('#datatable thead tr:eq(1) th select').select2({
+                theme: 'bootstrap',
+                width: 900,
+            })
+            $('#datatable thead tr:eq(1) th input')
+                .attr('class', 'form-control')
+                .attr('style', 'width: 100%; display: inline-block;');
+        });
+
+        function make_datatable() {
+            let table = $('#datatable').DataTable({
+                order: [[2, 'desc']],
+                orderCellsTop: true,
+                fixedHeader: true,
+                sDom: '<"top"i>rt<"bottom"lp><"clear">',
+                lengthChange: false,
+                bInfo: false,
+                pageLength: 10,
+
+                {#drawCallback: add_links_to_rows,#}
+                columns: [
+                    null,
+                    null,
+                    null,
+                    null,
+                ],
+            });
+            $("td.select-checkbox").attr('style', 'top: auto;')
+            return table;
+        }
+
+        function add_links_to_rows() {
+            $('tr[data-href]').on("click", function () {
+                document.location = $(this).data('href');
+            });
+        }
+
+        function make_select(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                var select = $('<select><option value="">-----------</option></select>')
+                    .appendTo($(this).empty())
+                    .on('change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+                            $(this).val()
+                        );
+                        table.column(i + slice1)
+                            .search(val ? $(this).val() : val, true, false)
+                            .draw();
+                    });
+
+                var statusItems = [];
+
+                /* ### IS THERE A BETTER/SIMPLER WAY TO GET A UNIQUE ARRAY OF <TD> data-filter ATTRIBUTES? ### */
+                table.column(i + slice1).nodes().to$().each(function (d, j) {
+                    var thisStatus = $(j).attr("data-filter");
+                    var data = thisStatus.split('|||')
+                    for (let k = 0; k < data.length - 1; k++) {
+                        let new_status = data[k]
+                        if ($.inArray(new_status, statusItems) === -1) statusItems.push(new_status);
+                    }
+                });
+
+                statusItems.sort();
+
+                $.each(statusItems, function (i, item) {
+                    select.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+
+        }
+
+        function make_search(filters_row, slice1, slice2, table) {
+            filters_row.slice(slice1, slice2).each(function (i) {
+                let title = $(this).text();
+                $(this).html('<input class="form-control" type="text" placeholder="Поиск - ' + title + '" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i + slice1).search() !== this.value) {
+                        table
+                            .column(i + slice1)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        }
+
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+
+{% endblock %}

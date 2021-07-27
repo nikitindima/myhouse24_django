@@ -6,7 +6,7 @@ from dateutil.utils import today
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.sitemaps import ping_google
 from django.core.serializers import serialize
 from django.db import models
@@ -65,6 +65,7 @@ from .services.user_passes_test import site_access, house_user_access, statistic
     cashbox_access, receipt_access, meter_data_access, call_request_access
 from .services.xls_services import make_in_memory_worksheet
 from ..users.models import UserRole
+from ..users.services.user_roles_services import get_or_create_user_roles
 
 User = get_user_model()
 
@@ -1102,13 +1103,7 @@ class TariffDetailView(DetailView):
 
 @user_passes_test(role_access)
 def system_user_role_view(request):
-    qs = UserRole.objects.all()
-    if not qs.exists():
-        role_list = ['Директор', 'Управляющий', 'Бухгалтер', 'Электрик', 'Сантехник']
-        for role in role_list:
-            UserRole(name=role).save()
-        qs = UserRole.objects.all()
-
+    qs = get_or_create_user_roles()
     formset = create_formset(UserRoleForm, request, post=True, prefix='formset', qs=qs)
 
     if request.method == "POST":
@@ -1853,7 +1848,7 @@ def call_request_update_view(request, pk):
     return render(request, "admin_panel/pages/call_request_update.html", context=context)
 
 
-@method_decorator(user_passes_test(call_request_access), name='dispatch')
+@method_decorator(login_required(), name='dispatch')
 class CallRequestDeleteView(DeleteView):
     model = CallRequest
     success_url = reverse_lazy("admin_panel:call_request_list")

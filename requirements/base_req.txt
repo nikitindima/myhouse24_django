@@ -49,3 +49,6 @@ django-birthday
 # XLS/PDF
 xlsxwriter  # xls
 reportlab  # pdf
+xhtml2pdf  # html to pdf
+Faker
+openpyxl
