@@ -15,7 +15,7 @@ def link_callback(uri, rel):
     """
     print(1)
     result = finders.find(uri)
-    print(result, 'result')
+    print(result, "result")
 
     if result:
         if not isinstance(result, (list, tuple)):
@@ -37,14 +37,12 @@ def link_callback(uri, rel):
             return uri
     # make sure that file exists
     if not os.path.isfile(path):
-        raise Exception(
-            'media URI must start with %s or %s' % (sUrl, mUrl)
-        )
+        raise Exception("media URI must start with %s or %s" % (sUrl, mUrl))
     return path
 
 
 class PdfFactory:
-    def __init__(self, template_path, context, filename='file'):
+    def __init__(self, template_path, context, filename="file"):
         self.template_path = template_path
         self.context = context
         self.filename = filename
@@ -54,8 +52,8 @@ class PdfFactory:
         self.create_pdf_response()
 
     def prepare_response(self):
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{self.filename}.pdf"'
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{self.filename}.pdf"'
         return response
 
     def create_pdf_response(self):
@@ -64,7 +62,7 @@ class PdfFactory:
         )
 
         if pisa_status.err:
-            return HttpResponse('Ошибка! --> <pre>' + self.html + '</pre>')
+            return HttpResponse("Ошибка! --> <pre>" + self.html + "</pre>")
 
     def get_response(self):
         return self.response

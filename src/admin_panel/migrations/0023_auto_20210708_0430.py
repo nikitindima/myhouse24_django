@@ -9,90 +9,208 @@ import src.admin_panel.services.media_services
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0022_auto_20210706_0738'),
+        ("admin_panel", "0022_auto_20210706_0738"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Bill',
+            name="Bill",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('consumption', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('cost', models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("consumption", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("cost", models.DecimalField(decimal_places=2, max_digits=10)),
             ],
         ),
         migrations.CreateModel(
-            name='Measure',
+            name="Measure",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='ReceiptTemplate',
+            name="ReceiptTemplate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('template', models.FileField(upload_to=src.admin_panel.services.media_services.UploadToPathAndRename('receipts/templates'))),
-                ('is_deleted', models.BooleanField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "template",
+                    models.FileField(
+                        upload_to=src.admin_panel.services.media_services.UploadToPathAndRename(
+                            "receipts/templates"
+                        )
+                    ),
+                ),
+                ("is_deleted", models.BooleanField()),
             ],
         ),
         migrations.CreateModel(
-            name='Service',
+            name="Service",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('is_removable', models.BooleanField()),
-                ('is_shown', models.BooleanField()),
-                ('measure', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.measure')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("is_removable", models.BooleanField()),
+                ("is_shown", models.BooleanField()),
+                (
+                    "measure",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_panel.measure",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ServicePrice',
+            name="ServicePrice",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.service')),
-                ('tariff', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='admin_panel.tariff')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "service",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_panel.service",
+                    ),
+                ),
+                (
+                    "tariff",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="admin_panel.tariff",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Receipt',
+            name="Receipt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_passed', models.BooleanField()),
-                ('is_paid', models.BooleanField()),
-                ('period', django.contrib.postgres.fields.ranges.DateRangeField()),
-                ('created', models.DateTimeField()),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.account')),
-                ('services', models.ManyToManyField(through='admin_panel.Bill', to='admin_panel.Service')),
-                ('tariff', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='admin_panel.tariff')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_passed", models.BooleanField()),
+                ("is_paid", models.BooleanField()),
+                ("period", django.contrib.postgres.fields.ranges.DateRangeField()),
+                ("created", models.DateTimeField()),
+                (
+                    "account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_panel.account",
+                    ),
+                ),
+                (
+                    "services",
+                    models.ManyToManyField(
+                        through="admin_panel.Bill", to="admin_panel.Service"
+                    ),
+                ),
+                (
+                    "tariff",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="admin_panel.tariff",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='MeterData',
+            name="MeterData",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('status', models.CharField(max_length=20)),
-                ('flat', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.flat')),
-                ('service', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.service')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("number", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("status", models.CharField(max_length=20)),
+                (
+                    "flat",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_panel.flat",
+                    ),
+                ),
+                (
+                    "service",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_panel.service",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='bill',
-            name='receipt',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.receipt'),
+            model_name="bill",
+            name="receipt",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="admin_panel.receipt"
+            ),
         ),
         migrations.AddField(
-            model_name='bill',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.service'),
+            model_name="bill",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="admin_panel.service"
+            ),
         ),
         migrations.AddField(
-            model_name='tariff',
-            name='services',
-            field=models.ManyToManyField(through='admin_panel.ServicePrice', to='admin_panel.Service'),
+            model_name="tariff",
+            name="services",
+            field=models.ManyToManyField(
+                through="admin_panel.ServicePrice", to="admin_panel.Service"
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0047_auto_20210714_1114'),
+        ("admin_panel", "0047_auto_20210714_1114"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transaction',
-            name='created',
+            model_name="transaction",
+            name="created",
             field=models.DateField(),
         ),
     ]

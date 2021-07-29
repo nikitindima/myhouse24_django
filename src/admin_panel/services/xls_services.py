@@ -6,7 +6,7 @@ from xlsxwriter import Workbook
 def make_in_memory_worksheet(columns):
     output = io.BytesIO()
 
-    workbook = Workbook(output, {'in_memory': True})
+    workbook = Workbook(output, {"in_memory": True})
     worksheet = workbook.add_worksheet()
 
     for column in columns:

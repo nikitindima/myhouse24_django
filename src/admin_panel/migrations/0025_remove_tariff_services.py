@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0024_alter_service_is_removable'),
+        ("admin_panel", "0024_alter_service_is_removable"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='tariff',
-            name='services',
+            model_name="tariff",
+            name="services",
         ),
     ]

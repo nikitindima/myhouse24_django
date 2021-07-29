@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0037_alter_message_floor'),
+        ("admin_panel", "0037_alter_message_floor"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='message',
-            name='floor',
+            model_name="message",
+            name="floor",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

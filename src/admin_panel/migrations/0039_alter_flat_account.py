@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0038_alter_message_floor'),
+        ("admin_panel", "0038_alter_message_floor"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flat',
-            name='account',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='account_flat', to='admin_panel.account'),
+            model_name="flat",
+            name="account",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="account_flat",
+                to="admin_panel.account",
+            ),
         ),
     ]

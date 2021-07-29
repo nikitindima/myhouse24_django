@@ -9,18 +9,26 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admin_panel', '0059_auto_20210722_0825'),
+        ("admin_panel", "0059_auto_20210722_0825"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='house',
-            name='house_staff',
-            field=models.ManyToManyField(blank=True, through='admin_panel.HouseStaff', to=settings.AUTH_USER_MODEL),
+            model_name="house",
+            name="house_staff",
+            field=models.ManyToManyField(
+                blank=True,
+                through="admin_panel.HouseStaff",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='receipt',
-            name='account',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='receipt_account', to='admin_panel.account'),
+            model_name="receipt",
+            name="account",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="receipt_account",
+                to="admin_panel.account",
+            ),
         ),
     ]

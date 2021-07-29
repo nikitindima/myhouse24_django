@@ -46,10 +46,13 @@ def check_user_access(user, variable):
 
 @register.filter(name="decimalFormat")
 def decimal_format(value):
-    return "{:,}".format(value)
+    if value is not None:
+        return "{:,}".format(round(value, 2))
+    else:
+        return value
 
 
 @register.filter(name="get_flats")
 def get_flats(user):
-    flats = Flat.objects.filter(owner=user).select_related('house').order_by('id')
+    flats = Flat.objects.filter(owner=user).select_related("house").order_by("id")
     return flats

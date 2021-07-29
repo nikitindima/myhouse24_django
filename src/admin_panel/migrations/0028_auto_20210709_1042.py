@@ -7,17 +7,21 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0027_tariff_service_price'),
+        ("admin_panel", "0027_tariff_service_price"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='serviceprice',
-            options={'default_related_name': 'services_with_price'},
+            name="serviceprice",
+            options={"default_related_name": "services_with_price"},
         ),
         migrations.AlterField(
-            model_name='serviceprice',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='services_with_price', to='admin_panel.service'),
+            model_name="serviceprice",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="services_with_price",
+                to="admin_panel.service",
+            ),
         ),
     ]

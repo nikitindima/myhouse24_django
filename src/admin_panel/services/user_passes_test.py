@@ -79,4 +79,5 @@ def staff_access(user):
 def payments_detail_access(user):
     return check_access(user, "payments_detail_access")
 
+
 # endregion ACCESS

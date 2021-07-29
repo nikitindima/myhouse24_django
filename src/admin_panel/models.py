@@ -20,7 +20,7 @@ class Measure(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name or ''
+        return self.name or ""
 
 
 class Service(models.Model):
@@ -30,7 +30,7 @@ class Service(models.Model):
     measure = models.ForeignKey(Measure, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.name}'
+        return f"{self.name}"
 
 
 class ServicePrice(models.Model):
@@ -150,6 +150,7 @@ class SiteContactsPage(models.Model):
 
 # region PROPERTY
 
+
 class House(models.Model):
     upload_path = os.path.join(MEDIA_ROOT, "images", "houses")
 
@@ -213,7 +214,11 @@ class Flat(models.Model):
 
     floor = models.CharField(max_length=100, null=True)
     section = models.ForeignKey(
-        Section, on_delete=models.CASCADE, null=True, blank=True, related_name="section_flats"
+        Section,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="section_flats",
     )
     house = models.ForeignKey(
         House, on_delete=models.CASCADE, null=True, related_name="houses"
@@ -225,11 +230,11 @@ class Flat(models.Model):
 
     def serialize(self, pattern):
         if pattern == "select2":
-            data = {"id": self.id, "text": f'{self.house.name}, кв. {self.number}'}
+            data = {"id": self.id, "text": f"{self.house.name}, кв. {self.number}"}
             return data
 
     def __str__(self):
-        return f'{self.number}'
+        return f"{self.number}"
 
 
 class Account(models.Model):
@@ -237,7 +242,9 @@ class Account(models.Model):
         ACTIVE = "Active", _("Активный")
         INACTIVE = "Inactive", _("Неактивный")
 
-    account_flat = models.OneToOneField(Flat, on_delete=models.CASCADE, related_name="flat_account")
+    account_flat = models.OneToOneField(
+        Flat, on_delete=models.CASCADE, related_name="flat_account"
+    )
 
     number = models.CharField(max_length=40, unique=True, blank=True)
     is_active = models.CharField(max_length=10, choices=AccountStatus.choices)
@@ -273,17 +280,23 @@ class Receipt(models.Model):
     created = models.DateField()
 
     status = models.CharField(max_length=11, choices=ReceiptStatus.choices)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="receipt_account")
+    account = models.ForeignKey(
+        Account, on_delete=models.CASCADE, related_name="receipt_account"
+    )
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True)
-    services = models.ManyToManyField(Service, through='Bill')
+    services = models.ManyToManyField(Service, through="Bill")
 
 
 class Bill(models.Model):
     consumption = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
-    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, related_name='bill_receipt')
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='bill_service')
+    receipt = models.ForeignKey(
+        Receipt, on_delete=models.CASCADE, related_name="bill_receipt"
+    )
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="bill_service"
+    )
 
 
 class MeterData(models.Model):
@@ -330,21 +343,43 @@ class Transaction(models.Model):
     created = models.DateField()
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, blank=True)
-    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True)
-    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE, null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_created_by')
-    manager = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_manager')
+    account = models.ForeignKey(
+        Account, on_delete=models.CASCADE, null=True, blank=True
+    )
+    receipt = models.ForeignKey(
+        Receipt, on_delete=models.CASCADE, null=True, blank=True
+    )
+    transaction_type = models.ForeignKey(
+        TransactionType, on_delete=models.CASCADE, null=True, blank=True
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="transaction_created_by",
+    )
+    manager = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="transaction_manager",
+    )
 
 
 class Message(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
     created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="created_by"
+    )
 
     house = models.ForeignKey(House, on_delete=models.CASCADE, null=True, blank=True)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True, blank=True)
+    section = models.ForeignKey(
+        Section, on_delete=models.CASCADE, null=True, blank=True
+    )
     floor = models.IntegerField(null=True, blank=True)
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -362,9 +397,15 @@ class CallRequest(models.Model):
     request_time = models.TimeField()
 
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
-    flat_owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_request_created_by')
-    master = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='call_request_master')
-    master_type = models.ForeignKey(UserRole, on_delete=models.SET_NULL, null=True, blank=True)
+    flat_owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="call_request_created_by"
+    )
+    master = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="call_request_master"
+    )
+    master_type = models.ForeignKey(
+        UserRole, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     description = models.CharField(max_length=3000)
     comment = models.CharField(max_length=3000)

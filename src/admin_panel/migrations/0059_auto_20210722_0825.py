@@ -9,46 +9,67 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admin_panel', '0058_rename_user_housestaff_house_staff'),
+        ("admin_panel", "0058_rename_user_housestaff_house_staff"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='callrequest',
-            name='created_by',
+            model_name="callrequest",
+            name="created_by",
         ),
         migrations.AddField(
-            model_name='callrequest',
-            name='flat',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='admin_panel.flat'),
+            model_name="callrequest",
+            name="flat",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_panel.flat",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='callrequest',
-            name='flat_owner',
-            field=models.ForeignKey(default=2, on_delete=django.db.models.deletion.CASCADE, related_name='call_request_created_by', to='users.user'),
+            model_name="callrequest",
+            name="flat_owner",
+            field=models.ForeignKey(
+                default=2,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="call_request_created_by",
+                to="users.user",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='callrequest',
-            name='master',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='call_request_master', to=settings.AUTH_USER_MODEL),
+            model_name="callrequest",
+            name="master",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="call_request_master",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='callrequest',
-            name='request_date',
-            field=models.DateField(default='1995-05-14'),
+            model_name="callrequest",
+            name="request_date",
+            field=models.DateField(default="1995-05-14"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='callrequest',
-            name='request_time',
-            field=models.TimeField(default='16:05'),
+            model_name="callrequest",
+            name="request_time",
+            field=models.TimeField(default="16:05"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='callrequest',
-            name='status',
-            field=models.CharField(choices=[('NEW', 'Новое'), ('IN_WORK', 'В работе'), ('DONE', 'Выполнено')], max_length=100),
+            model_name="callrequest",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("NEW", "Новое"),
+                    ("IN_WORK", "В работе"),
+                    ("DONE", "Выполнено"),
+                ],
+                max_length=100,
+            ),
         ),
     ]

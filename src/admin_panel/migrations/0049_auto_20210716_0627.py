@@ -6,25 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0048_alter_transaction_created'),
+        ("admin_panel", "0048_alter_transaction_created"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='meterdata',
-            name='amount',
+            model_name="meterdata",
+            name="amount",
             field=models.DecimalField(decimal_places=2, default=1, max_digits=10),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='meterdata',
-            name='created',
-            field=models.DateField(default='1995-09-16'),
+            model_name="meterdata",
+            name="created",
+            field=models.DateField(default="1995-09-16"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='meterdata',
-            name='status',
-            field=models.CharField(choices=[('NEW', 'Новое'), ('ACCOUNTED', 'Учтено'), ('ACCOUNTED_AND_PAID', 'Учтено и оплачено'), ('NULL', 'Нулевое')], max_length=20),
+            model_name="meterdata",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("NEW", "Новое"),
+                    ("ACCOUNTED", "Учтено"),
+                    ("ACCOUNTED_AND_PAID", "Учтено и оплачено"),
+                    ("NULL", "Нулевое"),
+                ],
+                max_length=20,
+            ),
         ),
     ]

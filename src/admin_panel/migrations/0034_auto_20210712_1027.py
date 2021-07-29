@@ -7,27 +7,37 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0033_message_to_debtors'),
+        ("admin_panel", "0033_message_to_debtors"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='message',
-            name='receiver',
+            model_name="message",
+            name="receiver",
         ),
         migrations.AddField(
-            model_name='message',
-            name='floor',
+            model_name="message",
+            name="floor",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='message',
-            name='house',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='admin_panel.house'),
+            model_name="message",
+            name="house",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_panel.house",
+            ),
         ),
         migrations.AddField(
-            model_name='message',
-            name='section',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='admin_panel.section'),
+            model_name="message",
+            name="section",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_panel.section",
+            ),
         ),
     ]

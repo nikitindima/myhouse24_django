@@ -6,18 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0051_alter_meterdata_number'),
+        ("admin_panel", "0051_alter_meterdata_number"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='receipt',
-            name='is_paid',
+            model_name="receipt",
+            name="is_paid",
         ),
         migrations.AddField(
-            model_name='receipt',
-            name='status',
-            field=models.CharField(choices=[('PAID', 'Оплачена'), ('PARTLY_PAID', 'Частично оплачена'), ('NOT_PAID', 'Неоплачена')], default='NOT_PAID', max_length=11),
+            model_name="receipt",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("PAID", "Оплачена"),
+                    ("PARTLY_PAID", "Частично оплачена"),
+                    ("NOT_PAID", "Неоплачена"),
+                ],
+                default="NOT_PAID",
+                max_length=11,
+            ),
             preserve_default=False,
         ),
     ]

@@ -1,109 +1,312 @@
 {% extends 'cabinet/elements/base.html' %}
 {% load static %}
+{% load extra_tags %}
 {% block nav_item_statistics %}active menu-open{% endblock %}
 
 {% block title %}Сводка - {% endblock %}
 
 {% block content %}
     <div class="content-wrapper" style="min-height: 867px;">
-    <section class="content-header">
-        <h1>Сводка - ЖК "Королевские сады", кв.5008</h1>
-    </section>
+        <section class="content-header">
+            <h1>Сводка - ЖК "Королевские сады", кв.5008</h1>
+        </section>
 
-    <section class="content">
+        <section class="content">
+            <div class="row">
+                <div class="col-xs-12 col-md-6 col-lg-4">
+                    <div class="small-box bg-{% if balance > 0 %}green{% else %}red{% endif %}">
+                        <div class="inner">
+                            <h3>{{ balance|decimalFormat }} грн</h3>
+                            <p>Баланс по квартире</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-money"></i>
+                        </div>
+                        <span class="small-box-footer">
+                &nbsp;
+            </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6 col-lg-4">
+                    <div class="small-box bg-blue">
+                        <div class="inner">
+                            <h3>{% if flat.flat_account %}{{ flat.flat_account }}{% else %}Счет
+                                отсутсвует{% endif %}</h3>
+                            <p>Лицевой счет</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <span class="small-box-footer">
+                &nbsp;
+            </span>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6 col-lg-4">
+                    <div class="small-box bg-yellow">
+                        <div class="inner">
+                            <h3>{% if monthly_avg_summ == None %}0{% else %}
+                                {{ monthly_avg_summ|decimalFormat }}{% endif %} грн</h3>
+                            <p>Средний расход за месяц</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-pie-chart"></i>
+                        </div>
+                        <span class="small-box-footer">
+                &nbsp;
+            </span>
+                    </div>
+                </div>
+            </div>
+            {% if last_month_data_json %}
                 <div class="row">
-    <div class="col-xs-12 col-md-6 col-lg-4">
-        <div class="small-box bg-red">
-            <div class="inner">
-                <h3>-39 502.90 грн</h3>
-                <p>Баланс по квартире</p>
-            </div>
-            <div class="icon">
-                <i class="fa fa-money"></i>
-            </div>
-            <span class="small-box-footer">
-                &nbsp;
-            </span>
-        </div>
-    </div>
-    <div class="col-xs-12 col-md-6 col-lg-4">
-        <div class="small-box bg-blue">
-            <div class="inner">
-                <h3>10019-00000</h3>
-                <p>Лицевой счет</p>
-            </div>
-            <div class="icon">
-                <i class="fa fa-user"></i>
-            </div>
-            <span class="small-box-footer">
-                &nbsp;
-            </span>
-        </div>
-    </div>
-    <div class="col-xs-12 col-md-6 col-lg-4">
-        <div class="small-box bg-yellow">
-            <div class="inner">
-                <h3>7 988.18 грн</h3>
-                <p>Средний расход за месяц</p>
-            </div>
-            <div class="icon">
-                <i class="fa fa-pie-chart"></i>
-            </div>
-            <span class="small-box-footer">
-                &nbsp;
-            </span>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-12">
-        <div class="box">
-            <div class="box-header with-border">
-                <h3 id="pieChartTitle" class="box-title">Диаграмма расходов</h3>
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header with-border">
+                                <h3 id="pieChartTitle" class="box-title">Диаграмма расходов</h3>
                             </div>
-            <div class="box-body">
-                <div class="row">
-                                            <div class="col-xs-12">
-                            <p>Недостаточно данных для отображения статистики</p>
-                        </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-xs-12 col-lg-6">
+                                        <div class="card-body">
+                                            <canvas id="pieChart1"
+                                                    style="min-height: 250px; height: 500px; max-height: 500px; max-width: 100%; display: block; width: 730px;"
+                                                    width="730" height="250" class="chartjs-render-monitor"></canvas>
+                                        </div>
                                     </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-12">
-        <div class="box">
-            <div class="box-header with-border">
-                <h3 class="box-title">Диаграмма расходов по месяцам за год</h3>
-            </div>
-            <div class="box-body">
-                <div class="row">
-                                            <div class="col-xs-12">
-                            <p>Недостаточно данных для отображения статистики</p>
-                        </div>
-                                    </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-    </section>
-</div>
+                                    <div class="col-xs-12 col-lg-6">
+                                        <div class="card-body">
+                                            <canvas id="pieChart2"
+                                                    style="min-height: 250px; height: 500px; max-height: 500px; max-width: 100%; display: block; width: 730px;"
+                                                    width="730" height="250" class="chartjs-render-monitor"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Диаграмма расходов по месяцам за год</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-xs-12">
+
+                                        <div class="col-12">
+                                            <div class="card-body">
+                                                <canvas id="lineChart"
+                                                        style="min-height: 250px; height: 500px; max-height: 500px; max-width: 100%; display: block; width: 100%;"
+                                                        width="730" height="250"
+                                                        class="chartjs-render-monitor"></canvas>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </div>
 {% endblock %}
 
 {% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {#    <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>#}
+
     <script>
-    function set_statistics_data() {
-        $.ajax({
-            url: '{% url 'admin_panel:api_get_statistics' %}',
-            dataType: 'json',
-            success: function (data) {
-                console.log(data.results.cash_box_balance)
-                $('#account-debt').text(data.results.account_debt)
-                $('#account-balance').text(data.results.account_balance)
-                $('#cash-box-balance').text(data.results.cash_box_balance)
+        {% if last_month_data_json %}
+            $(function () {
+                var labels = []
+                var data = []
+                var last_month_data = JSON.parse('{{ last_month_data_json|safe }}')
+
+                for (let i = 0; i < last_month_data.length; i++) {
+                    labels.push(last_month_data[i].bill_receipt__service__name)
+                    data.push(last_month_data[i].summ)
+                }
+
+                var donutData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: data,
+                            backgroundColor: ['#0ec2ff', '#e4fa8e', '#8e99fa', '#fa8ef8'],
+                        }
+                    ]
+                }
+
+
+                //-------------
+                //- PIE CHART -
+                //-------------
+                // Get context with jQuery - using jQuery's .get() method.
+                var pieChartCanvas = $('#pieChart1')
+                var pieData = donutData;
+                var pieOptions = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'За предыдущий месяц',
+                            padding: {
+                                top: 10,
+                                bottom: 10
+                            }
+                        }
+                    }
+                }
+                //Create pie or douhnut chart
+                new Chart(pieChartCanvas, {
+                    type: 'pie',
+                    data: pieData,
+                    options: pieOptions
+                })
+
+                console.log(pieOptions)
+            })
+        {% endif %}
+    </script>
+
+    <script>
+        {% if last_year_data_json %}
+            $(function () {
+                var labels = []
+                var data = []
+                var last_month_data = JSON.parse('{{ last_year_data_json|safe }}')
+
+                for (let i = 0; i < last_month_data.length; i++) {
+                    labels.push(last_month_data[i].bill_receipt__service__name)
+                    data.push(last_month_data[i].summ)
+                }
+
+                var donutData = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: data,
+                            backgroundColor: ['#0ec2ff', '#e4fa8e', '#8e99fa', '#fa8ef8'],
+                        }
+                    ]
+                }
+
+
+                //-------------
+                //- PIE CHART -
+                //-------------
+                // Get context with jQuery - using jQuery's .get() method.
+                var pieChartCanvas = $('#pieChart2')
+                var pieData = donutData;
+                var pieOptions = {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'За предыдущий год',
+                            padding: {
+                                top: 10,
+                                bottom: 10
+                            }
+                        }
+                    }
+                }
+                //Create pie or douhnut chart
+                new Chart(pieChartCanvas, {
+                    type: 'pie',
+                    data: pieData,
+                    options: pieOptions
+                })
+
+                console.log(pieOptions)
+            })
+        {% endif %}
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        window.onload = function () {
+            //-------------
+            //- Data handling
+            //--------------
+            var labels = []
+            var data = []
+            var seance_data = JSON.parse('{{ monthly_summ_json|safe }}');
+
+            for (let i = 0; i < seance_data.length; i++) {
+                labels.push(seance_data[i].month)
+                data.push(seance_data[i].monthly_summ)
             }
-        })
-    }
+
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            const date_options = {month: 'long'};
+            for (let i = 0; i < labels.length; i++) {
+                let momentDate = moment(labels[i], 'YYYY-MM-DD');
+                let jsDate = momentDate.toDate();
+                labels[i] = capitalizeFirstLetter(jsDate.toLocaleDateString("ru-RU", date_options))
+            }
+
+            const areaChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                showTooltips: true,
+
+                legend: {
+                    display: false
+                },
+            };
+
+            const areaChartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Расходы',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: data
+                    }
+                ]
+            };
+
+            //-------------
+            //- LINE CHART -
+            //--------------
+            var lineChartCanvas = $('#lineChart').get(0).getContext('2d')
+            var lineChartOptions = $.extend(true, {}, areaChartOptions)
+            var lineChartData = $.extend(true, {}, areaChartData)
+            lineChartData.datasets[0].fill = false;
+            lineChartOptions.datasetFill = false
+
+            var lineChart = new Chart(lineChartCanvas, {
+                type: 'bar',
+                data: lineChartData,
+                options: lineChartOptions
+            })
+        };
+
+
     </script>
 
 {% endblock %}

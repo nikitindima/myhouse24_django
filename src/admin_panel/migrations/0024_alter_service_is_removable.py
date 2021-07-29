@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0023_auto_20210708_0430'),
+        ("admin_panel", "0023_auto_20210708_0430"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='service',
-            name='is_removable',
+            model_name="service",
+            name="is_removable",
             field=models.BooleanField(default=True),
         ),
     ]
