@@ -7,17 +7,23 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0039_alter_flat_account'),
+        ("admin_panel", "0039_alter_flat_account"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='flat',
-            name='account',
+            model_name="flat",
+            name="account",
         ),
         migrations.AddField(
-            model_name='account',
-            name='account_flat',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='flat_account', to='admin_panel.flat'),
+            model_name="account",
+            name="account_flat",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="flat_account",
+                to="admin_panel.flat",
+            ),
         ),
     ]

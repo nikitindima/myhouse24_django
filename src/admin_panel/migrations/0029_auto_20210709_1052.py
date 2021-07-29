@@ -7,22 +7,26 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0028_auto_20210709_1042'),
+        ("admin_panel", "0028_auto_20210709_1042"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='serviceprice',
+            name="serviceprice",
             options={},
         ),
         migrations.AlterField(
-            model_name='serviceprice',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_panel.service'),
+            model_name="serviceprice",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="admin_panel.service"
+            ),
         ),
         migrations.AlterField(
-            model_name='tariff',
-            name='service_price',
-            field=models.ManyToManyField(related_name='service_price', to='admin_panel.ServicePrice'),
+            model_name="tariff",
+            name="service_price",
+            field=models.ManyToManyField(
+                related_name="service_price", to="admin_panel.ServicePrice"
+            ),
         ),
     ]

@@ -6,29 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0053_receipt_number'),
+        ("admin_panel", "0053_receipt_number"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='receipt',
-            name='period',
+            model_name="receipt",
+            name="period",
         ),
         migrations.AddField(
-            model_name='receipt',
-            name='period_end',
-            field=models.DateField(default='1995-09-09'),
+            model_name="receipt",
+            name="period_end",
+            field=models.DateField(default="1995-09-09"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='receipt',
-            name='period_start',
-            field=models.DateField(default='1995-05-05'),
+            model_name="receipt",
+            name="period_start",
+            field=models.DateField(default="1995-05-05"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='receipt',
-            name='created',
+            model_name="receipt",
+            name="created",
             field=models.DateField(),
         ),
     ]

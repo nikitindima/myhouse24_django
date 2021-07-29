@@ -28,9 +28,12 @@ class PdfPrint:
 
     def report(self, weather_history, title):
         doc = SimpleDocTemplate(
-            self.buffer, rightMargin=72, leftMargin=72,
-            topMargin=30, bottomMargin=72,
-            pagesize=self.pageSize
+            self.buffer,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=30,
+            bottomMargin=72,
+            pagesize=self.pageSize,
         )
         # register fonts
         # freesans = settings.BASE_DIR + settings.STATIC_URL + "FreeSans.ttf"
@@ -39,14 +42,25 @@ class PdfPrint:
         # pdfmetrics.registerFont(TTFont('FreeSansBold', freesansbold))
         # set up styles
         styles = getSampleStyleSheet()
-        styles.add(ParagraphStyle(
-            name="TableHeader", fontSize=11, alignment=TA_CENTER,
-            fontName="FreeSansBold"))
-        styles.add(ParagraphStyle(
-            name="ParagraphTitle", fontSize=11, alignment=TA_JUSTIFY,
-            fontName="FreeSansBold"))
-        styles.add(ParagraphStyle(
-            name="Justify", alignment=TA_JUSTIFY, fontName="FreeSans"))
+        styles.add(
+            ParagraphStyle(
+                name="TableHeader",
+                fontSize=11,
+                alignment=TA_CENTER,
+                fontName="FreeSansBold",
+            )
+        )
+        styles.add(
+            ParagraphStyle(
+                name="ParagraphTitle",
+                fontSize=11,
+                alignment=TA_JUSTIFY,
+                fontName="FreeSansBold",
+            )
+        )
+        styles.add(
+            ParagraphStyle(name="Justify", alignment=TA_JUSTIFY, fontName="FreeSans")
+        )
 
         data = []
         data.append(Paragraph(title, styles["Title"]))
@@ -54,30 +68,37 @@ class PdfPrint:
         data.append(Spacer(1, 12))
         table_data = []
         # table header
-        table_data.append([
-            Paragraph('Date', styles['Title']),
-            Paragraph('Station', styles['Title']),
-            Paragraph('Min temp', styles['Title']),
-            Paragraph('Mean temp', styles['Title']),
-            Paragraph('Max temp', styles['Title'])
-        ])
+        table_data.append(
+            [
+                Paragraph("Date", styles["Title"]),
+                Paragraph("Station", styles["Title"]),
+                Paragraph("Min temp", styles["Title"]),
+                Paragraph("Mean temp", styles["Title"]),
+                Paragraph("Max temp", styles["Title"]),
+            ]
+        )
         # for wh in weather_history:
-            # add a row to table
-            # table_data.append([
-            #     wh.date,
-            #     Paragraph(wh.station.name, styles['Justify']),
-            #     u"{0} °C".format(wh.min),
-            #     u"{0} °C".format(wh.mean),
-            #     u"{0} °C".format(wh.max)
-            # ])
+        # add a row to table
+        # table_data.append([
+        #     wh.date,
+        #     Paragraph(wh.station.name, styles['Justify']),
+        #     u"{0} °C".format(wh.min),
+        #     u"{0} °C".format(wh.mean),
+        #     u"{0} °C".format(wh.max)
+        # ])
         # create table
-        wh_table = Table(table_data, colWidths=[doc.width/5.0]*5)
-        wh_table.hAlign = 'LEFT'
-        wh_table.setStyle(TableStyle(
-            [('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-             ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-             ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
-             ('BACKGROUND', (0, 0), (-1, 0), colors.gray)]))
+        wh_table = Table(table_data, colWidths=[doc.width / 5.0] * 5)
+        wh_table.hAlign = "LEFT"
+        wh_table.setStyle(
+            TableStyle(
+                [
+                    ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.black),
+                    ("BOX", (0, 0), (-1, -1), 0.5, colors.black),
+                    ("VALIGN", (0, 0), (-1, 0), "MIDDLE"),
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.gray),
+                ]
+            )
+        )
         data.append(wh_table)
         data.append(Spacer(1, 48))
         #

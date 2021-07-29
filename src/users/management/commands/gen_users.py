@@ -14,18 +14,18 @@ class Command(BaseCommand):
         get_or_create_user_roles()
         fake = Faker()
         user = User(
-            first_name='Роман',
-            last_name='Чебан',
-            patronymic='Виорелович',
-            email='roman.cheban@ukr.net',
-            status='ACTIVE',
+            first_name="Роман",
+            last_name="Чебан",
+            patronymic="Виорелович",
+            email="roman.cheban@ukr.net",
+            status="ACTIVE",
             user_id=str(random.randint(10000, 99999)),
-            role=get_object_or_404(UserRole, name='Директор'),
+            role=get_object_or_404(UserRole, name="Директор"),
             is_active=True,
             is_superuser=True,
             is_staff=True,
         )
-        user.set_password('admin')
+        user.set_password("admin")
         user.save()
 
         for _ in range(5):
@@ -35,14 +35,14 @@ class Command(BaseCommand):
                     last_name=fake.last_name(),
                     patronymic=fake.last_name(),
                     email=fake.email(),
-                    status='ACTIVE',
+                    status="ACTIVE",
                     user_id=str(random.randint(10000, 99999)),
-                    role=get_object_or_404(UserRole, name='Управляющий'),
+                    role=get_object_or_404(UserRole, name="Управляющий"),
                     is_active=True,
                     is_superuser=False,
                     is_staff=True,
                 )
-                user.set_password('admin')
+                user.set_password("admin")
                 user.save()
 
             except IntegrityError:

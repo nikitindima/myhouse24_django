@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0026_remove_serviceprice_tariff'),
+        ("admin_panel", "0026_remove_serviceprice_tariff"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tariff',
-            name='service_price',
-            field=models.ManyToManyField(to='admin_panel.ServicePrice'),
+            model_name="tariff",
+            name="service_price",
+            field=models.ManyToManyField(to="admin_panel.ServicePrice"),
         ),
     ]

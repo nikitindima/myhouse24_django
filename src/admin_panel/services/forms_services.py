@@ -79,7 +79,16 @@ def validate_image(form, name, max_size=None):
             raise forms.ValidationError("Вы можете загружать только изображения")
 
 
-def create_formset(form, request, post=False, qs=None, can_delete=False, prefix='formset_sections', files=False, extra=0):
+def create_formset(
+    form,
+    request,
+    post=False,
+    qs=None,
+    can_delete=False,
+    prefix="formset_sections",
+    files=False,
+    extra=0,
+):
     formset_factory = modelformset_factory(
         model=form.Meta.model, form=form, can_delete=can_delete, extra=extra
     )
@@ -106,7 +115,11 @@ def save_extra_forms(formset, model, **kwargs):
             name = form.cleaned_data.get("name")
 
             if model is Section:
-                new_object = Section(name=name, house=kwargs["house"], floors=form.cleaned_data.get("floors"))
+                new_object = Section(
+                    name=name,
+                    house=kwargs["house"],
+                    floors=form.cleaned_data.get("floors"),
+                )
             elif model is Measure:
                 new_object = Measure(name=name)
             elif model is Service:
@@ -136,13 +149,13 @@ def send_form_errors_to_messages_framework(form, request, formset=False):
 
 def generate_random_number_for_model_field(model=None, field=None, length=10):
     while True:
-        range_start = 10**(length-1)
-        range_end = (10**length)-1
+        range_start = 10 ** (length - 1)
+        range_end = (10 ** length) - 1
 
         number = random.randint(range_start, range_end)
 
         if model is not None and field is not None:
-            qs_filter = field + '__' + 'contains'
+            qs_filter = field + "__" + "contains"
             qs = model.objects.filter(**{qs_filter: number})
             if qs.exists():
                 continue

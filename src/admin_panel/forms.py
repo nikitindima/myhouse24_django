@@ -7,14 +7,23 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.postgres.forms import RangeWidget
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, TextInput, Textarea, CheckboxInput, FileInput, CharField
+from django.forms import (
+    ModelForm,
+    TextInput,
+    Textarea,
+    CheckboxInput,
+    FileInput,
+    CharField,
+)
 from django.forms.widgets import (
     URLInput,
     EmailInput,
     NumberInput,
     Select,
     PasswordInput,
-    DateInput, SelectMultiple, TimeInput,
+    DateInput,
+    SelectMultiple,
+    TimeInput,
 )
 from django.shortcuts import get_object_or_404
 
@@ -29,9 +38,23 @@ from .models import (
     House,
     Section,
     Floor,
-    Flat, Measure, Service, Tariff, ServicePrice, CompanyCredentials, TransactionType, Message, Account, Transaction,
-    MeterData, Receipt, Bill, HouseStaff, CallRequest,
+    Flat,
+    Measure,
+    Service,
+    Tariff,
+    ServicePrice,
+    CompanyCredentials,
+    TransactionType,
+    Message,
+    Account,
+    Transaction,
+    MeterData,
+    Receipt,
+    Bill,
+    HouseStaff,
+    CallRequest,
 )
+
 # 2.5MB - 2621440
 # 5MB - 5242880
 # 10MB - 10485760
@@ -473,7 +496,7 @@ class HouseCreateForm(HouseForm):
 class HouseStaffForm(ModelForm):
     class Meta:
         model = HouseStaff
-        fields = ['house_staff']
+        fields = ["house_staff"]
         widgets = {
             "house_staff": Select(
                 attrs={
@@ -481,9 +504,7 @@ class HouseStaffForm(ModelForm):
                 }
             )
         }
-        labels = {
-            "house_staff": "ФИО"
-        }
+        labels = {"house_staff": "ФИО"}
 
 
 # region FLAT
@@ -810,15 +831,17 @@ class UserProfileUpdateForm(UserUpdateForm):
             "avatar",
         ]
         widgets = UserUpdateForm.Meta.widgets
-        widgets.update({
-            "user_id": TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Введите id",
-                    "readonly": "readonly"
-                }
-            ),
-        })
+        widgets.update(
+            {
+                "user_id": TextInput(
+                    attrs={
+                        "class": "form-control",
+                        "placeholder": "Введите id",
+                        "readonly": "readonly",
+                    }
+                ),
+            }
+        )
 
     def clean_user_id(self):
         user_id = self.instance.user_id
@@ -828,17 +851,17 @@ class UserProfileUpdateForm(UserUpdateForm):
 class StaffCreateForm(UserCreateForm):
     class Meta(UserForm.Meta):
         model = User
-        fields = UserForm.Meta.fields + ['role']
+        fields = UserForm.Meta.fields + ["role"]
         labels = UserForm.Meta.labels
-        labels['role'] = 'Роль'
+        labels["role"] = "Роль"
 
 
 class StaffUpdateForm(UserUpdateForm):
     class Meta(UserUpdateForm.Meta):
         model = User
-        fields = UserUpdateForm.Meta.fields + ['role']
+        fields = UserUpdateForm.Meta.fields + ["role"]
         labels = UserUpdateForm.Meta.labels
-        labels['role'] = 'Роль'
+        labels["role"] = "Роль"
 
 
 class MeasureForm(forms.ModelForm):
@@ -853,9 +876,7 @@ class MeasureForm(forms.ModelForm):
                 }
             ),
         }
-        labels = {
-            "name": "Ед. изм."
-        }
+        labels = {"name": "Ед. изм."}
 
 
 class ServiceForm(forms.ModelForm):
@@ -902,7 +923,7 @@ class TariffForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите описание тарифа",
-                    "rows": 7
+                    "rows": 7,
                 }
             ),
         }
@@ -939,60 +960,93 @@ class ServicePriceForm(ModelForm):
 class UserRoleForm(ModelForm):
     class Meta:
         model = UserRole
-        exclude = ['name']
+        exclude = ["name"]
         widgets = {
-            'statistics_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'cashbox_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'receipt_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'account_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'flat_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'house_user_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'house_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'message_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'call_request_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'meter_data_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'site_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'service_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'tariff_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'role_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'staff_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
-            'payments_detail_access': forms.CheckboxInput(attrs={
-                'class': 'custom-control-input',
-            }),
+            "statistics_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "cashbox_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "receipt_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "account_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "flat_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "house_user_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "house_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "message_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "call_request_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "meter_data_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "site_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "service_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "tariff_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "role_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "staff_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
+            "payments_detail_access": forms.CheckboxInput(
+                attrs={
+                    "class": "custom-control-input",
+                }
+            ),
         }
 
 
 # endregion USER
+
 
 class CredentialsForm(ModelForm):
     class Meta:
@@ -1009,7 +1063,7 @@ class CredentialsForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите информацию",
-                    "rows": 7
+                    "rows": 7,
                 }
             ),
         }
@@ -1039,7 +1093,7 @@ class TransactionTypeForm(ModelForm):
 
 
 class MessageForm(ModelForm):
-    flat = CharField(widget=Select(choices=[(0, "---------")]), label='Квартира')
+    flat = CharField(widget=Select(choices=[(0, "---------")]), label="Квартира")
 
     class Meta:
         model = Message
@@ -1074,12 +1128,21 @@ class MessageForm(ModelForm):
 
 
 class AccountForm(ModelForm):
-    house = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Дом',
-                      required=True)
-    section = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Секция',
-                        required=True)
-    flat = CharField(widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}), label='Квартира',
-                     required=True)
+    house = CharField(
+        widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}),
+        label="Дом",
+        required=True,
+    )
+    section = CharField(
+        widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}),
+        label="Секция",
+        required=True,
+    )
+    flat = CharField(
+        widget=Select(choices=[(0, "Всем...")], attrs={"class": "form-control"}),
+        label="Квартира",
+        required=True,
+    )
 
     class Meta:
         model = Account
@@ -1103,26 +1166,26 @@ class AccountForm(ModelForm):
 
     def clean_number(self):
         number = self.cleaned_data.get("number")
-        if number == '':
-            raise forms.ValidationError('Введите номер счета')
+        if number == "":
+            raise forms.ValidationError("Введите номер счета")
         return number
 
     def clean_house(self):
         house = self.cleaned_data.get("house")
-        if house == '0':
-            raise forms.ValidationError('Выберите дом')
+        if house == "0":
+            raise forms.ValidationError("Выберите дом")
         return house
 
     def clean_section(self):
         section = self.cleaned_data.get("section")
-        if section == '0':
-            raise forms.ValidationError('Выберите секцию')
+        if section == "0":
+            raise forms.ValidationError("Выберите секцию")
         return section
 
     def clean_flat(self):
         flat_pk = self.cleaned_data.get("flat")
-        if flat_pk == '0':
-            raise forms.ValidationError('Выберите квартиру')
+        if flat_pk == "0":
+            raise forms.ValidationError("Выберите квартиру")
         return flat_pk
 
 
@@ -1133,13 +1196,13 @@ class AccountCreateForm(AccountForm):
     def clean_flat(self):
         flat_pk = self.cleaned_data.get("flat")
 
-        if flat_pk == '0':
-            raise forms.ValidationError('Выберите квартиру')
+        if flat_pk == "0":
+            raise forms.ValidationError("Выберите квартиру")
 
         else:
             flat_inst = Flat.objects.filter(pk=flat_pk)
             if flat_inst is not None:
-                raise forms.ValidationError('К этой квартире уже привязан счёт')
+                raise forms.ValidationError("К этой квартире уже привязан счёт")
 
         return flat_pk
 
@@ -1151,14 +1214,14 @@ class AccountUpdateForm(AccountForm):
     def clean_flat(self):
         flat_pk = self.cleaned_data.get("flat")
 
-        if flat_pk == '0':
-            raise forms.ValidationError('Выберите квартиру')
+        if flat_pk == "0":
+            raise forms.ValidationError("Выберите квартиру")
 
         else:
             old_flat_pk = self.instance.account_flat.pk
             if flat_pk != str(old_flat_pk):
                 if Account.objects.filter(account_flat=flat_pk).exists():
-                    raise forms.ValidationError('К этой квартире уже привязан счёт')
+                    raise forms.ValidationError("К этой квартире уже привязан счёт")
 
         return flat_pk
 
@@ -1166,8 +1229,17 @@ class AccountUpdateForm(AccountForm):
 class TransactionIncomeCreateForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ['created_by', 'account', 'transaction_type', 'amount', 'manager', 'is_passed', 'number', 'created',
-                  'description']
+        fields = [
+            "created_by",
+            "account",
+            "transaction_type",
+            "amount",
+            "manager",
+            "is_passed",
+            "number",
+            "created",
+            "description",
+        ]
         widgets = {
             "created_by": Select(),
             "account": Select(),
@@ -1195,9 +1267,9 @@ class TransactionIncomeCreateForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите комментарий",
-                    "rows": 6
+                    "rows": 6,
                 }
-            )
+            ),
         }
         labels = {
             "created_by": "Владелец квартиры",
@@ -1208,14 +1280,22 @@ class TransactionIncomeCreateForm(ModelForm):
             "is_passed": "Проведен",
             "number": "Номер",
             "created": "Создано",
-            "description": "Комментарий"
+            "description": "Комментарий",
         }
 
 
 class TransactionExpenseCreateForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ['number', 'created', 'transaction_type', 'manager', 'amount', 'description', 'is_passed']
+        fields = [
+            "number",
+            "created",
+            "transaction_type",
+            "manager",
+            "amount",
+            "description",
+            "is_passed",
+        ]
         widgets = {
             "transaction_type": Select(),
             "amount": NumberInput(
@@ -1241,9 +1321,9 @@ class TransactionExpenseCreateForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите комментарий",
-                    "rows": 6
+                    "rows": 6,
                 }
-            )
+            ),
         }
         labels = {
             "transaction_type": "Статья",
@@ -1257,17 +1337,23 @@ class TransactionExpenseCreateForm(ModelForm):
 
 
 class MeterDataForm(ModelForm):
-    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
-                      required=True)
-    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
-                        required=True)
+    house = CharField(
+        widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}),
+        label="Дом",
+        required=True,
+    )
+    section = CharField(
+        widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}),
+        label="Секция",
+        required=True,
+    )
 
     # flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
     #                  required=True)
 
     class Meta:
         model = MeterData
-        fields = ['status', 'service', 'flat', 'amount', 'created', 'number']
+        fields = ["status", "service", "flat", "amount", "created", "number"]
 
         widgets = {
             "flat": Select(),
@@ -1284,12 +1370,11 @@ class MeterDataForm(ModelForm):
                     "placeholder": "Введите номер ведомости",
                 }
             ),
-            "amount": NumberInput()
+            "amount": NumberInput(),
         }
         labels = {
             "house": "Дом",
             "section": "Секция",
-
             "flat": "Квартира",
             "service": "Счетчик",
             "status": "Статус",
@@ -1300,16 +1385,34 @@ class MeterDataForm(ModelForm):
 
 
 class ReceiptCreateForm(ModelForm):
-    house = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Дом',
-                      required=True)
-    section = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Секция',
-                        required=True)
-    flat = CharField(widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}), label='Квартира',
-                     required=True)
+    house = CharField(
+        widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}),
+        label="Дом",
+        required=True,
+    )
+    section = CharField(
+        widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}),
+        label="Секция",
+        required=True,
+    )
+    flat = CharField(
+        widget=Select(choices=[(0, "---------")], attrs={"class": "form-control"}),
+        label="Квартира",
+        required=True,
+    )
 
     class Meta:
         model = Receipt
-        fields = ['is_passed', 'created', 'number', 'account', 'tariff', 'status', 'period_start', 'period_end']
+        fields = [
+            "is_passed",
+            "created",
+            "number",
+            "account",
+            "tariff",
+            "status",
+            "period_start",
+            "period_end",
+        ]
 
         widgets = {
             "number": TextInput(
@@ -1335,13 +1438,15 @@ class ReceiptCreateForm(ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите дату начала периода",
-                }),
+                }
+            ),
             "period_end": DateInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Введите дату окончания периода",
-                }),
-            "is_passed": CheckboxInput()
+                }
+            ),
+            "is_passed": CheckboxInput(),
         }
         labels = {
             "house": "Дом",
@@ -1354,14 +1459,14 @@ class ReceiptCreateForm(ModelForm):
             "is_passed": "Проведена",
             "period_start": "Период с",
             "period_end": "Период до",
-            "account": "Счет"
+            "account": "Счет",
         }
 
 
 class BillForm(ModelForm):
     class Meta:
         model = Bill
-        fields = ['consumption', 'price', 'cost', 'service']
+        fields = ["consumption", "price", "cost", "service"]
         widgets = {
             "consumption": NumberInput(
                 attrs={
@@ -1386,7 +1491,7 @@ class BillForm(ModelForm):
                     "class": "form-control",
                     "placeholder": "Введите расход",
                 },
-                choices=[(0, "Выбирите...")]
+                choices=[(0, "Выбирите...")],
             ),
         }
 
@@ -1394,15 +1499,23 @@ class BillForm(ModelForm):
 class BillUpdateForm(BillForm):
     class Meta(BillForm.Meta):
         model = Bill
-        fields = BillForm.Meta.fields + ['receipt']
+        fields = BillForm.Meta.fields + ["receipt"]
 
 
 class CallRequestForm(ModelForm):
     class Meta:
         model = CallRequest
-        fields = ['request_date', 'request_time', 'flat_owner',
-                  'description', 'comment', 'flat', 'master_type',
-                  'status', 'master']
+        fields = [
+            "request_date",
+            "request_time",
+            "flat_owner",
+            "description",
+            "comment",
+            "flat",
+            "master_type",
+            "status",
+            "master",
+        ]
         widgets = {
             "request_date": DateInput(
                 attrs={
@@ -1415,7 +1528,6 @@ class CallRequestForm(ModelForm):
                     "id": "kt_timepicker_1",
                     "class": "form-control",
                     "placeholder": "Выберите время заявки",
-
                 },
             ),
             "flat_owner": Select(
@@ -1424,15 +1536,12 @@ class CallRequestForm(ModelForm):
                 },
             ),
             "description": Textarea(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Введите описание"
-                },
+                attrs={"class": "form-control", "placeholder": "Введите описание"},
             ),
             "comment": Textarea(
                 attrs={
                     "class": "form-control summernote",
-                    "placeholder": "Введите комментарий"
+                    "placeholder": "Введите комментарий",
                 },
             ),
             "flat": Select(
@@ -1457,11 +1566,11 @@ class CallRequestForm(ModelForm):
             ),
         }
         labels = {
-            'flat_owner': "Владелец квартиры",
-            'description': "Описание",
-            'comment': "Комментарий",
-            'flat': "Квартира",
-            'master_type': "Тип мастера",
-            'status': "Статус",
-            'master': "Мастер"
+            "flat_owner": "Владелец квартиры",
+            "description": "Описание",
+            "comment": "Комментарий",
+            "flat": "Квартира",
+            "master_type": "Тип мастера",
+            "status": "Статус",
+            "master": "Мастер",
         }

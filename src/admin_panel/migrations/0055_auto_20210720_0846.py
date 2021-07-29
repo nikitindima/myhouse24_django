@@ -7,18 +7,26 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0054_auto_20210717_1334'),
+        ("admin_panel", "0054_auto_20210717_1334"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='bill',
-            name='receipt',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bill_receipt', to='admin_panel.receipt'),
+            model_name="bill",
+            name="receipt",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="bill_receipt",
+                to="admin_panel.receipt",
+            ),
         ),
         migrations.AlterField(
-            model_name='bill',
-            name='service',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bill_service', to='admin_panel.service'),
+            model_name="bill",
+            name="service",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="bill_service",
+                to="admin_panel.service",
+            ),
         ),
     ]

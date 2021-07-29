@@ -8,13 +8,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admin_panel', '0056_auto_20210721_1254'),
+        ("admin_panel", "0056_auto_20210721_1254"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='house',
-            name='house_staff',
-            field=models.ManyToManyField(blank=True, null=True, through='admin_panel.HouseStaff', to=settings.AUTH_USER_MODEL),
+            model_name="house",
+            name="house_staff",
+            field=models.ManyToManyField(
+                blank=True,
+                null=True,
+                through="admin_panel.HouseStaff",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0032_callrequest_message'),
+        ("admin_panel", "0032_callrequest_message"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='message',
-            name='to_debtors',
+            model_name="message",
+            name="to_debtors",
             field=models.BooleanField(default=False),
         ),
     ]
