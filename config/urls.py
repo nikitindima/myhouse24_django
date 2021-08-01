@@ -25,11 +25,11 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', robots_txt, name='robots_txt'),
 
-    path("accounts/", include("allauth.urls")),
-    path("allauth/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path("allauth/about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
-    path("allauth/users/", include("src.users.urls", namespace="users")),
-    path("admin-old", admin.site.urls),
+    # path("accounts/", include("allauth.urls")),
+    # path("allauth/", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    # path("allauth/about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
+    # path("allauth/users/", include("src.users.urls", namespace="users")),
+    # path("admin-old", admin.site.urls),
 
     # Your stuff: custom urls includes go here
     path("admin_panel/", include("src.admin_panel.urls", namespace="admin_panel")),
