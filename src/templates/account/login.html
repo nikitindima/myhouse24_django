@@ -128,6 +128,14 @@
 <script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
 <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
 <script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
-
+<script>
+    {% if user.is_authenticated %}
+        {% if user.is_staff %}
+            location.href = '{% url 'admin_panel:welcome' %}';
+        {% else %}
+            location.href = '{% url 'site:home' %}';
+        {% endif %}
+    {% endif %}
+</script>
 </body>
 </html>
