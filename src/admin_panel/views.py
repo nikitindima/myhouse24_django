@@ -1298,7 +1298,7 @@ def system_user_role_view(request):
 
     if request.method == "POST":
         forms_valid_status = validate_forms(formset)
-        print(formset)
+
         if forms_valid_status:
             save_forms(formset)
 
