@@ -60,55 +60,46 @@ services:
     restart: "on-failure"
 
 #  redis:
-#    image: "redis:alpine"
-#
-#  celery:
-#    restart: always
-#    build:
-#      context: .
-#    command: make worker
+#    image: redis:5.0
+#    container_name: redis
 #    depends_on:
-#      - web
+#      - django
+##
+#  celeryworker:
+#    <<: *django
+#    container_name: celeryworker
+#    volumes:
+#      - .:/app:rw
+#    depends_on:
 #      - redis
+#      - postgresdb
+#      - django
+##      - mailhog
+#    ports: []
+#    command: make celeryworker
+##
+#  celerybeat:
+#    <<: *django
+#    container_name: celerybeat
+#    volumes:
+#      - .:/app:rw
+#    depends_on:
+#      - redis
+#      - postgresdb
+#      - django
+##      - mailhog
+#    ports: []
+#    command: make celerybeat
+#
+#  flower:
+#    <<: *django
+#    container_name: flower
+#    volumes:
+#      - .:/app:rw
+#    depends_on:
+#      - redis
+#      - postgresdb
+#      - django
 #    ports:
-#      - "587:587"
-
-  redis:
-    image: redis:5.0
-    container_name: redis
-#
-  celeryworker:
-    <<: *django
-    container_name: celeryworker
-    volumes:
-      - .:/app:rw
-    depends_on:
-      - redis
-      - postgresdb
-#      - mailhog
-    ports: []
-    command: make celeryworker
-#
-  celerybeat:
-    <<: *django
-    container_name: celerybeat
-    volumes:
-      - .:/app:rw
-    depends_on:
-      - redis
-      - postgresdb
-#      - mailhog
-    ports: []
-    command: make celerybeat
-
-  flower:
-    <<: *django
-    container_name: flower
-    volumes:
-      - .:/app:rw
-    depends_on:
-      - redis
-      - postgresdb
-    ports:
-      - "5555:5555"
-    command: make flower
+#      - "5555:5555"
+#    command: make flower
