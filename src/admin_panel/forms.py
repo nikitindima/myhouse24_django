@@ -1044,6 +1044,15 @@ class UserRoleForm(ModelForm):
             ),
         }
 
+    def save(self, commit=True):
+        old_instance = self.instance
+        if old_instance.name == 'Директор':
+            return old_instance
+
+        new_instance = super().save(commit=False)
+        if commit:
+            new_instance.save()
+        return new_instance
 
 # endregion USER
 

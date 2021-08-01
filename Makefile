@@ -1,8 +1,12 @@
 #!make
-include .envs/.local/django.env
-include .envs/.local/postgres.env
-export $(shell sed 's/=.*//' .envs/.local/django.env)
-export $(shell sed 's/=.*//' .envs/.local/postgres.env)
+ENV_FILE_CHECK = .envs/.local/django.env
+ifneq ("$(wildcard $(ENV_FILE_CHECK))","")
+	include .envs/.local/django.env
+	include .envs/.local/postgres.env
+	export $(shell sed 's/=.*//' .envs/.local/django.env)
+	export $(shell sed 's/=.*//' .envs/.local/postgres.env)
+endif
+
 
 MANAGE = python manage.py
 SOURCE = src
