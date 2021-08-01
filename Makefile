@@ -19,6 +19,7 @@ WSGI_PORT=8000
 
 # ##########################################################################
 # common commands
+
 black:
 	black $(SOURCE) --exclude 'urls.py'
 celerybeat:
