@@ -1,4 +1,5 @@
 {% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
@@ -43,12 +44,13 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Просмотр лицевого счета</h3>
                     <div class="box-tools">
-                        <a href="/admin/account-transaction/create?type=in&amp;account_id=105"
+                        <a href="{% url 'admin_panel:transaction_income_create' %}?account_id={{ object.id }}"
                            class="btn btn-default btn-sm">
-                            <span class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span><i
+                            <span class="hidden-xs"><i class="fa fa-dollar"></i>Принять платеж</span><i
                                 class="fa fa-pencil visible-xs" aria-hidden="true"></i>
                         </a>
-                        <a href="/admin/invoice/create?flat_id=40" class="btn btn-default btn-sm">
+                        <a href="{% url 'admin_panel:receipt_create' %}?account_id={{ object.pk }}"
+                           class="btn btn-default btn-sm">
                             <span class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span><i
                                 class="fa fa-pencil visible-xs" aria-hidden="true"></i>
                         </a>
@@ -105,17 +107,21 @@
                                 <tr>
                                     <td>Остаток, грн.</td>
                                     <td>
-                                        <span class="text-green">00 000.00</span></td>
+                                        {% with object.account_flat.id|get_account_balance as balance %}
+                                            <span class="text-{% if balance >= 0 %}green{% else %}red{% endif %}">{{ balance }}</span>
+                                            </td>
+                                        {% endwith %}
                                 </tr>
                                 </tbody>
                             </table>
                             <div>
-                                <p><a href="/admin/counter-data/counter-list?CounterDataSearch%5Bflat_id%5D=40">Посмотреть
-                                    показания счетчиков</a></p>
                                 <p>
-                                    <a href="/admin/account-transaction/index?AccountTransactionSearch%5Baccount_id%5D=105&amp;AccountTransactionSearch%5Btype%5D=in">Посмотреть
-                                        приходы</a></p>
-                                <p><a href="/admin/invoice/index?InvoiceSearch%5Bflat_id%5D=40">Посмотреть квитанции</a>
+                                    <a href="{% url 'admin_panel:meter_data_list_by_flat' %}?flat_id={{ object.account_flat.pk }}">Посмотреть
+                                        показания счетчиков</a></p>
+                                <p><a href="{% url 'admin_panel:transaction_list' %}?account_id={{ object.id }}">Посмотреть
+                                    приходы</a></p>
+                                <p><a href="{% url 'admin_panel:receipt_list' %}?account_id={{ object.id }}">Посмотреть
+                                    квитанции</a>
                                 </p>
                             </div>
                         </div>

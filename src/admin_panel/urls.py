@@ -13,7 +13,8 @@ urlpatterns = [
     path("cashbox/transactions/detail/<int:pk>/", views.TransactionDetailView.as_view(), name="transaction_detail"),
     path("cashbox/transactions/update/<int:pk>/", views.transaction_update_view, name="transaction_update"),
     path("cashbox/transactions/delete/<int:pk>/", views.TransactionDeleteView.as_view(), name="transaction_delete"),
-    path("cashbox/transactions/xls/", views.transaction_xls_list, name="transaction_xls_list"),
+    path("cashbox/transactions/xls/", views.transaction_list_xls, name="transaction_xls_list"),
+    path("cashbox/transactions/xls/<int:pk>/", views.transaction_detail_xls, name="transaction_xls_detail"),
 
     path("receipts/", views.ReceiptListView.as_view(), name="receipt_list"),
     path("receipts/create/", views.receipt_create_view, name="receipt_create"),

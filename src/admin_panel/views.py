@@ -1677,10 +1677,18 @@ def account_xls_list(request):
 
 @method_decorator(user_passes_test(cashbox_access), name="dispatch")
 class TransactionListView(ListView):
-    queryset = Transaction.objects.select_related(
-        "account__account_flat__owner", "receipt", "transaction_type", "created_by"
-    ).order_by("-created")
     template_name = "admin_panel/pages/transaction_list.html"
+
+    def get_queryset(self):
+        account_id = self.request.GET.get("account_id", None)
+        if account_id is not None:
+            queryset = Transaction.objects.select_related(
+                "account__account_flat__owner", "receipt", "transaction_type", "created_by") \
+                .order_by("-created").filter(account__id=account_id)
+        else:
+            queryset = Transaction.objects.select_related(
+                "account__account_flat__owner", "receipt", "transaction_type", "created_by").order_by("-created")
+        return queryset
 
 
 @method_decorator(user_passes_test(cashbox_access), name="dispatch")
@@ -1692,8 +1700,10 @@ class TransactionDetailView(DetailView):
 @user_passes_test(cashbox_access)
 def transaction_income_create_view(request):
     transaction_id = request.GET.get("transaction_id", None)
+    account_id = request.GET.get("account_id", None)
     number = generate_random_number_for_model_field(model=Transaction, field="number", length=8)
-    form1 = TransactionIncomeCreateForm(request.POST or None, prefix="form1", initial={'number': number})
+    form1 = TransactionIncomeCreateForm(request.POST or None, prefix="form1",
+                                        initial={'number': number, 'created': today()})
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
@@ -1708,7 +1718,7 @@ def transaction_income_create_view(request):
         messages.error(request, f"Ошибка при сохранении формы.")
 
     if transaction_id is not None:
-        obj = Transaction.objects.filter(id=transaction_id).last()
+        obj = get_object_or_404(Transaction, pk=transaction_id)
 
         form1.initial = {
             "created_by": obj.created_by,
@@ -1720,6 +1730,18 @@ def transaction_income_create_view(request):
             "number": number,
             "transaction_type": obj.transaction_type,
             "description": obj.description,
+        }
+    elif account_id is not None:
+        obj = Account.objects.filter(pk=account_id) \
+            .select_related('account_flat__owner').last()
+
+        form1.initial = {
+            "created_by": obj.account_flat.owner,
+            "is_passed": True,
+            "manager": User.objects.filter(is_staff=True, is_superuser=False).last(),
+            "account": obj.account_flat,
+            "created": today(),
+            "number": number,
         }
 
     context = {
@@ -1814,7 +1836,48 @@ def transaction_update_view(request, pk):
 
 
 @user_passes_test(account_access)
-def transaction_xls_list(request):
+def transaction_detail_xls(request, pk):
+    columns = []
+    cell_format, output, workbook, worksheet = make_in_memory_worksheet(columns)
+
+    obj = Transaction.objects.filter(pk=pk).select_related(
+        "account__account_flat__owner", "receipt", "transaction_type", "created_by"
+    ).last()
+
+    transaction_type = "Приход" if obj.transaction_type.type == "INCOME" else "Расход"
+    status = "Проведена" if obj.is_passed is True else "Не проведена"
+    data = [
+        {"row_name": "Платеж", "row_data": f"#{obj.number}"},
+        {"row_name": "Дата", "row_data": f"{str(obj.created)}"},
+        {"row_name": "Владелец квартиры", "row_data": f"{obj.created_by.full_name}"},
+        {"row_name": "Лицевой счет", "row_data": f"{obj.account.number}"},
+        {"row_name": "Приход/Расход", "row_data": f"{transaction_type}"},
+        {"row_name": "Статус", "row_data": f"{status}"},
+        {"row_name": "Статья", "row_data": f"{obj.transaction_type.name}"},
+        {"row_name": "Квитанция", "row_data": "-"},
+        {"row_name": "Услуга", "row_data": "-"},
+        {"row_name": "Сумма", "row_data": f"{obj.amount}"},
+        {"row_name": "Валюта", "row_data": "грн."},
+        {"row_name": "Комментарий", "row_data": f"{obj.description}"},
+        {"row_name": "Менеджер", "row_data": f"{obj.manager.full_name}"},
+    ]
+    for row in range(len(data)):
+        worksheet.write(row, 0, data[row]['row_name'], cell_format)
+        worksheet.write(row, 1, data[row]['row_data'], cell_format)
+
+    workbook.close()
+    output.seek(0)
+
+    response = HttpResponse(output.read(), content_type="application/vnd.ms-excel")
+    response["Content-Disposition"] = "attachment; filename=transaction_detail.xlsx"
+
+    output.close()
+
+    return response
+
+
+@user_passes_test(account_access)
+def transaction_list_xls(request):
     columns = [
         "№",
         "Дата",
@@ -1971,24 +2034,35 @@ def meter_data_update_view(request, pk):
 
 @method_decorator(user_passes_test(receipt_access), name="dispatch")
 class ReceiptListView(ListView):
-    queryset = (
-        Receipt.objects.select_related("account__account_flat__owner")
-            .prefetch_related("bill_receipt")
-            .annotate(total_price=models.Sum("bill_receipt__cost"))
-            .order_by("-created")
-    )
     template_name = "admin_panel/pages/receipt_list.html"
+
+    def get_queryset(self):
+        account_id = self.request.GET.get("account_id", None)
+        if account_id is not None:
+            queryset = Receipt.objects.filter(account__id=account_id) \
+                .select_related("account__account_flat__owner") \
+                .prefetch_related("bill_receipt") \
+                .annotate(total_price=models.Sum("bill_receipt__cost")) \
+                .order_by("-created")
+        else:
+            queryset = Receipt.objects\
+                .select_related("account__account_flat__owner") \
+                .prefetch_related("bill_receipt") \
+                .annotate(total_price=models.Sum("bill_receipt__cost")) \
+                .order_by("-created")
+        return queryset
 
 
 @user_passes_test(receipt_access)
 def receipt_create_view(request):
     receipt_id = request.GET.get("receipt_id", None)
+    account_id = request.GET.get("account_id", None)
     receipt, owner = None, None
 
     number = generate_random_number_for_model_field(
         model=Receipt, field="number", length=8
     )
-    form1_initial = {"number": number}
+    form1_initial = {"number": number, "created": today()}
 
     formset = create_formset(
         BillForm, request, post=True, prefix="formset", can_delete=True
@@ -2000,6 +2074,7 @@ def receipt_create_view(request):
     if receipt_id is not None:
         receipt = get_object_or_404(Receipt, pk=receipt_id)
         flat = receipt.account.account_flat
+        account = receipt.account
         bills = Bill.objects.filter(receipt=receipt)
         formset.queryset = bills
         form1_initial.update(
@@ -2015,6 +2090,24 @@ def receipt_create_view(request):
         )
         owner = receipt.account.account_flat.owner
         meter_data_qs = meter_data_qs.filter(flat=flat)
+
+    elif account_id is not None:
+        account = Account.objects.filter(pk=account_id).last()
+
+        form1_initial.update(
+            {
+                "is_passed": True,
+                "created": today(),
+                "account": account,
+                "tariff": Tariff.objects.last(),
+                "status": "NOT_PAID",
+                "period_start": today(),
+                "period_end": today(),
+            }
+        )
+
+        owner = account.account_flat.owner
+        meter_data_qs = meter_data_qs.filter(flat=account.account_flat)
 
     if request.method == "POST":
         form1 = ReceiptCreateForm(request.POST, prefix="form1")
@@ -2058,7 +2151,7 @@ def receipt_create_view(request):
         "form1": form1,
         "formset": formset,
         "meter_data_qs": meter_data_qs,
-        "receipt": receipt,
+        "account": account,
         "owner": owner,
     }
 

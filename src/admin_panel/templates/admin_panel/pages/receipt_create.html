@@ -517,18 +517,18 @@
                 })
                 {#add_formset_form(counter, form_counters);#}
             })
-            {% if receipt != None %}
+            {% if account != None %}
                 let data_house = {
-                    id: {{ receipt.account.account_flat.house.id }},
-                    text: '{{ receipt.account.account_flat.house }}'
+                    id: {{ account.account_flat.house.id }},
+                    text: '{{ account.account_flat.house }}'
                 };
                 let data_section = {
-                    id: {{ receipt.account.account_flat.section.id }},
-                    text: '{{ receipt.account.account_flat.section }}'
+                    id: {{ account.account_flat.section.id }},
+                    text: '{{ account.account_flat.section }}'
                 };
                 let data_flat = {
-                    id: {{ receipt.account.account_flat.id }},
-                    text: '{{ receipt.account.account_flat }}'
+                    id: {{ account.account_flat.id }},
+                    text: '{{ account.account_flat }}'
                 };
                 let newOptionHouse = new Option(data_house.text, data_house.id, false, false);
                 select_house.append(newOptionHouse).val(data_house.id).trigger('change')
