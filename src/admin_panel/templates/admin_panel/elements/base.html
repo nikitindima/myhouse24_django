@@ -56,11 +56,11 @@
                     <li class="dropdown notifications-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             <i class="fa fa-child fa-lg"></i>
-                            <span class="label label-warning">4</span>
+                            <span class="label label-warning new-users-count">0</span>
                         </a>
                         <ul class="dropdown-menu">
 
-                            <li class="header">Новых пользователей: <span id="new-users-count">0</span></li>
+                            <li class="header">Новых пользователей: <span class="new-users-count">0</span></li>
                             <li>
                                 <!-- inner menu: contains the actual data -->
                                 <ul class="menu" id="new-users">
@@ -94,7 +94,7 @@
                                     <img src="{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}"
                                          class="img-circle" alt="admin admin">
                                 {% endif %}
-                                <p>{{ request.user.full_name }} (Директор)</p>
+                                <p>{{ request.user.full_name }} ({% if request.user.role %}{{ request.user.role.name }}{% elif request.user.is_superuser %}Суперюзер{% else %}Ошибка!{% endif %})</p>
                             </li>
                             <!-- Menu Footer-->
                             <li class="user-footer">
@@ -253,7 +253,6 @@
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
-    <script src="{% static 'admin_panel/plugins/chart.js/Chart.js' %}"></script>
     <script src="{% static 'admin_panel/plugins/alertifyjs/alertify.min.js' %}"></script>
 
     {% block scripts %}{% endblock %}
@@ -277,7 +276,10 @@
                     let list_element = '<li><a href="' + link + id + '">' + full_name + '</a></li>';
                     $(new_users).append($(list_element))
                 }
-                let users_count = $('#new-users-count').html(data.length)
+                $('.new-users-count').each(function () {
+                    $(this).html(data.length)
+                })
+
             },
             error: function (response) {
                 console.log(response)

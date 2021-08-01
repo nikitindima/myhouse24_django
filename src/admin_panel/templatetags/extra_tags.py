@@ -1,8 +1,9 @@
 import datetime
 
 from django import template
+from django.db import models
 
-from src.admin_panel.models import Flat
+from src.admin_panel.models import Flat, Receipt, Transaction
 from src.admin_panel.services.user_passes_test import check_access
 
 register = template.Library()
@@ -56,3 +57,23 @@ def decimal_format(value):
 def get_flats(user):
     flats = Flat.objects.filter(owner=user).select_related("house").order_by("id")
     return flats
+
+
+@register.filter(name="get_account_balance")
+def get_account_balance(value):
+    receipts = Receipt.objects\
+        .prefetch_related("bill_receipt") \
+        .annotate(total_price=models.Sum("bill_receipt__cost")) \
+        .filter(account__account_flat__id=value, is_passed=True) \
+        .order_by("-created")
+
+    transactions = Transaction.objects.select_related("account", "transaction_type") \
+        .filter(account__account_flat__id=value, is_passed=True, transaction_type__type="INCOME")
+
+    balance = 0
+    for receipt in receipts:
+        balance -= receipt.total_price
+    for transaction in transactions:
+        balance += transaction.amount
+
+    return balance

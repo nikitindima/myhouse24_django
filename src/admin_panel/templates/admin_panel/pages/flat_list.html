@@ -1,4 +1,5 @@
 {% extends 'admin_panel/elements/base.html' %}
+{% load extra_tags %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
@@ -81,7 +82,17 @@
                                         <td data-filter="{{ flat.section.name }}|||">{{ flat.section.name }}</td>
                                         <td data-filter="Этаж {{ flat.floor }}|||">Этаж {{ flat.floor }}</td>
                                         <td data-filter="{{ flat.owner }}|||">{{ flat.owner }}</td>
-                                        <td data-filter="0|||">0</td>
+                                        {% with flat.id|get_account_balance as balance %}
+                                            <td data-filter="{{ balance }}">
+                                                {% if balance >= 0 %}
+                                                    <span class="text text-green">{{ balance }}</span>
+                                                {% elif balance < 0 %}
+                                                    <span class="text text-red">{{ balance }}</span>
+                                                {% else %}
+                                                    ERROR
+                                                {% endif %}
+                                            </td>
+                                        {% endwith %}
                                         <td>
                                             <div class="btn-group pull-right"><a class="btn btn-default btn-sm"
                                                                                  href="{% url 'admin_panel:flat_update' flat.pk %}"

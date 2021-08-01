@@ -9,10 +9,10 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.functions import TruncMonth
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView
-from src.admin_panel.forms import UserProfileUpdateForm
+from django.views.generic import DetailView, ListView, DeleteView
+from src.admin_panel.forms import UserProfileUpdateForm, CallRequestForm
 from src.admin_panel.models import (
     Flat,
     Receipt,
@@ -236,6 +236,44 @@ class CallRequestListView(ListView):
         return queryset
 
 
+@login_required()
+def call_request_create_view(request):
+    form1 = CallRequestForm(request.POST or None, request.FILES or None, prefix="form1")
+
+    if request.method == "POST":
+        forms_valid_status = validate_forms(form1)
+
+        if forms_valid_status:
+            save_forms(form1)
+
+            messages.success(request, "Данные успешно обновлены.")
+
+            return redirect("cabinet:call_request_list")
+
+        messages.error(request, f"Ошибка при сохранении формы.")
+
+    context = {
+        "form1": form1,
+    }
+    return render(
+        request, "cabinet/pages/call_request_create.html", context=context
+    )
+
+
+@method_decorator(login_required(), name="dispatch")
+class CallRequestDeleteView(DeleteView):
+    model = CallRequest
+    success_url = reverse_lazy("cabinet:call_request_list")
+    success_message = "Заявка успешно удалена"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
+
+
 @login_required
 def user_profile_detail_view(request):
     flats = Flat.objects.filter(owner=request.user).prefetch_related("flat_account")
@@ -279,7 +317,7 @@ def receipt_pdf_view(request, pk):
         .order_by("-created")
         .last()
     )
-    print(receipt, 'sffffffffffff')
+
     company_credentials = CompanyCredentials.objects.last()
     context = {
         "request": request,

@@ -1,11 +1,11 @@
-{% extends 'admin_panel/elements/base.html' %}
+{% extends 'cabinet/elements/base.html' %}
 {% load extra_tags %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
 {% load static %}
 {% block nav_item_call_request_list %}active{% endblock %}
 
-{% block title %}Редактировать заявку{% endblock %}
+{% block title %}Новая заявка{% endblock %}
 
 {% block head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
@@ -21,11 +21,11 @@
 
     <div class="content-wrapper" style="min-height: 867px;">
         <section class="content-header">
-            <h1>Редактировать заявку</h1>
+            <h1>Новая заявка</h1>
 
             <ul class="breadcrumb">
-                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
-                <li><a href="{% url 'admin_panel:call_request_list' %}">Вызов мастера</a></li>
+                <li><a href="{% url 'cabinet:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'cabinet:call_request_list' %}">Вызов мастера</a></li>
                 <li class="active">Новая заявка</li>
             </ul>
         </section>
@@ -66,12 +66,11 @@
                     <div class="box-body">
                         <div class="row">
 
-                            <div class="col-xs-12 col-md-6">
-                                <div class="form-group">
-                                    {{ form1.flat_owner|as_crispy_field }}
-                                </div>
-                            </div>
-
+                            <input type="hidden" name="{{ form1.flat_owner.html_name }}"
+                                   id="{{ form1.flat_owner.auto_id }}"
+                                   value="{{ request.user.id }}">
+                            <input type="hidden" name="{{ form1.status.html_name }}" id="{{ form1.status.auto_id }}"
+                                   value="NEW">
 
                             <div class="col-xs-12 col-md-6"></div>
 
@@ -90,10 +89,6 @@
 
                                 <div class="form-group">
                                     {{ form1.master_type|as_crispy_field }}
-                                </div>
-
-                                <div class="form-group">
-                                    {{ form1.status|as_crispy_field }}
                                 </div>
 
                                 <div class="form-group">
@@ -157,7 +152,7 @@
                         // Query parameters will be ?search=[term]&type=public
                         return {
                             search: params.term,
-                            owner_id: select_flat_owner.val()
+                            owner_id: {{request.user.id}}
                         };
                     }
                 }
@@ -229,7 +224,7 @@
                 startDate: '-100y',
                 endDate: '+0d',
                 language: 'ru'
-            }).datepicker("setDate",'now');
+            }).datepicker("setDate", 'now');
             $('#kt_timepicker_1').timepicker({
                 minuteStep: 1,
                 defaultTime: '10AM',
@@ -243,7 +238,6 @@
             let redirect_status = $('#redirect')
             redirect_status.val('True');
         }
-
     </script>
 
     {% include 'admin_panel/elements/messages.html' %}>

@@ -1200,8 +1200,9 @@ class AccountCreateForm(AccountForm):
             raise forms.ValidationError("Выберите квартиру")
 
         else:
-            flat_inst = Flat.objects.filter(pk=flat_pk)
-            if flat_inst is not None:
+            flat = Flat.objects.filter(pk=flat_pk).last()
+
+            if flat.has_related_object("flat_account"):
                 raise forms.ValidationError("К этой квартире уже привязан счёт")
 
         return flat_pk

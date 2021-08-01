@@ -27,7 +27,7 @@
             <h1>Квитанции на оплату</h1>
 
             <ul class="breadcrumb">
-                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i>Главная</a></li>
+                <li><a href="{% url 'cabinet:home' %}"><i class="fa fa-home"></i>Главная</a></li>
                 <li class="active">Лицевые счета</li>
             </ul>
         </section>
@@ -95,7 +95,7 @@
                         </div>
 
                         <div class="box-footer">
-                            <div>Количество владельцев: <span class="text-bold">{{ user_list.count }}</span></div>
+                            <div>Количество квитанций: <span class="text-bold">{{ object_list.count }}</span></div>
                         </div>
 
                     </div>

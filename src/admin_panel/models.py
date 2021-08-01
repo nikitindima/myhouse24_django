@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import DateRangeField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import ManyToManyField, DateField
+from django.db.models import ManyToManyField, DateField, Q
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
 
@@ -228,6 +228,10 @@ class Flat(models.Model):
     )
     tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True, blank=True)
 
+    def has_related_object(self, attr_name):
+        return hasattr(self, attr_name)
+
+
     def serialize(self, pattern):
         if pattern == "select2":
             data = {"id": self.id, "text": f"{self.house.name}, кв. {self.number}"}
@@ -243,7 +247,7 @@ class Account(models.Model):
         INACTIVE = "Inactive", _("Неактивный")
 
     account_flat = models.OneToOneField(
-        Flat, on_delete=models.CASCADE, related_name="flat_account"
+        Flat, on_delete=models.CASCADE, related_name="flat_account", unique=True
     )
 
     number = models.CharField(max_length=40, unique=True, blank=True)
@@ -344,7 +348,7 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 
     account = models.ForeignKey(
-        Account, on_delete=models.CASCADE, null=True, blank=True
+        Account, on_delete=models.CASCADE, null=True, blank=True, related_name="account_transactions"
     )
     receipt = models.ForeignKey(
         Receipt, on_delete=models.CASCADE, null=True, blank=True

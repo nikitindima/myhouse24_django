@@ -1,0 +1,153 @@
+{% extends 'admin_panel/elements/base.html' %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+{% load static %}
+{% block nav_item_transaction_list %}active{% endblock %}
+
+{% block title %}{% if object.transaction_type.type == "INCOME" %}Приходная{% else %}Расходная{% endif %}
+    ведомость{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 867px;">
+        <section class="content-header">
+            <h1>{% if object.transaction_type.type == "INCOME" %}Приходная{% else %}Расходная{% endif %} ведомость</h1>
+
+            <ul class="breadcrumb">
+                <li><a href="{% url 'admin_panel:home' %}"><i class="fa fa-home"></i> Главная</a></li>
+                <li><a href="{% url 'admin_panel:transaction_list' %}">Платежи</a></li>
+                <li class="active">{% if object.transaction_type.type == "INCOME" %}Приходная{% else %}
+                    Расходная{% endif %} ведомость №{{ object.number }}</li>
+            </ul>
+        </section>
+
+        <section class="content">
+
+            <div class="row">
+                <div class="col-xs-12 col-md-7 col-lg-6">
+                    <div class="page-header-spec">
+                        <div class="form-group">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    №
+                                </div>
+                                <div class="form-control pull-right">{{ object.number }}</div>
+                            </div>
+                        </div>
+                        <span class="label-mid">от</span>
+                        <div class="form-group">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </div>
+                                <div class="form-control pull-right">{{ object.created }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{% if object.transaction_type.type == "INCOME" %}Приходная{% else %}
+                        Расходная{% endif %} ведомость</h3>
+                    <div class="box-tools">
+                        <a href="
+                                {% if object.transaction_type.type == "INCOME" %}{% url 'admin_panel:transaction_income_create' %}{% else %}{% url 'admin_panel:transaction_expense_create' %}{% endif %}?transaction_id={{ object.id }}"
+                           class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Копировать</span><i class="fa fa-print visible-xs"
+                                                                        aria-hidden="true"></i>
+                        </a>
+                        <a href="{% url 'admin_panel:transaction_delete' object.pk %}" class="btn btn-default btn-sm"
+                           data-method="post" data-confirm="Вы уверены, что хотите удалить этот элемент?" onclick="delete_object(event)">
+                            <span class="hidden-xs">Удалить</span><i class="fa fa-envelope-o visible-xs"
+                                                                     aria-hidden="true"></i>
+                        </a>
+                        <a href="{% url 'admin_panel:transaction_update' object.pk %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать ведомость</span><i class="fa fa-pencil visible-xs"
+                                                                                     aria-hidden="true"></i>
+                        </a>
+                        <a href="/admin/account-transaction/export-one/165?export=xls" class="btn btn-default btn-sm">
+                            <span class="hidden-xs">Выгрузить в Excel</span><i class="fa fa-pencil visible-xs"
+                                                                               aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table class="table table-bordered table-striped table-view">
+                        <tbody>
+                        <tr>
+                            <td>Владелец квартиры</td>
+                            <td>
+                                {% if object.created_by %}
+                                    <a href="{% url 'admin_panel:user_detail' object.created_by.id %}">
+                                        {{ object.created_by }} </a>
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Лицевой счет</td>
+                            <td>
+                                {% if object.account %}
+                                    <a href="{% url 'admin_panel:account_detail' object.account.id %}">
+                                        {{ object.account.number }} </a>
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Статья</td>
+                            <td>{{ object.transaction_type.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Квитанция</td>
+                            <td>
+                                Не указано
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Услуга</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Менеджер</td>
+                            <td>
+                                <a href="{% url 'admin_panel:system_staff_detail' object.manager.id %}">
+                                    {{ object.manager }} </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Сумма</td>
+                            <td>
+                                <span class="text-{% if object.transaction_type.type == "INCOME" %}green{% else %}red{% endif %}">{{ object.amount }}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Комментарий</td>
+                            <td>{{ object.comment }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function delete_object(event) {
+            if (window.confirm("Вы действительно хотете удалить транзакцию?")) {
+            } else {
+                event.preventDefault();
+            }
+        }
+    </script>
+    {% include 'admin_panel/elements/messages.html' %}>
+{% endblock %}
