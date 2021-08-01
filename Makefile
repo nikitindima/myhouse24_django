@@ -56,10 +56,10 @@ gunicorn-run:
 	$(MANAGE) makemigrations --no-input
 	$(MANAGE) migrate --no-input
 	$(MANAGE) gen_users
-	#cd $(PROJECT_DIR)/scr && gunicorn -w 4 -b 0.0.0.0:$(WSGI_PORT) config.wsgi --timeout 30 --log-level debug --max-requests 10000 --reload
+	gunicorn -w 4 -b 0.0.0.0:8000 config.wsgi --timeout 30 --log-level debug --max-requests 10000 --reload
 	#gunicorn -w 4 -b 0.0.0.0:$(WSGI_PORT) config.config.wsgi:Application --timeout 30 --log-level debug --max-requests 10000 --reload
 	#PYTHONPATH=`pwd` gunicorn config.wsgi -b 0.0.0.0:8000 --reload
-	gunicorn config.wsgi -b 0.0.0.0:8000 --reload
+	#gunicorn config.wsgi -b 0.0.0.0:8000 --reload
 
 collect:
 	$(MANAGE) collectstatic --noinput
