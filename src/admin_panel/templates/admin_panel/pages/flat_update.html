@@ -37,28 +37,12 @@
 
                         <div class="row">
                             <div class="col-xs-12 col-sm-6 col-sm-push-6">
-                                <div class="form-group field-flatform-account_uid ">
-                                    <label class="control-label" for="flatform-account_uid">Лицевой счет</label>
-                                    <input type="text" id="flatform-account_uid" class="form-control"
-                                           name="FlatForm[account_uid]"> <select id="account_uid"
-                                                                                 class="form-control select2-hidden-accessible"
-                                                                                 name="account_uid"
-                                                                                 onchange="if ($(this).val()) { $(&quot;#flatform-account_uid&quot;).val($(this).val()); $(&quot;#account_uid&quot;).val(&quot;&quot;).trigger(&quot;change&quot;); }"
-                                                                                 data-s2-options="s2options_7ebc6538"
-                                                                                 data-krajee-select2="select2_27ecbd8a"
-                                                                                 style="display:none" tabindex="-1"
-                                                                                 aria-hidden="true">
-                                    <option value="">или выберите из списка...</option>
-                                </select><span class="select2 select2-container select2-container--default" dir="ltr"
-                                               style="width: 100%;"><span class="selection"><span
-                                        class="select2-selection select2-selection--single" role="combobox"
-                                        aria-haspopup="true" aria-expanded="false" tabindex="0"
-                                        aria-labelledby="select2-account_uid-container"><span
-                                        class="select2-selection__rendered" id="select2-account_uid-container"><span
-                                        class="select2-selection__placeholder">или выберите из списка...</span></span><span
-                                        class="select2-selection__arrow" role="presentation"><b role="presentation"></b></span></span></span><span
-                                        class="dropdown-wrapper" aria-hidden="true"></span></span>
-                                    <div class="help-block"></div>
+                                <div class="form-group">
+                                    {{ form1.account_input|as_crispy_field }}
+                                </div>
+
+                                <div class="form-group">
+                                    {{ form1.account_select|as_crispy_field }}
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-6 col-sm-pull-6">
@@ -125,7 +109,23 @@
             const select_floor = $('select[name=form1-floor]')
             const select_owner = $('select[name=form1-owner]')
             const select_tariff = $('select[name=form1-tariff]')
+            const select_account = $('select[name=form1-account_select]')
 
+            select_account.select2({
+                theme: 'bootstrap',
+                ajax: {
+                    url: function (params) {
+                        return '{% url 'admin_panel:api_accounts' %}?user_id=' + select_owner.val();
+                    },
+                    data: function (params) {
+                        // Query parameters will be ?search=[term]&type=public
+                        return {
+                            search: params.term,
+                            type: 'public'
+                        };
+                    }
+                }
+            })
             select_house.select2({
                 theme: 'bootstrap',
             })
@@ -178,6 +178,12 @@
                 theme: 'bootstrap',
             })
 
+            $('#id_form1-account_input').change(function () {
+                select_account.select2("val", '0')
+            });
+            select_account.on("select2:select", function () {
+                $('#id_form1-account_input').val('')
+            });
             select_house.on("select2:select", function () {
                 select_section.select2("val", 0)
                 select_floor.select2("val", '0')
@@ -186,6 +192,9 @@
                 select_floor.select2("val", '0')
             });
             set_default_floor(select_floor)
+            {% if account %}
+            set_default_account(select_account)
+            {% endif %}
         })
 
         function redirect_after_save() {
@@ -203,6 +212,18 @@
             select_floor.val({{ object.floor }});
             select_floor.trigger('change');
         }
+        {% if account %}
+        function set_default_account(select_account) {
+            let data = {
+                id: {{ account.id }},
+                text: {{ account.number }}
+            };
+            let newOptionAccount = new Option(data.text, data.id, false, false);
+            select_account.append(newOptionAccount);
+            select_account.val({{ account.id }});
+            select_account.trigger('change');
+        }
+        {% endif %}
     </script>
 
     {% include 'admin_panel/elements/messages.html' %}>

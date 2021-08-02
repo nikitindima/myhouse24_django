@@ -61,6 +61,8 @@
                                                 Дом {{ object.house }}
                                             {% elif object.to_all == True %}
                                                 Всем
+                                            {% elif object.personal_for == request.user %}
+                                                Вам
                                             {% else %}
                                                 ERROR
                                             {% endif %}

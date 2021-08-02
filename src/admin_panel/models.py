@@ -209,7 +209,7 @@ class Floor(models.Model):
 
 
 class Flat(models.Model):
-    number = models.PositiveIntegerField()
+    number = models.CharField(max_length=100)
     area = models.DecimalField(max_digits=10, decimal_places=2)
 
     floor = models.CharField(max_length=100, null=True)
@@ -231,7 +231,6 @@ class Flat(models.Model):
     def has_related_object(self, attr_name):
         return hasattr(self, attr_name)
 
-
     def serialize(self, pattern):
         if pattern == "select2":
             data = {"id": self.id, "text": f"{self.house.name}, кв. {self.number}"}
@@ -247,8 +246,7 @@ class Account(models.Model):
         INACTIVE = "Inactive", _("Неактивный")
 
     account_flat = models.OneToOneField(
-        Flat, on_delete=models.CASCADE, related_name="flat_account", unique=True
-    )
+        Flat, on_delete=models.CASCADE, related_name="flat_account", null=True, blank=True)
 
     number = models.CharField(max_length=40, unique=True, blank=True)
     is_active = models.CharField(max_length=10, choices=AccountStatus.choices)
@@ -389,6 +387,7 @@ class Message(models.Model):
 
     to_debtors = models.BooleanField(default=False)
     to_all = models.BooleanField(default=False)
+    personal_for = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class CallRequest(models.Model):
@@ -400,7 +399,7 @@ class CallRequest(models.Model):
     request_date = models.DateField()
     request_time = models.TimeField()
 
-    flat = models.ForeignKey(Flat, on_delete=models.CASCADE)
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, null=True)
     flat_owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="call_request_created_by"
     )

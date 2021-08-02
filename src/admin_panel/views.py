@@ -19,9 +19,9 @@ from django.db.models.functions import Concat, TruncMonth
 from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
-from django.utils.timezone import utc
+from django.utils.timezone import utc, now
 from django.views.generic import DeleteView, ListView, DetailView
 
 from .forms import (
@@ -559,13 +559,25 @@ class FlatListView(ListView):
 
 @user_passes_test(flat_access)
 def flat_create_view(request):
-    form1 = FlatCreateForm(request.POST or None, request.FILES or None, prefix="form1")
+    account_number = generate_random_number_for_model_field(Account, 'number', 10)
+    flat_number = generate_random_number_for_model_field(Flat, 'number', 5)
+    form1 = FlatCreateForm(request.POST or None, initial={'account_input': account_number, "number": flat_number}, prefix="form1")
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
 
         if forms_valid_status:
-            save_forms(form1)
+            flat = form1.save()
+            account_number = form1.cleaned_data.get('account_input')
+            account_id = form1.cleaned_data.get('account_select')
+
+            if account_number not in [None, '']:
+                account = Account(number=account_number, account_flat=flat, is_active="Active")
+                account.save()
+            elif account_id not in [None, '']:
+                account = get_object_or_404(Account, pk=account_id)
+                account.account_flat = flat
+                account.save()
 
             messages.success(request, "Данные успешно обновлены.")
 
@@ -603,7 +615,23 @@ def flat_update_view(request, pk):
         forms_valid_status = validate_forms(form1)
 
         if forms_valid_status:
-            save_forms(form1)
+            flat = form1.save()
+            account_number = form1.cleaned_data.get('account_input')
+            account_id = form1.cleaned_data.get('account_select')
+
+            if account_number not in [None, '']:
+                if flat.has_related_object('flat_account'):
+                    old_account = flat.flat_account
+                    old_account.account_flat = None
+                    old_account.save()
+
+                new_account = Account(number=account_number, account_flat=flat, is_active="Active")
+                new_account.save()
+
+            elif account_id not in [None, '']:
+                account = get_object_or_404(Account, pk=account_id)
+                account.account_flat = flat
+                account.save()
 
             messages.success(request, "Данные успешно обновлены.")
 
@@ -618,6 +646,9 @@ def flat_update_view(request, pk):
         "object": flat,
         "form1": form1,
     }
+
+    if flat.has_related_object('flat_account'):
+        context.update({"account": flat.flat_account})
     return render(request, "admin_panel/pages/flat_update.html", context=context)
 
 
@@ -950,13 +981,13 @@ def api_accounts(request):
     flat_id = request.GET.get("flat_id", None)
     results = []
 
-    if user_id is not None:
+    if user_id not in [None, '']:
         user = get_object_or_404(User, pk=user_id)
         accounts = Account.objects.select_related("account_flat__owner").filter(
             account_flat__owner=user
         )
 
-    elif flat_id is not None:
+    elif flat_id not in [None, '']:
         flat = get_object_or_404(Flat, pk=flat_id)
         accounts = Account.objects.select_related("account_flat__owner").filter(
             account_flat=flat
@@ -1321,6 +1352,17 @@ class StaffListView(ListView):
 
 
 @user_passes_test(staff_access)
+def system_staff_invite(request, pk):
+    Message(
+        title="Просьба зайти в ЖЭК",
+        created_by=request.user,
+        description='Просьба зайти в ЖЭК',
+        personal_for=get_object_or_404(User, pk=pk)
+    ).save()
+    return redirect(reverse("admin_panel:system_staff_list"))
+
+
+@user_passes_test(staff_access)
 def staff_create_view(request):
     form1 = StaffCreateForm(request.POST or None, request.FILES or None, prefix="form1")
 
@@ -1552,7 +1594,7 @@ class AccountListView(ListView):
         "account_flat__section",
     ).prefetch_related("receipt_account").annotate(
         expense=models.Sum("receipt_account__bill_receipt__cost"),
-    )
+    ).order_by("-id")
     template_name = "admin_panel/pages/account_list.html"
 
 

@@ -518,7 +518,6 @@ class FlatForm(ModelForm):
             "section",
             "house",
             "owner",
-            # "account",
             "tariff",
         ]
         widgets = {
@@ -559,12 +558,6 @@ class FlatForm(ModelForm):
                     "placeholder": "Выберите владельца",
                 }
             ),
-            # "account": Select(
-            #     attrs={
-            #         "class": "form-control",
-            #         "placeholder": "Введите номер квартиры",
-            #     }
-            # ),
             "tariff": Select(
                 attrs={
                     "class": "form-control",
@@ -585,14 +578,80 @@ class FlatForm(ModelForm):
 
 
 class FlatCreateForm(FlatForm):
+    account_input = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Лицевой счет - Создать новый"
+    )
+    account_select = forms.CharField(
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control", "placeholder": "Или выберите существующий"}),
+        label="Лицевой счет - Выбрать существующий"
+    )
+
     class Meta(FlatForm.Meta):
         model = Flat
+
+    def clean_account_input(self):
+        account_number = self.cleaned_data.get('account_input')
+
+        if account_number != "":
+            account = Account.objects.filter(number=account_number)
+            if account.exists():
+                raise forms.ValidationError("Аккаунт с таким номером уже существует")
+
+        return account_number
+
+    def clean_account_select(self):
+        account_select = self.cleaned_data.get('account_select')
+        account_number = self.cleaned_data.get('account_input')
+
+        if account_select != "" and account_number != "":
+            raise forms.ValidationError("Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
+                                        "существующего.")
+
+        if account_select != "":
+            account = Account.objects.filter(pk=account_select)
+            if not account.exists():
+                raise forms.ValidationError("Аккаунт с таким номером не существует")
+
+        return account_select
 
 
 class FlatUpdateForm(FlatForm):
+    account_input = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        label="Лицевой счет - Создать новый"
+    )
+    account_select = forms.CharField(
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control", "placeholder": "Или выберите существующий"}),
+        label="Лицевой счет - Выбрать существующий"
+    )
+
     class Meta(FlatForm.Meta):
         model = Flat
 
+    def clean_account_input(self):
+        account_number = self.cleaned_data.get('account_input')
+
+        if account_number != "":
+            account = Account.objects.filter(number=account_number)
+            if account.exists():
+                raise forms.ValidationError("Аккаунт с таким номером уже существует")
+
+        return account_number
+
+    def clean_account_select(self):
+        account_select = self.cleaned_data.get('account_select')
+        account_number = self.cleaned_data.get('account_input')
+
+        if account_select != "" and account_number != "":
+            raise forms.ValidationError("Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
+                                        "существующего.")
+
+        return account_select
 
 # endregion FLAT
 # endregion PROPERTY

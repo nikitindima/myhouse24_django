@@ -29,18 +29,23 @@
                     <h3 class="box-title">Просмотр квартиры</h3>
 
                     <div class="box-tools">
-                        <button class="btn btn-default btn-sm disabled" data-confirm="Лицевой счет неактивен"><span
-                                class="hidden-xs"><i class="fa fa-dollar"></i> Принять платеж</span><i
-                                class="fa fa-pencil visible-xs" aria-hidden="true"></i></button>
-                        <button class="btn btn-default btn-sm disabled" data-confirm="Лицевой счет неактивен"><span
-                                class="hidden-xs"><i class="fa fa-files-o"></i> Оформить квитанцию</span><i
-                                class="fa fa-pencil visible-xs" aria-hidden="true"></i></button>
+                        <a href="{% url 'admin_panel:transaction_income_create' %}?account_id={{ object.flat_account.pk }}"
+                           class="btn btn-default btn-sm {% if not object.flat_account %}disabled{% endif %}">
+                            <span class="hidden-xs"><i class="fa fa-dollar"></i>Принять платеж</span><i
+                                class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                        </a>
+
+                        <a href="{% url 'admin_panel:receipt_create' %}?account_id={{ object.flat_account.pk }}"
+                           class="btn btn-default btn-sm {% if not object.flat_account %}disabled{% endif %}">
+                            <span class="hidden-xs"><i class="fa fa-files-o"></i>Оформить квитанцию</span><i
+                                class="fa fa-pencil visible-xs" aria-hidden="true"></i>
+                        </a>
+
                         <a href="{% url 'admin_panel:flat_update' object.pk %}" class="btn btn-primary btn-sm">
                             <span class="hidden-xs">Редактировать квартиру</span><i class="fa fa-pencil visible-xs"
                                                                                     aria-hidden="true"></i>
                         </a>
                     </div>
-
                 </div>
 
                 <div class="box-body">
@@ -97,12 +102,16 @@
                                 </tbody>
                             </table>
                             <div>
-                                <p>
-                                    <a href="{% url 'admin_panel:meter_data_list_by_flat' %}?flat_id={{ object.id }}">Посмотреть
-                                        показания счетчиков</a></p>
-                                <p><a href="#">Посмотреть приходы</a></p>
-                                <p><a href="#">Посмотреть квитанции</a>
-                                </p>
+                                <p><a href="{% url 'admin_panel:meter_data_list_by_flat' %}?flat_id={{ object.id }}">Посмотреть
+                                    показания счетчиков</a></p>
+                                {% if object.flat_account %}
+                                    <p>
+                                        <a href="{% url 'admin_panel:transaction_list' %}?account_id={{ object.flat_account.id }}">Посмотреть
+                                            приходы</a></p>
+                                    <p>
+                                        <a href="{% url 'admin_panel:receipt_list' %}?account_id={{ object.flat_account.id }}">Посмотреть
+                                            квитанции</a></p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -216,12 +216,11 @@ class MessageListView(ListView):
         user = self.request.user
         flats = Flat.objects.filter(owner=user)
         houses = flats.values("house")
-        debtor = False
 
         queryset = (
             Message.objects.select_related("house", "section", "flat")
             .order_by("-created")
-            .filter(Q(house__in=houses) | Q(to_all=True))
+            .filter(Q(house__in=houses) | Q(to_all=True) | Q(personal_for=user))
         )
 
         return queryset
