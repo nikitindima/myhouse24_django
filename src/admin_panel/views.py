@@ -1858,7 +1858,7 @@ def transaction_expense_create_view(request):
         model=Transaction, field="number", length=8
     )
     form1 = TransactionExpenseCreateForm(
-        request.POST or None, initial={"number": number}, prefix="form1"
+        request.POST or None, initial={"number": number, "created": today()}, prefix="form1"
     )
 
     if request.method == "POST":

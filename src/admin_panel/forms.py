@@ -1362,6 +1362,30 @@ class TransactionIncomeCreateForm(ModelForm):
             "description": "Комментарий",
         }
 
+    def clean_account(self):
+        account_id = self.cleaned_data.get("account")
+        if account_id is None:
+            raise forms.ValidationError("Выберите счет")
+        return account_id
+
+    def clean_transaction_type(self):
+        transaction_type = self.cleaned_data.get("transaction_type")
+        if transaction_type is None:
+            raise forms.ValidationError("Выберите cтатью")
+        return transaction_type
+
+    def clean_created_by(self):
+        created_by = self.cleaned_data.get("created_by")
+        if created_by is None:
+            raise forms.ValidationError("Выберите владельца квартиры")
+        return created_by
+
+    def clean_manager(self):
+        manager = self.cleaned_data.get("manager")
+        if manager is None:
+            raise forms.ValidationError("Выберите менеджера")
+        return manager
+
 
 class TransactionExpenseCreateForm(ModelForm):
     class Meta:
@@ -1413,6 +1437,18 @@ class TransactionExpenseCreateForm(ModelForm):
             "created": "Создано",
             "description": "Комментарий",
         }
+
+    def clean_transaction_type(self):
+        transaction_type = self.cleaned_data.get("transaction_type")
+        if transaction_type is None:
+            raise forms.ValidationError("Выберите cтатью")
+        return transaction_type
+
+    def clean_manager(self):
+        manager = self.cleaned_data.get("manager")
+        if manager is None:
+            raise forms.ValidationError("Выберите менеджера")
+        return manager
 
 
 class MeterDataForm(ModelForm):
