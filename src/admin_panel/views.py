@@ -400,6 +400,9 @@ class GalleryImageDeleteView(DeleteView):
     success_url = reverse_lazy("admin_panel:site_about")
     success_message = "Данные успешно удалены"
 
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
@@ -410,6 +413,9 @@ class DocumentDeleteView(DeleteView):
     model = Document
     success_url = reverse_lazy("admin_panel:site_about")
     success_message = "Данные успешно удалены"
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)

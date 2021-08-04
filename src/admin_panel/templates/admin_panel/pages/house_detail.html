@@ -58,7 +58,12 @@
                                 <tr>
                                     <td>Пользователи</td>
                                     <td>
-                                        <p class="no-margin">Не назначены</p>
+                                        {% for staff in house.house_staff.all %}
+                                            <p class="no-margin">{{ staff }}</p>
+                                        {% endfor %}
+                                        {% if not house.house_staff.all %}
+                                            <p class="no-margin">Персонал не назначен</p>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 </tbody>
@@ -67,27 +72,32 @@
                         <div class="col-xs-12 col-lg-8">
                             <div class="row">
                                 <div class="col-xs-12 col-md-6">
-                                    <img src="{% if object.image1 %}{{ object.image1.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                    <img src="
+                                            {% if object.image1 %}{{ object.image1.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                          class="img-responsive largeImg margin-bottom-30" alt=""
                                          style="width:522px; height: 350px; object-fit: cover;">
                                 </div>
                                 <div class="col-xs-6 col-md-3">
-                                    <img src="{% if object.image2 %}{{ object.image2.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                    <img src="
+                                            {% if object.image2 %}{{ object.image2.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                          class="img-responsive smallImg margin-bottom-30" alt=""
                                          style="width:248px; height: 160px; object-fit: cover;">
                                 </div>
                                 <div class="col-xs-6 col-md-3">
-                                    <img src="{% if object.image3 %}{{ object.image3.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                    <img src="
+                                            {% if object.image3 %}{{ object.image3.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                          class="img-responsive smallImg margin-bottom-30" alt=""
                                          style="width:248px; height: 160px; object-fit: cover;">
                                 </div>
                                 <div class="col-xs-6 col-md-3">
-                                    <img src="{% if object.image4 %}{{ object.image4.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                    <img src="
+                                            {% if object.image4 %}{{ object.image4.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                          class="img-responsive smallImg margin-bottom-30" alt=""
                                          style="width:248px; height: 160px; object-fit: cover;">
                                 </div>
                                 <div class="col-xs-6 col-md-3">
-                                    <img src="{% if object.image5 %}{{ object.image5.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
+                                    <img src="
+                                            {% if object.image5 %}{{ object.image5.url }}{% else %}{% static 'admin_panel/images/jpg/Image-not-found.jpg' %}{% endif %}"
                                          class="img-responsive smallImg margin-bottom-30" alt=""
                                          style="width:248px; height: 160px; object-fit: cover;">
                                 </div>
