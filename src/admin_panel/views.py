@@ -770,7 +770,7 @@ def api_houses(request):
 
 def api_sections(request, pk):
     search = request.GET.get("search", None)
-    get_all = request.GET.get("all", None)
+    get_all = request.GET.get("get_all", None)
     results = []
 
     if get_all == "True":
