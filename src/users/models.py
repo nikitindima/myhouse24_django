@@ -1,8 +1,6 @@
 import os
 
-from allauth.utils import build_absolute_uri
 from birthday.fields import BirthdayField
-from birthday.managers import BirthdayManager
 from django.conf.global_settings import MEDIA_ROOT
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -11,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from src.admin_panel.services.media_services import UploadToPathAndRename
-from src.admin_panel.services.user_passes_test import check_access
 
 
 class UserRole(models.Model):
@@ -69,12 +66,6 @@ class User(AbstractUser):
     role = models.ForeignKey(UserRole, null=True, blank=True, on_delete=models.SET_NULL)
 
     def get_absolute_url(self):
-        """Get url for user's detail view.
-
-        Returns:
-            str: URL for user detail.
-
-        """
         return reverse("users:detail", kwargs={"username": self.username})
 
     @property

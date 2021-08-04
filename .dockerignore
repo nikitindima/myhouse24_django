@@ -9,3 +9,7 @@
 .travis.yml
 staticfiles
 media
+
+.coverage
+.coveragerc
+htmlcov

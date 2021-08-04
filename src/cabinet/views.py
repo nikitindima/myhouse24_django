@@ -254,9 +254,7 @@ def call_request_create_view(request):
     context = {
         "form1": form1,
     }
-    return render(
-        request, "cabinet/pages/call_request_create.html", context=context
-    )
+    return render(request, "cabinet/pages/call_request_create.html", context=context)
 
 
 @method_decorator(login_required(), name="dispatch")

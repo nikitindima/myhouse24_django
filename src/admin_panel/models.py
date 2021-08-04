@@ -246,7 +246,12 @@ class Account(models.Model):
         INACTIVE = "Inactive", _("Неактивный")
 
     account_flat = models.OneToOneField(
-        Flat, on_delete=models.CASCADE, related_name="flat_account", null=True, blank=True)
+        Flat,
+        on_delete=models.CASCADE,
+        related_name="flat_account",
+        null=True,
+        blank=True,
+    )
 
     number = models.CharField(max_length=40, unique=True, blank=True)
     is_active = models.CharField(max_length=10, choices=AccountStatus.choices)
@@ -346,7 +351,11 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 
     account = models.ForeignKey(
-        Account, on_delete=models.CASCADE, null=True, blank=True, related_name="account_transactions"
+        Account,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="account_transactions",
     )
     receipt = models.ForeignKey(
         Receipt, on_delete=models.CASCADE, null=True, blank=True
@@ -387,7 +396,9 @@ class Message(models.Model):
 
     to_debtors = models.BooleanField(default=False)
     to_all = models.BooleanField(default=False)
-    personal_for = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    personal_for = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True, blank=True
+    )
 
 
 class CallRequest(models.Model):

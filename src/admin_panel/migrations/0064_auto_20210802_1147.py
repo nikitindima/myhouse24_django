@@ -9,17 +9,22 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admin_panel', '0063_callrequest_personal_call'),
+        ("admin_panel", "0063_callrequest_personal_call"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='callrequest',
-            name='personal_call',
+            model_name="callrequest",
+            name="personal_call",
         ),
         migrations.AddField(
-            model_name='message',
-            name='personal_for',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="message",
+            name="personal_for",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

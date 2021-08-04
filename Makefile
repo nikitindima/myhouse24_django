@@ -19,6 +19,15 @@ WSGI_PORT=8000
 
 # ##########################################################################
 # common commands
+tests:
+	./manage.py test --parallel --noinput
+coverage:
+	coverage run --source='./src' ./manage.py test --parallel --noinput
+	coverage report
+report:
+	coverage report
+report+:
+	coverage html
 
 black:
 	black $(SOURCE) --exclude 'urls.py'

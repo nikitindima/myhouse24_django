@@ -21,7 +21,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
-from django.utils.timezone import utc, now
+from django.utils.timezone import utc
 from django.views.generic import DeleteView, ListView, DetailView
 
 from .forms import (
@@ -136,35 +136,51 @@ def statistics_view(request):
     flats_count = Flat.objects.count()
     accounts_count = Account.objects.filter(is_active="Active").count()
 
-    debt_by_months_qs = Receipt.objects.select_related("account__account_flat__owner") \
-        .annotate(month=TruncMonth("created")) \
-        .values("month") \
-        .prefetch_related("bill_receipt") \
-        .annotate(total_price=models.Sum("bill_receipt__cost")) \
-        .filter(is_passed=True, created__lte=datetime.datetime.today(),
-                created__gt=datetime.datetime.today() - datetime.timedelta(days=365)) \
-        .values('month', 'total_price') \
-        .order_by('month')
+    debt_by_months_qs = (
+        Receipt.objects.select_related("account__account_flat__owner")
+            .annotate(month=TruncMonth("created"))
+            .values("month")
+            .prefetch_related("bill_receipt")
+            .annotate(total_price=models.Sum("bill_receipt__cost"))
+            .filter(
+            is_passed=True,
+            created__lte=datetime.datetime.today(),
+            created__gt=datetime.datetime.today() - datetime.timedelta(days=365),
+        )
+            .values("month", "total_price")
+            .order_by("month")
+    )
 
-    transactions_by_months = Transaction.objects.select_related("account", "transaction_type") \
-        .annotate(month=TruncMonth("created")) \
-        .values("month") \
-        .annotate(total_price=models.Sum("amount")) \
-        .filter(is_passed=True, created__lte=datetime.datetime.today(),
-                created__gt=datetime.datetime.today() - datetime.timedelta(days=365),
-                transaction_type__type="INCOME", created_by__isnull=False) \
-        .values("month", "total_price") \
-        .order_by('month')
+    transactions_by_months = (
+        Transaction.objects.select_related("account", "transaction_type")
+            .annotate(month=TruncMonth("created"))
+            .values("month")
+            .annotate(total_price=models.Sum("amount"))
+            .filter(
+            is_passed=True,
+            created__lte=datetime.datetime.today(),
+            created__gt=datetime.datetime.today() - datetime.timedelta(days=365),
+            transaction_type__type="INCOME",
+            created_by__isnull=False,
+        )
+            .values("month", "total_price")
+            .order_by("month")
+    )
 
-    transactions_expense_by_month = Transaction.objects.select_related("account", "transaction_type") \
-        .annotate(month=TruncMonth("created")) \
-        .values("month") \
-        .annotate(total_price=models.Sum("amount")) \
-        .filter(is_passed=True, created__lte=datetime.datetime.today(),
-                created__gt=datetime.datetime.today() - datetime.timedelta(days=365),
-                transaction_type__type="EXPENSE") \
-        .values("month", "total_price") \
-        .order_by('month')
+    transactions_expense_by_month = (
+        Transaction.objects.select_related("account", "transaction_type")
+            .annotate(month=TruncMonth("created"))
+            .values("month")
+            .annotate(total_price=models.Sum("amount"))
+            .filter(
+            is_passed=True,
+            created__lte=datetime.datetime.today(),
+            created__gt=datetime.datetime.today() - datetime.timedelta(days=365),
+            transaction_type__type="EXPENSE",
+        )
+            .values("month", "total_price")
+            .order_by("month")
+    )
 
     end_date = datetime.datetime.today()
     start_date = (end_date - datetime.timedelta(days=365)).replace(day=1)
@@ -175,15 +191,17 @@ def statistics_view(request):
 
         income_data = list(transactions_by_months)
         for income in income_data:
-            if income['month'] == dt.date():
-                income_summ = income['total_price']
+            if income["month"] == dt.date():
+                income_summ = income["total_price"]
 
         debt_data = list(debt_by_months_qs)
         for debt in debt_data:
-            if debt['month'] == dt.date():
-                debt_summ = debt['total_price']
+            if debt["month"] == dt.date():
+                debt_summ = debt["total_price"]
 
-        receipt_data.append({'month': dt.date(), 'debt': debt_summ, 'income': income_summ})
+        receipt_data.append(
+            {"month": dt.date(), "debt": debt_summ, "income": income_summ}
+        )
 
     receipt_data = json.dumps(receipt_data, cls=DjangoJSONEncoder)
 
@@ -193,15 +211,17 @@ def statistics_view(request):
 
         income_data = list(transactions_by_months)
         for income in income_data:
-            if income['month'] == dt.date():
-                income_summ = income['total_price']
+            if income["month"] == dt.date():
+                income_summ = income["total_price"]
 
         expense_data = list(transactions_expense_by_month)
         for expense in expense_data:
-            if expense['month'] == dt.date():
-                expense_summ = expense['total_price']
+            if expense["month"] == dt.date():
+                expense_summ = expense["total_price"]
 
-        transactions_data.append({'month': dt.date(), 'expense': expense_summ, 'income': income_summ})
+        transactions_data.append(
+            {"month": dt.date(), "expense": expense_summ, "income": income_summ}
+        )
 
     transactions_data = json.dumps(transactions_data, cls=DjangoJSONEncoder)
     print(transactions_data)
@@ -214,7 +234,7 @@ def statistics_view(request):
         "flats_count": flats_count,
         "accounts_count": accounts_count,
         "receipt_data": receipt_data,
-        "transactions_data": transactions_data
+        "transactions_data": transactions_data,
     }
     return render(request, "admin_panel/pages/statistics.html", context=context)
 
@@ -559,22 +579,28 @@ class FlatListView(ListView):
 
 @user_passes_test(flat_access)
 def flat_create_view(request):
-    account_number = generate_random_number_for_model_field(Account, 'number', 10)
-    flat_number = generate_random_number_for_model_field(Flat, 'number', 5)
-    form1 = FlatCreateForm(request.POST or None, initial={'account_input': account_number, "number": flat_number}, prefix="form1")
+    account_number = generate_random_number_for_model_field(Account, "number", 10)
+    flat_number = generate_random_number_for_model_field(Flat, "number", 5)
+    form1 = FlatCreateForm(
+        request.POST or None,
+        initial={"account_input": account_number, "number": flat_number},
+        prefix="form1",
+    )
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
 
         if forms_valid_status:
             flat = form1.save()
-            account_number = form1.cleaned_data.get('account_input')
-            account_id = form1.cleaned_data.get('account_select')
+            account_number = form1.cleaned_data.get("account_input")
+            account_id = form1.cleaned_data.get("account_select")
 
-            if account_number not in [None, '']:
-                account = Account(number=account_number, account_flat=flat, is_active="Active")
+            if account_number not in [None, ""]:
+                account = Account(
+                    number=account_number, account_flat=flat, is_active="Active"
+                )
                 account.save()
-            elif account_id not in [None, '']:
+            elif account_id not in [None, ""]:
                 account = get_object_or_404(Account, pk=account_id)
                 account.account_flat = flat
                 account.save()
@@ -616,19 +642,21 @@ def flat_update_view(request, pk):
 
         if forms_valid_status:
             flat = form1.save()
-            account_number = form1.cleaned_data.get('account_input')
-            account_id = form1.cleaned_data.get('account_select')
+            account_number = form1.cleaned_data.get("account_input")
+            account_id = form1.cleaned_data.get("account_select")
 
-            if account_number not in [None, '']:
-                if flat.has_related_object('flat_account'):
+            if account_number not in [None, ""]:
+                if flat.has_related_object("flat_account"):
                     old_account = flat.flat_account
                     old_account.account_flat = None
                     old_account.save()
 
-                new_account = Account(number=account_number, account_flat=flat, is_active="Active")
+                new_account = Account(
+                    number=account_number, account_flat=flat, is_active="Active"
+                )
                 new_account.save()
 
-            elif account_id not in [None, '']:
+            elif account_id not in [None, ""]:
                 account = get_object_or_404(Account, pk=account_id)
                 account.account_flat = flat
                 account.save()
@@ -647,7 +675,7 @@ def flat_update_view(request, pk):
         "form1": form1,
     }
 
-    if flat.has_related_object('flat_account'):
+    if flat.has_related_object("flat_account"):
         context.update({"account": flat.flat_account})
     return render(request, "admin_panel/pages/flat_update.html", context=context)
 
@@ -693,16 +721,15 @@ def api_statistics(request):
         cash_box_income["amount__sum"] - cash_box_expense["amount__sum"]
     )
 
-    queryset = Receipt.objects \
-        .prefetch_related("bill_receipt") \
-        .annotate(total_price=models.Sum("bill_receipt__cost")) \
-        .filter(is_passed=True) \
-        .order_by("-created")
+    queryset = (
+        Receipt.objects.prefetch_related("bill_receipt")
+            .annotate(total_price=models.Sum("bill_receipt__cost"))
+            .filter(is_passed=True)
+            .order_by("-created")
+    )
     transactions = Transaction.objects.select_related(
         "account", "transaction_type"
-    ).filter(
-        is_passed=True, transaction_type__type="INCOME"
-    )
+    ).filter(is_passed=True, transaction_type__type="INCOME")
     balance = 0
     for receipt in queryset:
         balance -= receipt.total_price
@@ -743,13 +770,19 @@ def api_houses(request):
 
 def api_sections(request, pk):
     search = request.GET.get("search", None)
-    sections = (
-        Section.objects.prefetch_related("section_flats")
-            .filter(house=pk, section_flats__isnull=False)
-            .distinct()
-            .order_by("id")
-    )
+    get_all = request.GET.get("all", None)
     results = []
+
+    if get_all == "True":
+        sections = Section.objects.prefetch_related("section_flats") \
+            .filter(house=pk) \
+            .distinct() \
+            .order_by("id")
+    else:
+        sections = Section.objects.prefetch_related("section_flats") \
+            .filter(house=pk, section_flats__isnull=False) \
+            .distinct() \
+            .order_by("id")
 
     if search is not None:
         sections = sections.filter(name__icontains=search)
@@ -981,13 +1014,13 @@ def api_accounts(request):
     flat_id = request.GET.get("flat_id", None)
     results = []
 
-    if user_id not in [None, '']:
+    if user_id not in [None, ""]:
         user = get_object_or_404(User, pk=user_id)
         accounts = Account.objects.select_related("account_flat__owner").filter(
             account_flat__owner=user
         )
 
-    elif flat_id not in [None, '']:
+    elif flat_id not in [None, ""]:
         flat = get_object_or_404(Flat, pk=flat_id)
         accounts = Account.objects.select_related("account_flat__owner").filter(
             account_flat=flat
@@ -1356,8 +1389,8 @@ def system_staff_invite(request, pk):
     Message(
         title="Просьба зайти в ЖЭК",
         created_by=request.user,
-        description='Просьба зайти в ЖЭК',
-        personal_for=get_object_or_404(User, pk=pk)
+        description="Просьба зайти в ЖЭК",
+        personal_for=get_object_or_404(User, pk=pk),
     ).save()
     return redirect(reverse("admin_panel:system_staff_list"))
 
@@ -1587,14 +1620,19 @@ def message_create_view(request):
 
 @method_decorator(user_passes_test(account_access), name="dispatch")
 class AccountListView(ListView):
-    queryset = Account.objects.select_related(
-        "account_flat",
-        "account_flat__house",
-        "account_flat__owner",
-        "account_flat__section",
-    ).prefetch_related("receipt_account").annotate(
-        expense=models.Sum("receipt_account__bill_receipt__cost"),
-    ).order_by("-id")
+    queryset = (
+        Account.objects.select_related(
+            "account_flat",
+            "account_flat__house",
+            "account_flat__owner",
+            "account_flat__section",
+        )
+            .prefetch_related("receipt_account")
+            .annotate(
+            expense=models.Sum("receipt_account__bill_receipt__cost"),
+        )
+            .order_by("-id")
+    )
     template_name = "admin_panel/pages/account_list.html"
 
 
@@ -1724,28 +1762,44 @@ class TransactionListView(ListView):
     def get_queryset(self):
         account_id = self.request.GET.get("account_id", None)
         if account_id is not None:
-            queryset = Transaction.objects.select_related(
-                "account__account_flat__owner", "receipt", "transaction_type", "created_by") \
-                .order_by("-created").filter(account__id=account_id)
+            queryset = (
+                Transaction.objects.select_related(
+                    "account__account_flat__owner",
+                    "receipt",
+                    "transaction_type",
+                    "created_by",
+                )
+                    .order_by("-created")
+                    .filter(account__id=account_id)
+            )
         else:
             queryset = Transaction.objects.select_related(
-                "account__account_flat__owner", "receipt", "transaction_type", "created_by").order_by("-created")
+                "account__account_flat__owner",
+                "receipt",
+                "transaction_type",
+                "created_by",
+            ).order_by("-created")
         return queryset
 
 
 @method_decorator(user_passes_test(cashbox_access), name="dispatch")
 class TransactionDetailView(DetailView):
     template_name = "admin_panel/pages/transaction_detail.html"
-    queryset = Transaction.objects.select_related('created_by', 'account', 'manager')
+    queryset = Transaction.objects.select_related("created_by", "account", "manager")
 
 
 @user_passes_test(cashbox_access)
 def transaction_income_create_view(request):
     transaction_id = request.GET.get("transaction_id", None)
     account_id = request.GET.get("account_id", None)
-    number = generate_random_number_for_model_field(model=Transaction, field="number", length=8)
-    form1 = TransactionIncomeCreateForm(request.POST or None, prefix="form1",
-                                        initial={'number': number, 'created': today()})
+    number = generate_random_number_for_model_field(
+        model=Transaction, field="number", length=8
+    )
+    form1 = TransactionIncomeCreateForm(
+        request.POST or None,
+        prefix="form1",
+        initial={"number": number, "created": today()},
+    )
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
@@ -1774,8 +1828,11 @@ def transaction_income_create_view(request):
             "description": obj.description,
         }
     elif account_id is not None:
-        obj = Account.objects.filter(pk=account_id) \
-            .select_related('account_flat__owner').last()
+        obj = (
+            Account.objects.filter(pk=account_id)
+                .select_related("account_flat__owner")
+                .last()
+        )
 
         form1.initial = {
             "created_by": obj.account_flat.owner,
@@ -1797,8 +1854,12 @@ def transaction_income_create_view(request):
 @user_passes_test(cashbox_access)
 def transaction_expense_create_view(request):
     transaction_id = request.GET.get("transaction_id", None)
-    number = generate_random_number_for_model_field(model=Transaction, field="number", length=8)
-    form1 = TransactionExpenseCreateForm(request.POST or None, initial={'number': number}, prefix="form1")
+    number = generate_random_number_for_model_field(
+        model=Transaction, field="number", length=8
+    )
+    form1 = TransactionExpenseCreateForm(
+        request.POST or None, initial={"number": number}, prefix="form1"
+    )
 
     if request.method == "POST":
         forms_valid_status = validate_forms(form1)
@@ -1882,9 +1943,13 @@ def transaction_detail_xls(request, pk):
     columns = []
     cell_format, output, workbook, worksheet = make_in_memory_worksheet(columns)
 
-    obj = Transaction.objects.filter(pk=pk).select_related(
-        "account__account_flat__owner", "receipt", "transaction_type", "created_by"
-    ).last()
+    obj = (
+        Transaction.objects.filter(pk=pk)
+            .select_related(
+            "account__account_flat__owner", "receipt", "transaction_type", "created_by"
+        )
+            .last()
+    )
 
     transaction_type = "Приход" if obj.transaction_type.type == "INCOME" else "Расход"
     status = "Проведена" if obj.is_passed is True else "Не проведена"
@@ -1904,8 +1969,8 @@ def transaction_detail_xls(request, pk):
         {"row_name": "Менеджер", "row_data": f"{obj.manager.full_name}"},
     ]
     for row in range(len(data)):
-        worksheet.write(row, 0, data[row]['row_name'], cell_format)
-        worksheet.write(row, 1, data[row]['row_data'], cell_format)
+        worksheet.write(row, 0, data[row]["row_name"], cell_format)
+        worksheet.write(row, 1, data[row]["row_data"], cell_format)
 
     workbook.close()
     output.seek(0)
@@ -2081,17 +2146,20 @@ class ReceiptListView(ListView):
     def get_queryset(self):
         account_id = self.request.GET.get("account_id", None)
         if account_id is not None:
-            queryset = Receipt.objects.filter(account__id=account_id) \
-                .select_related("account__account_flat__owner") \
-                .prefetch_related("bill_receipt") \
-                .annotate(total_price=models.Sum("bill_receipt__cost")) \
-                .order_by("-created")
+            queryset = (
+                Receipt.objects.filter(account__id=account_id)
+                    .select_related("account__account_flat__owner")
+                    .prefetch_related("bill_receipt")
+                    .annotate(total_price=models.Sum("bill_receipt__cost"))
+                    .order_by("-created")
+            )
         else:
-            queryset = Receipt.objects\
-                .select_related("account__account_flat__owner") \
-                .prefetch_related("bill_receipt") \
-                .annotate(total_price=models.Sum("bill_receipt__cost")) \
-                .order_by("-created")
+            queryset = (
+                Receipt.objects.select_related("account__account_flat__owner")
+                    .prefetch_related("bill_receipt")
+                    .annotate(total_price=models.Sum("bill_receipt__cost"))
+                    .order_by("-created")
+            )
         return queryset
 
 

@@ -61,14 +61,18 @@ def get_flats(user):
 
 @register.filter(name="get_account_balance")
 def get_account_balance(value):
-    receipts = Receipt.objects\
-        .prefetch_related("bill_receipt") \
-        .annotate(total_price=models.Sum("bill_receipt__cost")) \
-        .filter(account__account_flat__id=value, is_passed=True) \
+    receipts = (
+        Receipt.objects.prefetch_related("bill_receipt")
+        .annotate(total_price=models.Sum("bill_receipt__cost"))
+        .filter(account__account_flat__id=value, is_passed=True)
         .order_by("-created")
+    )
 
-    transactions = Transaction.objects.select_related("account", "transaction_type") \
-        .filter(account__account_flat__id=value, is_passed=True, transaction_type__type="INCOME")
+    transactions = Transaction.objects.select_related(
+        "account", "transaction_type"
+    ).filter(
+        account__account_flat__id=value, is_passed=True, transaction_type__type="INCOME"
+    )
 
     balance = 0
     for receipt in receipts:

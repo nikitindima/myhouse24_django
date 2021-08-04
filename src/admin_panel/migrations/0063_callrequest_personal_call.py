@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_panel', '0062_alter_callrequest_flat'),
+        ("admin_panel", "0062_alter_callrequest_flat"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='callrequest',
-            name='personal_call',
+            model_name="callrequest",
+            name="personal_call",
             field=models.BooleanField(blank=True, null=True),
         ),
     ]

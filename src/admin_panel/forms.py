@@ -581,19 +581,21 @@ class FlatCreateForm(FlatForm):
     account_input = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label="Лицевой счет - Создать новый"
+        label="Лицевой счет - Создать новый",
     )
     account_select = forms.CharField(
         required=False,
-        widget=forms.Select(attrs={"class": "form-control", "placeholder": "Или выберите существующий"}),
-        label="Лицевой счет - Выбрать существующий"
+        widget=forms.Select(
+            attrs={"class": "form-control", "placeholder": "Или выберите существующий"}
+        ),
+        label="Лицевой счет - Выбрать существующий",
     )
 
     class Meta(FlatForm.Meta):
         model = Flat
 
     def clean_account_input(self):
-        account_number = self.cleaned_data.get('account_input')
+        account_number = self.cleaned_data.get("account_input")
 
         if account_number != "":
             account = Account.objects.filter(number=account_number)
@@ -603,12 +605,14 @@ class FlatCreateForm(FlatForm):
         return account_number
 
     def clean_account_select(self):
-        account_select = self.cleaned_data.get('account_select')
-        account_number = self.cleaned_data.get('account_input')
+        account_select = self.cleaned_data.get("account_select")
+        account_number = self.cleaned_data.get("account_input")
 
         if account_select != "" and account_number != "":
-            raise forms.ValidationError("Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
-                                        "существующего.")
+            raise forms.ValidationError(
+                "Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
+                "существующего."
+            )
 
         if account_select != "":
             account = Account.objects.filter(pk=account_select)
@@ -622,19 +626,21 @@ class FlatUpdateForm(FlatForm):
     account_input = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={"class": "form-control"}),
-        label="Лицевой счет - Создать новый"
+        label="Лицевой счет - Создать новый",
     )
     account_select = forms.CharField(
         required=False,
-        widget=forms.Select(attrs={"class": "form-control", "placeholder": "Или выберите существующий"}),
-        label="Лицевой счет - Выбрать существующий"
+        widget=forms.Select(
+            attrs={"class": "form-control", "placeholder": "Или выберите существующий"}
+        ),
+        label="Лицевой счет - Выбрать существующий",
     )
 
     class Meta(FlatForm.Meta):
         model = Flat
 
     def clean_account_input(self):
-        account_number = self.cleaned_data.get('account_input')
+        account_number = self.cleaned_data.get("account_input")
 
         if account_number != "":
             account = Account.objects.filter(number=account_number)
@@ -644,14 +650,17 @@ class FlatUpdateForm(FlatForm):
         return account_number
 
     def clean_account_select(self):
-        account_select = self.cleaned_data.get('account_select')
-        account_number = self.cleaned_data.get('account_input')
+        account_select = self.cleaned_data.get("account_select")
+        account_number = self.cleaned_data.get("account_input")
 
         if account_select != "" and account_number != "":
-            raise forms.ValidationError("Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
-                                        "существующего.")
+            raise forms.ValidationError(
+                "Вы должны выбрать что-то одно. Либо создание нового счета, либо выбор уже "
+                "существующего."
+            )
 
         return account_select
+
 
 # endregion FLAT
 # endregion PROPERTY
@@ -1105,13 +1114,14 @@ class UserRoleForm(ModelForm):
 
     def save(self, commit=True):
         old_instance = self.instance
-        if old_instance.name == 'Директор':
+        if old_instance.name == "Директор":
             return old_instance
 
         new_instance = super().save(commit=False)
         if commit:
             new_instance.save()
         return new_instance
+
 
 # endregion USER
 
