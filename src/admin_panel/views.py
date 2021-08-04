@@ -2167,7 +2167,7 @@ class ReceiptListView(ListView):
 def receipt_create_view(request):
     receipt_id = request.GET.get("receipt_id", None)
     account_id = request.GET.get("account_id", None)
-    receipt, owner = None, None
+    receipt, owner, account = None, None, None
 
     number = generate_random_number_for_model_field(
         model=Receipt, field="number", length=8
