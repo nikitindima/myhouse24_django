@@ -723,9 +723,19 @@ def api_statistics(request):
     cash_box_expense = cash_box.filter(transaction_type__type="EXPENSE").aggregate(
         Sum("amount")
     )
-    cash_box_balance = "{:,}".format(
-        cash_box_income["amount__sum"] - cash_box_expense["amount__sum"]
-    )
+    income = cash_box_income["amount__sum"]
+    expense = cash_box_expense["amount__sum"]
+
+    if income is not None and expense is not None:
+        cash_box_balance = "{:,}".format(
+            income - expense
+        )
+    elif expense is not None:
+        cash_box_balance = "{:,}".format(0.00 - expense)
+    elif income is not None:
+        cash_box_balance = "{:,}".format(income)
+    else:
+        cash_box_balance = "{:,}".format(0.00)
 
     queryset = (
         Receipt.objects.prefetch_related("bill_receipt")
